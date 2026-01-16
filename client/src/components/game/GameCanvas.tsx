@@ -174,35 +174,73 @@ export function GameCanvas() {
       obs.x -= obs.speed;
 
       // Draw
-      ctx.beginPath();
+      ctx.save();
       if (obs.type === 'planet') {
-        const gradient = ctx.createRadialGradient(obs.x - 5, obs.y - 5, 2, obs.x, obs.y, obs.size);
+        // More interesting planet
+        const gradient = ctx.createRadialGradient(obs.x - obs.size/3, obs.y - obs.size/3, obs.size/10, obs.x, obs.y, obs.size);
         gradient.addColorStop(0, '#818cf8');
-        gradient.addColorStop(1, '#4f46e5');
+        gradient.addColorStop(0.6, '#4f46e5');
+        gradient.addColorStop(1, '#312e81');
+        
+        ctx.shadowBlur = 15;
+        ctx.shadowColor = 'rgba(79, 70, 229, 0.4)';
+        
+        ctx.beginPath();
         ctx.fillStyle = gradient;
         ctx.arc(obs.x, obs.y, obs.size, 0, Math.PI * 2);
+        ctx.fill();
+        
+        // Planet Rings
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.ellipse(obs.x, obs.y, obs.size * 1.5, obs.size * 0.4, Math.PI / 4, 0, Math.PI * 2);
+        ctx.stroke();
       } else if (obs.type === 'asteroid') {
-        ctx.fillStyle = '#64748b';
-        // Rough shape
-        ctx.moveTo(obs.x - obs.size, obs.y);
-        ctx.lineTo(obs.x - obs.size/2, obs.y - obs.size);
-        ctx.lineTo(obs.x + obs.size/2, obs.y - obs.size);
-        ctx.lineTo(obs.x + obs.size, obs.y);
-        ctx.lineTo(obs.x + obs.size/2, obs.y + obs.size);
-        ctx.lineTo(obs.x - obs.size/2, obs.y + obs.size);
+        // Detailed Asteroid
+        ctx.fillStyle = '#475569';
+        ctx.strokeStyle = '#1e293b';
+        ctx.lineWidth = 1;
+        
+        ctx.beginPath();
+        const sides = 8;
+        for (let i = 0; i < sides; i++) {
+          const angle = (i / sides) * Math.PI * 2;
+          const variance = obs.size * 0.3;
+          const r = obs.size + (Math.sin(angle * 3 + obs.x / 10) * variance);
+          const px = obs.x + Math.cos(angle) * r;
+          const py = obs.y + Math.sin(angle) * r;
+          if (i === 0) ctx.moveTo(px, py);
+          else ctx.lineTo(px, py);
+        }
         ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+        
+        // Craters
+        ctx.fillStyle = 'rgba(0,0,0,0.2)';
+        [0.3, 0.7, 1.2].forEach((offset, i) => {
+          ctx.beginPath();
+          ctx.arc(obs.x + Math.cos(i) * 5, obs.y + Math.sin(i) * 5, obs.size/4, 0, Math.PI * 2);
+          ctx.fill();
+        });
       } else {
-        ctx.fillStyle = '#94a3b8';
+        // Space Stone with glow
+        ctx.shadowBlur = 10;
+        ctx.shadowColor = '#94a3b8';
+        ctx.fillStyle = '#cbd5e1';
+        ctx.beginPath();
         ctx.arc(obs.x, obs.y, obs.size, 0, Math.PI * 2);
+        ctx.fill();
       }
-      ctx.fill();
+      ctx.restore();
 
       // Simple Circle Collision
       const dx = state.player.x - obs.x;
       const dy = state.player.y - obs.y;
       const distance = Math.sqrt(dx * dx + dy * dy);
 
-      if (distance < PLAYER_SIZE/2 + obs.size) {
+      if (distance < PLAYER_SIZE/1.5 + obs.size) {
         stopGame();
         return;
       }
@@ -216,28 +254,56 @@ export function GameCanvas() {
     });
 
     if (state.isPlaying) {
-      // Draw Player (Spaceship)
+      // Draw Player (Detailed Spaceship)
       ctx.save();
       ctx.translate(state.player.x, state.player.y);
       
-      // Engine Glow
-      ctx.shadowBlur = 15;
-      ctx.shadowColor = '#d946ef';
+      // Engine Flame
+      const flameHeight = 15 + Math.random() * 10;
+      const flameGradient = ctx.createLinearGradient(0, 0, -flameHeight, 0);
+      flameGradient.addColorStop(0, '#f472b6');
+      flameGradient.addColorStop(1, 'transparent');
       
-      // Ship Body
-      ctx.fillStyle = '#e2e8f0';
       ctx.beginPath();
-      ctx.moveTo(20, 0);
-      ctx.lineTo(-15, 15);
-      ctx.lineTo(-10, 0);
-      ctx.lineTo(-15, -15);
+      ctx.fillStyle = flameGradient;
+      ctx.moveTo(-10, -5);
+      ctx.lineTo(-10 - flameHeight, 0);
+      ctx.lineTo(-10, 5);
+      ctx.fill();
+
+      // Ship Glow
+      ctx.shadowBlur = 20;
+      ctx.shadowColor = '#818cf8';
+      
+      // Wing Accents
+      ctx.fillStyle = '#4f46e5';
+      ctx.beginPath();
+      ctx.moveTo(-5, -15);
+      ctx.lineTo(10, -5);
+      ctx.lineTo(10, 5);
+      ctx.lineTo(-5, 15);
+      ctx.fill();
+
+      // Ship Body
+      ctx.fillStyle = '#f8fafc';
+      ctx.beginPath();
+      ctx.moveTo(25, 0); // Nose
+      ctx.lineTo(-10, 12);
+      ctx.lineTo(-5, 0);
+      ctx.lineTo(-10, -12);
       ctx.closePath();
       ctx.fill();
       
-      // Cockpit
+      // Cockpit Glass
       ctx.fillStyle = '#0ea5e9';
       ctx.beginPath();
-      ctx.ellipse(0, 0, 8, 4, 0, 0, Math.PI * 2);
+      ctx.ellipse(8, 0, 10, 4, 0, 0, Math.PI * 2);
+      ctx.fill();
+      
+      // Cockpit Reflection
+      ctx.fillStyle = 'rgba(255,255,255,0.4)';
+      ctx.beginPath();
+      ctx.ellipse(10, -1, 4, 1, 0, 0, Math.PI * 2);
       ctx.fill();
       
       ctx.restore();

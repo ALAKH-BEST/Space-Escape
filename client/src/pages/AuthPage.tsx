@@ -85,6 +85,11 @@ export default function AuthPage() {
               />
             )}
           </CardContent>
+          <CardFooter className="justify-center border-t border-white/5 pt-4 pb-4">
+            <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-[0.2em]">
+              Made by Alakh
+            </p>
+          </CardFooter>
         </Card>
       </motion.div>
     </div>
