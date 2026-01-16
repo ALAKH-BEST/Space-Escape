@@ -22,9 +22,9 @@ export function GameCanvas() {
 
   // Game Constants
   const PLAYER_SIZE = 30;
-  const OBSTACLE_SPEED = 4;
-  const SPAWN_RATE = 1000; // ms
-  const PLAYER_SPEED = 5;
+  const OBSTACLE_SPEED = 3.5;
+  const SPAWN_RATE = 1500; // ms
+  const PLAYER_SPEED = 5.5;
 
   // Refs for game loop state (avoiding react re-renders inside loop)
   const gameStateRef = useRef({
@@ -149,7 +149,7 @@ export function GameCanvas() {
     });
 
     // Spawn Obstacles
-    if (timestamp - state.lastSpawn > SPAWN_RATE - (state.score * 2)) { // Gets harder
+    if (timestamp - state.lastSpawn > SPAWN_RATE - Math.min(700, state.score * 0.5)) { // Capped difficulty
       const types: ('planet' | 'asteroid' | 'stone')[] = ['planet', 'asteroid', 'stone'];
       const type = types[Math.floor(Math.random() * types.length)];
       let size = 10;
