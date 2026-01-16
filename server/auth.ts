@@ -6,9 +6,9 @@ import { scrypt, randomBytes, timingSafeEqual } from "crypto";
 import { promisify } from "util";
 import { storage } from "./storage";
 import { User as SelectUser } from "@shared/schema";
-import { createRequire } from "module";
+import MemoryStoreFactory from "memorystore";
 
-const require = createRequire(import.meta.url);
+const MemoryStore = MemoryStoreFactory(session);
 
 declare global {
   namespace Express {
@@ -36,7 +36,7 @@ export function setupAuth(app: Express) {
     secret: process.env.SESSION_SECRET || "secret_key",
     resave: false,
     saveUninitialized: false,
-    store: new (require("memorystore")(session))({
+    store: new MemoryStore({
       checkPeriod: 86400000,
     }),
   };
