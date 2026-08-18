@@ -10,6 +10,7 @@ import AuthPage from "@/pages/AuthPage";
 import GamePage from "@/pages/GamePage";
 import LeaderboardPage from "@/pages/LeaderboardPage";
 import NotFound from "@/pages/not-found";
+import GoogleAnalytics from "@/components/GoogleAnalytics";
 
 function ProtectedRoute({ component: Component }: { component: React.ComponentType }) {
   const { data: user, isLoading } = useUser();
@@ -48,6 +49,7 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
+        <GoogleAnalytics />
         <Router />
         <Toaster />
       </TooltipProvider>
