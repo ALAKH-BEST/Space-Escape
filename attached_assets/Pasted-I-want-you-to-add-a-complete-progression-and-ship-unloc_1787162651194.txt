@@ -1,0 +1,266 @@
+I want you to add a complete progression and ship-unlocking system to my existing ASTRODODGE game.
+
+IMPORTANT:
+
+* Do NOT rebuild the game from scratch.
+* Do NOT remove or break any existing functionality.
+* Preserve the current visual style, gameplay, leaderboard, navigation, scoring, and existing ship.
+* Integrate the new features cleanly into the existing codebase.
+* Before making changes, inspect the existing project structure and understand how the current game, scoring, player data, and navigation work.
+
+## 1. GEM / CURRENCY SYSTEM
+
+Add a new in-game currency called GEMS.
+
+Players should earn gems at the end of every completed/failed run based on their score.
+
+Use a simple formula initially:
+Gems earned = floor(score / 10)
+
+Examples:
+
+* Score 100 → 10 gems
+* Score 500 → 50 gems
+* Score 1,247 → 124 gems
+
+Show the gems earned on the game-over/results screen.
+
+Example:
+
+MISSION TERMINATED
+
+SCORE: 1,247
+SECTOR: 11
+
+GEMS EARNED: +124 💎
+TOTAL GEMS: 1,863 💎
+
+[ PLAY AGAIN ] [ RETURN TO HANGAR ]
+
+The player's gem balance must persist between sessions using the existing persistence/database system if one already exists. If the project currently has no suitable persistence system, implement a reliable solution appropriate for the existing architecture.
+
+Prevent players from losing their existing gems when they reload the page.
+
+## 2. HANGAR SECTION
+
+Add a new HANGAR item to the main navigation.
+
+Current navigation includes PLAY and LEADERBOARD. Add:
+
+PLAY | HANGAR | LEADERBOARD
+
+The Hangar should feel like a futuristic spacecraft bay rather than a generic online store.
+
+At the top display:
+
+HANGAR
+GEM BALANCE: 💎 1,863
+
+Create attractive ship cards for all available ships.
+
+## 3. SHIPS
+
+Keep Vanguard V1 as the default starting ship and make sure it remains free and owned by the player.
+
+Add these additional ships:
+
+### VANGUARD V1
+
+Price: FREE
+Role: Balanced starter ship
+Speed: 3/5
+Handling: 4/5
+Shield: 2/5
+Ability: None
+Status: OWNED
+
+### PHANTOM X
+
+Price: 1,000 GEMS
+Role: Speed / agility
+Speed: 5/5
+Handling: 5/5
+Shield: 1/5
+Special Ability: PHASE SHIFT
+Ability: Temporarily become invulnerable to asteroid collisions.
+
+### TITAN MK II
+
+Price: 2,500 GEMS
+Role: Tank / survival
+Speed: 2/5
+Handling: 2/5
+Shield: 5/5
+Special Ability: FORTRESS
+Ability: Absorb up to 3 asteroid collisions before being destroyed.
+
+### NOVA
+
+Price: 5,000 GEMS
+Role: High-risk / high-reward
+Speed: 4/5
+Handling: 4/5
+Shield: 3/5
+Special Ability: OVERDRIVE
+Ability: Temporarily increases movement speed and score multiplier.
+
+These stats should actually affect gameplay. Do not make the ships purely cosmetic.
+
+## 4. HANGAR INTERACTION
+
+Each ship card should show:
+
+* Ship name
+* Ship visual/icon
+* Price
+* Stats
+* Special ability
+* Current status
+
+Possible states:
+
+OWNED
+EQUIPPED
+LOCKED
+PURCHASE
+
+When the player has enough gems:
+
+[PURCHASE]
+
+After purchasing:
+
+[OWNED] [EQUIP]
+
+The player must be able to equip any owned ship.
+
+Only one ship can be equipped at a time.
+
+The equipped ship should be used in the actual gameplay.
+
+## 5. SHIP VISUALS
+
+Keep the existing Vanguard V1 visual.
+
+Create distinct visual designs for the other ships while maintaining the existing ASTRODODGE sci-fi aesthetic.
+
+Do not use random unrelated images.
+
+Prefer CSS/SVG/canvas-based visuals or the existing rendering approach used by the game so the ships remain consistent with the current game.
+
+Each ship should feel noticeably different.
+
+## 6. GAMEPLAY INTEGRATION
+
+The selected ship must affect the actual gameplay.
+
+For example:
+
+* Phantom X → faster movement / better handling
+* Titan MK II → collision protection
+* Nova → temporary overdrive and score multiplier
+* Vanguard V1 → balanced default statistics
+
+Make sure the abilities are clearly communicated to the player.
+
+If an ability has a cooldown or limited duration, show an ability indicator during gameplay.
+
+Example:
+
+PHASE SHIFT
+READY
+
+or
+
+OVERDRIVE
+READY
+
+When activated:
+
+OVERDRIVE
+ACTIVE — 3.2s
+
+Use intuitive controls that fit the existing game.
+
+Do not make the new abilities activate accidentally.
+
+## 7. GAME-OVER SCREEN
+
+Improve the existing game-over/results screen so it clearly shows:
+
+FINAL SCORE
+SECTOR REACHED
+SURVIVAL TIME
+GEMS EARNED
+TOTAL GEMS
+
+Also include:
+
+[ PLAY AGAIN ]
+[ HANGAR ]
+[ LEADERBOARD ]
+
+The player should immediately understand that their score converted into gems.
+
+## 8. UI / DESIGN
+
+Everything must match the existing ASTRODODGE design.
+
+Maintain:
+
+* Dark space background
+* Purple/neon futuristic accents
+* Sci-fi typography
+* Glowing borders
+* Subtle animations
+* Existing navigation style
+* Existing Commander/profile styling
+
+Do NOT introduce a completely different design language.
+
+Add subtle animations when:
+
+* purchasing a ship
+* equipping a ship
+* earning gems
+* hovering over ships
+* activating abilities
+
+Keep the UI responsive for desktop and mobile.
+
+## 9. DATA / SECURITY
+
+Make sure purchases cannot accidentally happen twice.
+
+A purchased ship must remain owned after refreshing the page.
+
+The gem balance and owned/equipped ships must persist.
+
+Do not allow the client to simply award unlimited gems through an easily exploitable UI action if the current architecture supports server-side validation.
+
+Do not reset existing player/leaderboard data.
+
+## 10. IMPORTANT IMPLEMENTATION RULE
+
+First inspect the existing ASTRODODGE codebase.
+
+Identify:
+
+* How the current player state works
+* How score is calculated
+* How the game loop works
+* How collisions work
+* How the current ship is rendered
+* How navigation/routes/pages work
+* How the leaderboard is stored
+* Whether user/player data already persists
+
+Then implement the system using the existing architecture instead of creating unnecessary duplicate systems.
+
+After implementation, test the complete flow:
+
+PLAY → FINISH GAME → RECEIVE GEMS → OPEN HANGAR → PURCHASE SHIP → EQUIP SHIP → PLAY WITH NEW SHIP → EARN MORE GEMS
+
+Make sure the existing game still works exactly as before if the player continues using Vanguard V1.
+
+Do not stop after creating the UI. The gem economy, purchasing, persistence, equipping, ship stats, and abilities must actually function.

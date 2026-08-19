@@ -1,4 +1,4 @@
-import { pgTable, text, serial, integer } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, sql } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -6,12 +6,16 @@ export const users = pgTable("users", {
   id: serial("id").primaryKey(),
   username: text("username").notNull().unique(),
   password: text("password").notNull(),
+  gems: integer("gems").notNull().default(0),
+  ownedShips: text("owned_ships").array().notNull().default(sql`ARRAY['vanguard']::text[]`),
+  equippedShip: text("equipped_ship").notNull().default("vanguard"),
 });
 
 export const scores = pgTable("scores", {
   id: serial("id").primaryKey(),
   userId: integer("user_id").notNull().references(() => users.id),
   score: integer("score").notNull(),
+  runId: text("run_id"),
 });
 
 export const insertUserSchema = createInsertSchema(users).pick({

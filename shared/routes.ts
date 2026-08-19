@@ -1,6 +1,8 @@
 import { z } from "zod";
 import { insertUserSchema, insertScoreSchema, users, scores } from "./schema";
 
+const shipIdSchema = z.enum(["vanguard", "phantom", "titan", "nova"]);
+
 export const api = {
   auth: {
     register: {
@@ -54,9 +56,56 @@ export const api = {
     create: {
       method: "POST" as const,
       path: "/api/scores",
-      input: insertScoreSchema,
+      input: insertScoreSchema.extend({ runId: z.string().uuid() }),
       responses: {
-        201: z.custom<typeof scores.$inferSelect>(),
+        201: z.object({
+          score: z.custom<typeof scores.$inferSelect>(),
+          gemsEarned: z.number(),
+          totalGems: z.number(),
+          duplicate: z.boolean(),
+        }),
+        401: z.void(),
+      },
+    },
+  },
+  progression: {
+    get: {
+      method: "GET" as const,
+      path: "/api/progression",
+      responses: {
+        200: z.object({
+          gems: z.number(),
+          ownedShips: z.array(shipIdSchema),
+          equippedShip: shipIdSchema,
+        }),
+        401: z.void(),
+      },
+    },
+    purchase: {
+      method: "POST" as const,
+      path: "/api/progression/purchase",
+      input: z.object({ shipId: shipIdSchema }),
+      responses: {
+        200: z.object({
+          gems: z.number(),
+          ownedShips: z.array(shipIdSchema),
+          equippedShip: shipIdSchema,
+        }),
+        400: z.object({ message: z.string() }),
+        401: z.void(),
+      },
+    },
+    equip: {
+      method: "POST" as const,
+      path: "/api/progression/equip",
+      input: z.object({ shipId: shipIdSchema }),
+      responses: {
+        200: z.object({
+          gems: z.number(),
+          ownedShips: z.array(shipIdSchema),
+          equippedShip: shipIdSchema,
+        }),
+        400: z.object({ message: z.string() }),
         401: z.void(),
       },
     },
