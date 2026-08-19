@@ -9,6 +9,7 @@ import { Loader2 } from "lucide-react";
 import AuthPage from "@/pages/AuthPage";
 import GamePage from "@/pages/GamePage";
 import LeaderboardPage from "@/pages/LeaderboardPage";
+import HangarPage from "@/pages/HangarPage";
 import NotFound from "@/pages/not-found";
 import GoogleAnalytics from "@/components/GoogleAnalytics";
 
@@ -39,6 +40,9 @@ function Router() {
       </Route>
       <Route path="/leaderboard">
         <ProtectedRoute component={LeaderboardPage} />
+      </Route>
+      <Route path="/hangar">
+        <ProtectedRoute component={HangarPage} />
       </Route>
       <Route component={NotFound} />
     </Switch>

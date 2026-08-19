@@ -1,11 +1,13 @@
 import { ReactNode } from "react";
 import { Link, useLocation } from "wouter";
 import { useUser, useLogout } from "@/hooks/use-auth";
+import { useProgression } from "@/hooks/use-progression";
 import { Button } from "@/components/ui/button";
-import { Rocket, Trophy, LogOut } from "lucide-react";
+import { Gem, Rocket, LogOut } from "lucide-react";
 
 export function GameLayout({ children }: { children: ReactNode }) {
   const { data: user } = useUser();
+  const { data: progression } = useProgression();
   const { mutate: logout } = useLogout();
   const [location] = useLocation();
 
@@ -29,16 +31,23 @@ export function GameLayout({ children }: { children: ReactNode }) {
 
             {user && (
               <div className="flex items-center gap-4">
-                <div className="hidden md:flex items-center gap-6 mr-4">
-                  <Link href="/game" className={`text-sm font-medium transition-colors hover:text-primary ${location === '/game' ? 'text-primary' : 'text-muted-foreground'}`}>
+                <div className="flex items-center gap-3 sm:gap-6 mr-2 sm:mr-4">
+                  <Link href="/game" className={`text-xs sm:text-sm font-medium transition-colors hover:text-primary ${location === '/game' ? 'text-primary' : 'text-muted-foreground'}`}>
                     PLAY
                   </Link>
-                  <Link href="/leaderboard" className={`text-sm font-medium transition-colors hover:text-primary ${location === '/leaderboard' ? 'text-primary' : 'text-muted-foreground'}`}>
+                  <Link href="/hangar" className={`text-xs sm:text-sm font-medium transition-colors hover:text-primary ${location === '/hangar' ? 'text-primary' : 'text-muted-foreground'}`}>
+                    HANGAR
+                  </Link>
+                  <Link href="/leaderboard" className={`text-xs sm:text-sm font-medium transition-colors hover:text-primary ${location === '/leaderboard' ? 'text-primary' : 'text-muted-foreground'}`}>
                     LEADERBOARD
                   </Link>
                 </div>
 
                 <div className="flex items-center gap-3 pl-4 border-l border-white/10">
+                  <div className="hidden sm:flex items-center gap-1.5 text-sm font-mono text-cyan-300" title="Gem balance">
+                    <Gem className="h-4 w-4" />
+                    {(progression?.gems ?? user?.gems ?? 0).toLocaleString()}
+                  </div>
                   <span className="hidden sm:block text-sm font-mono text-muted-foreground">
                     CMDR. {user.username.toUpperCase()}
                   </span>

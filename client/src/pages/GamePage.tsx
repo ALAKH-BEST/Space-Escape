@@ -5,9 +5,13 @@ import { Card } from "@/components/ui/card";
 import { Info, Play, Rocket, Trophy, Target } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
+import { useProgression } from "@/hooks/use-progression";
+import { ships } from "@shared/ships";
 
 export default function GamePage() {
   const [showGame, setShowGame] = useState(false);
+  const { data: progression } = useProgression();
+  const currentShip = ships[progression?.equippedShip ?? "vanguard"];
 
   return (
     <GameLayout>
@@ -55,7 +59,7 @@ export default function GamePage() {
                 <div className="p-4 rounded-xl bg-white/5 border border-white/10 backdrop-blur">
                   <Rocket className="w-6 h-6 text-primary mx-auto mb-2" />
                   <div className="text-[10px] font-mono text-muted-foreground uppercase">Ship</div>
-                  <div className="text-sm font-bold text-white">Vanguard V1</div>
+                  <div className="text-sm font-bold text-white">{currentShip.name}</div>
                 </div>
                 <div className="p-4 rounded-xl bg-white/5 border border-white/10 backdrop-blur">
                   <Trophy className="w-6 h-6 text-yellow-500 mx-auto mb-2" />
@@ -99,7 +103,7 @@ export default function GamePage() {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <StatsCard label="CURRENT RANK" value="CADET" delay={0} />
                 <StatsCard label="BEST SCORE" value="---" delay={100} />
-                <StatsCard label="SHIP STATUS" value="OPERATIONAL" delay={200} />
+                <StatsCard label="SHIP STATUS" value={`${currentShip.name} · OPERATIONAL`} delay={200} />
               </div>
               
               <div className="text-center">

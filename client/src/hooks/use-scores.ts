@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { api, type InsertScore } from "@shared/routes";
+import { api } from "@shared/routes";
+import type { InsertScore } from "@shared/schema";
 import { useToast } from "@/hooks/use-toast";
 
 export function useScores() {
@@ -19,7 +20,7 @@ export function useSubmitScore() {
   const { toast } = useToast();
 
   return useMutation({
-    mutationFn: async (data: InsertScore) => {
+    mutationFn: async (data: InsertScore & { runId: string }) => {
       const res = await fetch(api.scores.create.path, {
         method: api.scores.create.method,
         headers: { "Content-Type": "application/json" },
@@ -27,7 +28,7 @@ export function useSubmitScore() {
       });
 
       if (!res.ok) throw new Error("Failed to submit score");
-      return await res.json();
+      return api.scores.create.responses[201].parse(await res.json());
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/scores"] });
@@ -45,3 +46,5 @@ export function useSubmitScore() {
     },
   });
 }
+
+export type ScoreResult = ReturnType<typeof api.scores.create.responses[201]["parse"]>;

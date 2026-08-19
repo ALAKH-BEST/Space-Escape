@@ -86,6 +86,7 @@ export class DatabaseStorage implements IStorage {
         id: scores.id,
         score: scores.score,
         userId: scores.userId,
+        runId: scores.runId,
         username: users.username,
       })
       .from(scores)
