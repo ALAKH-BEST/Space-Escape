@@ -1,0 +1,121 @@
+## Add About & Privacy Policy Pages to ASTRODODGE
+
+Add two new pages to the existing ASTRODODGE website:
+
+1. **About**
+2. **Privacy Policy**
+
+### Footer placement
+
+Add a professional footer at the very bottom of the main website, using the existing ASTRODODGE visual style.
+
+The footer should contain:
+
+* ASTRODODGE logo/name
+* A short tagline: **"Survive. Adapt. Escape."**
+* Links:
+
+  * About
+  * Privacy Policy
+  * Terms of Service
+* Copyright: **© 2026 ASTRODODGE**
+
+Do not make the footer visually large or distracting. It should feel like part of the existing website.
+
+### About page
+
+Create an `/about` page using the same purple/black futuristic sci-fi design language as the rest of ASTRODODGE.
+
+Content:
+
+**ASTRODODGE**
+
+ASTRODODGE is a fast-paced space survival game where your mission is simple: survive the asteroid field for as long as possible.
+
+Take control of **Vanguard V1**, navigate through increasingly dangerous asteroid fields, and push your score higher with every run.
+
+ASTRODODGE is an independent student game project focused on creating a polished, web-based space survival experience while exploring modern game development and web technologies.
+
+**Your Mission**
+
+Survive the field. Beat your record. Climb the leaderboard.
+
+**Features**
+
+* Space survival gameplay
+* Increasingly difficult asteroid fields
+* Global leaderboard
+* Achievements
+* Unlockable ship cosmetics
+* Power-ups and special events
+
+Add a small "Back to ASTRODODGE" button that returns to the main game.
+
+### Privacy Policy page
+
+Create a `/privacy` page with the same visual design.
+
+Use this content:
+
+**Privacy Policy**
+
+**Last updated: August 20, 2026**
+
+ASTRODODGE respects your privacy. This Privacy Policy explains what information may be collected when you use the ASTRODODGE website and game.
+
+**Information We Collect**
+
+Depending on the features you use, ASTRODODGE may collect information such as your commander name, game scores, achievements, and account information.
+
+We only collect information that is necessary to provide and improve the game's features.
+
+**How We Use Information**
+
+Information may be used to:
+
+* Provide game functionality
+* Maintain leaderboards
+* Save game progress and achievements
+* Improve the game's performance and user experience
+* Prevent abuse, cheating, and misuse of the service
+
+**Third-Party Services**
+
+ASTRODODGE may use third-party services for hosting, analytics, advertising, authentication, payments, or other functionality. These services may process information according to their own privacy policies.
+
+**Advertising**
+
+If advertising is enabled, third-party advertising providers may use cookies or similar technologies to display and measure advertisements.
+
+**Data Security**
+
+We take reasonable measures to protect information associated with ASTRODODGE. However, no internet service can guarantee complete security.
+
+**Children's Privacy**
+
+ASTRODODGE does not knowingly collect personal information from children without appropriate authorization.
+
+**Changes to This Policy**
+
+This Privacy Policy may be updated as ASTRODODGE develops. Changes will be reflected on this page with an updated date.
+
+**Contact**
+
+For privacy-related questions or requests, contact:
+
+[REPLACE WITH MY CONTACT EMAIL]
+
+### Important implementation requirements
+
+* Do NOT change the existing gameplay.
+* Do NOT change the existing leaderboard functionality.
+* Do NOT change the existing visual identity.
+* Reuse the existing fonts, colors, animations, buttons, cards, backgrounds, and components wherever possible.
+* Make both pages fully responsive on desktop and mobile.
+* Add proper navigation between the pages and the main game.
+* Make sure browser back/forward navigation works correctly.
+* Add appropriate page titles and metadata.
+* Do not add claims about data collection, analytics, cookies, advertising, accounts, or payments that are not actually implemented in the current application.
+* If a section describes a feature that is not currently implemented, phrase it conditionally as "may" rather than claiming it is currently active.
+
+Before finishing, verify that `/about` and `/privacy` both load correctly and that all footer links work.

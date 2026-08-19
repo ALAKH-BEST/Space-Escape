@@ -4,6 +4,7 @@ import { useUser, useLogout } from "@/hooks/use-auth";
 import { useProgression } from "@/hooks/use-progression";
 import { Button } from "@/components/ui/button";
 import { Gem, Rocket, LogOut } from "lucide-react";
+import { PublicFooter } from "@/components/layout/PublicFooter";
 
 export function GameLayout({ children }: { children: ReactNode }) {
   const { data: user } = useUser();
@@ -70,6 +71,7 @@ export function GameLayout({ children }: { children: ReactNode }) {
       <main className="relative z-10 flex-1 container mx-auto px-4 py-8">
         {children}
       </main>
+      <PublicFooter />
     </div>
   );
 }

@@ -25,6 +25,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Loader2, Rocket } from "lucide-react";
 import { motion } from "framer-motion";
+import { PublicFooter } from "@/components/layout/PublicFooter";
 
 export default function AuthPage() {
   const [_, setLocation] = useLocation();
@@ -40,7 +41,8 @@ export default function AuthPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
+    <div className="min-h-screen flex flex-col">
+      <div className="flex-1 flex items-center justify-center p-4 relative overflow-hidden">
       {/* Animated Background Elements */}
       <div className="absolute inset-0 bg-background z-0">
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/20 rounded-full blur-[100px] animate-pulse" />
@@ -92,6 +94,8 @@ export default function AuthPage() {
           </CardFooter>
         </Card>
       </motion.div>
+      </div>
+      <PublicFooter />
     </div>
   );
 }
