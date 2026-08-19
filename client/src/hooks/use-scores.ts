@@ -30,8 +30,17 @@ export function useSubmitScore() {
       if (!res.ok) throw new Error("Failed to submit score");
       return api.scores.create.responses[201].parse(await res.json());
     },
-    onSuccess: () => {
+    onSuccess: (result) => {
       queryClient.invalidateQueries({ queryKey: ["/api/scores"] });
+      queryClient.setQueryData([api.progression.get.path], (progression) =>
+        progression
+          ? { ...progression, gems: result.totalGems }
+          : progression,
+      );
+      queryClient.invalidateQueries({ queryKey: [api.progression.get.path] });
+      queryClient.setQueryData(["/api/user"], (user: any) =>
+        user ? { ...user, gems: result.totalGems } : user,
+      );
       toast({
         title: "Score Uploaded",
         description: "Your achievement has been recorded in the galactic archives.",
