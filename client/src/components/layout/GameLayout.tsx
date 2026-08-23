@@ -13,7 +13,7 @@ export function GameLayout({ children }: { children: ReactNode }) {
   const [location] = useLocation();
 
   return (
-    <div className="min-h-screen flex flex-col bg-[url('/stars-bg.png')] bg-cover bg-center bg-fixed">
+    <div className="min-h-screen flex flex-col bg-cover bg-center bg-fixed">
       {/* Dynamic Background Overlay */}
       <div className="fixed inset-0 bg-background/90 z-0 pointer-events-none" />
 

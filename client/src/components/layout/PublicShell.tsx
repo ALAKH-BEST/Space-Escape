@@ -28,7 +28,7 @@ export function PublicShell({
   }, [title, description]);
 
   return (
-    <div className="min-h-screen flex flex-col bg-[url('/stars-bg.png')] bg-cover bg-center bg-fixed">
+    <div className="min-h-screen flex flex-col bg-cover bg-center bg-fixed">
       <div className="fixed inset-0 bg-background/90 z-0 pointer-events-none" />
       <header className="relative z-10 border-b border-white/10 backdrop-blur-md bg-black/20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">

@@ -2,12 +2,15 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "@shared/routes";
 import type { InsertScore } from "@shared/schema";
 import { useToast } from "@/hooks/use-toast";
+import { apiUrl } from "@/lib/apiBase";
 
 export function useScores() {
   return useQuery({
     queryKey: ["/api/scores"],
     queryFn: async () => {
-      const res = await fetch(api.scores.list.path);
+      const res = await fetch(apiUrl(api.scores.list.path), {
+        credentials: "include",
+      });
       if (!res.ok) throw new Error("Failed to fetch leaderboard");
       const data = await res.json();
       return api.scores.list.responses[200].parse(data);
@@ -21,10 +24,11 @@ export function useSubmitScore() {
 
   return useMutation({
     mutationFn: async (data: InsertScore & { runId: string }) => {
-      const res = await fetch(api.scores.create.path, {
+      const res = await fetch(apiUrl(api.scores.create.path), {
         method: api.scores.create.method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
+        credentials: "include",
       });
 
       if (!res.ok) throw new Error("Failed to submit score");

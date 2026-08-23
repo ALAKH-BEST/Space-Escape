@@ -2,12 +2,15 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api } from "@shared/routes";
 import type { ShipId } from "@shared/ships";
 import { useToast } from "@/hooks/use-toast";
+import { apiUrl } from "@/lib/apiBase";
 
 export function useProgression() {
   return useQuery({
     queryKey: [api.progression.get.path],
     queryFn: async () => {
-      const res = await fetch(api.progression.get.path);
+      const res = await fetch(apiUrl(api.progression.get.path), {
+        credentials: "include",
+      });
       if (res.status === 401) return null;
       if (!res.ok) throw new Error("Failed to load hangar systems");
       return api.progression.get.responses[200].parse(await res.json());
@@ -25,10 +28,11 @@ function useProgressionMutation(
   return useMutation({
     mutationFn: async ({ shipId }: { shipId: ShipId }) => {
       const contract = api.progression[method];
-      const res = await fetch(path, {
+      const res = await fetch(apiUrl(path), {
         method: contract.method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ shipId }),
+        credentials: "include",
       });
       const body = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(body.message || "Hangar command rejected");
