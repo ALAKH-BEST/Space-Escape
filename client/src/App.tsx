@@ -16,6 +16,7 @@ import TermsPage from "@/pages/TermsPage";
 import NotFound from "@/pages/not-found";
 import GoogleAnalytics from "@/components/GoogleAnalytics";
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
+import MultiplayerPage from "@/pages/MultiplayerPage";
 
 function ProtectedRoute({ component: Component }: { component: React.ComponentType }) {
   const { data: user, isLoading } = useUser();
@@ -47,6 +48,9 @@ function Router() {
       </Route>
       <Route path="/hangar">
         <ProtectedRoute component={HangarPage} />
+      </Route>
+      <Route path="/multiplayer">
+        <ProtectedRoute component={MultiplayerPage} />
       </Route>
       <Route path="/about" component={AboutPage} />
       <Route path="/privacy" component={PrivacyPage} />

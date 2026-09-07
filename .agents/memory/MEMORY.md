@@ -1,1 +1,2 @@
 - [Static hosting backend configuration](static-hosting.md) — itch.io builds need a real published backend origin supplied at build time.
+- [Multiplayer room architecture](multiplayer-rooms.md) — four-player room state currently lives in the Node process and syncs over `/ws`.

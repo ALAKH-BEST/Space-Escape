@@ -5,6 +5,7 @@ import { useSubmitScore } from "@/hooks/use-scores";
 import { useProgression } from "@/hooks/use-progression";
 import { ships, type ShipId } from "@shared/ships";
 import { Button } from "@/components/ui/button";
+import type { MultiplayerRoom } from "@/hooks/use-multiplayer";
 
 interface GameState {
   isPlaying: boolean;
@@ -32,7 +33,14 @@ const PLAYER_SIZE = 30;
 const OBSTACLE_SPEED = 3.5;
 const SPAWN_RATE = 1500;
 
-export function GameCanvas() {
+export function GameCanvas({
+  multiplayer,
+}: {
+  multiplayer?: {
+    room: MultiplayerRoom;
+    onPosition: (x: number, y: number, score: number) => void;
+  };
+}) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const requestRef = useRef<number>();
   const shipRef = useRef<ShipId>("vanguard");
@@ -64,7 +72,13 @@ export function GameCanvas() {
     shieldCharges: 0,
     abilityActiveUntil: 0,
     abilityCooldownUntil: 0,
+    rngSeed: 1,
+    lastPositionBroadcast: 0,
   });
+  const multiplayerRef = useRef(multiplayer);
+  useEffect(() => {
+    multiplayerRef.current = multiplayer;
+  }, [multiplayer]);
 
   const selectedShip = ships[shipRef.current];
 
@@ -90,6 +104,12 @@ export function GameCanvas() {
 
     return () => window.removeEventListener("resize", resizeCanvas);
   }, []);
+
+  useEffect(() => {
+    if (multiplayer?.room.phase === "running" && multiplayer.room.startedAt && !gameStateRef.current.isPlaying) {
+      startGame();
+    }
+  }, [multiplayer?.room.phase, multiplayer?.room.startedAt]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -178,6 +198,8 @@ export function GameCanvas() {
       shieldCharges: equippedShip === "titan" ? 3 : 0,
       abilityActiveUntil: 0,
       abilityCooldownUntil: 0,
+      rngSeed: multiplayerRef.current?.room.seed ?? Math.floor(Math.random() * 2_147_483_647),
+      lastPositionBroadcast: 0,
     };
     setAbilityUi({
       label: ships[equippedShip].ability,
@@ -235,12 +257,12 @@ export function GameCanvas() {
 
     if (timestamp - state.lastSpawn > SPAWN_RATE - Math.min(700, state.score * 0.5)) {
       const types: Obstacle["type"][] = ["planet", "asteroid", "stone"];
-      const type = types[Math.floor(Math.random() * types.length)];
+      const type = types[Math.floor(nextRandom(state) * types.length)];
       const size = type === "planet" ? 40 : type === "asteroid" ? 25 : 10;
       const speed = type === "planet" ? OBSTACLE_SPEED * 0.8 : type === "asteroid" ? OBSTACLE_SPEED * 1.2 : OBSTACLE_SPEED * 1.5;
       state.obstacles.push({
         x: canvas.width + 50,
-        y: Math.random() * (canvas.height - 100) + 50,
+        y: nextRandom(state) * (canvas.height - 100) + 50,
         type,
         size,
         speed: speed + state.score / 500,
@@ -277,6 +299,30 @@ export function GameCanvas() {
       }
     }
 
+    const activeMultiplayer = multiplayerRef.current;
+    if (activeMultiplayer?.room.phase === "running") {
+      activeMultiplayer.room.players
+        .filter((player) => player.id !== activeMultiplayer.room.localPlayerId)
+        .forEach((player) => {
+          drawRemotePlayer(
+            ctx,
+            player.x * canvas.width,
+            player.y * canvas.height,
+            player.color,
+            player.username,
+            activeMultiplayer.room.players.findIndex((item) => item.id === player.id) + 1,
+          );
+        });
+      if (timestamp - state.lastPositionBroadcast > 60) {
+        activeMultiplayer.onPosition(
+          state.player.x / canvas.width,
+          state.player.y / canvas.height,
+          state.score,
+        );
+        state.lastPositionBroadcast = timestamp;
+      }
+    }
+
     drawPlayer(ctx, state.player.x, state.player.y, ship, abilityActive);
     state.score += 0.1 * (ship.id === "nova" && abilityActive ? 2 : 1);
     setGameState((previous) => ({ ...previous, score: state.score }));
@@ -305,7 +351,7 @@ export function GameCanvas() {
         </button>
       )}
 
-      {!gameState.isPlaying && !gameState.gameOver && (
+       {!gameState.isPlaying && !gameState.gameOver && !multiplayer && (
         <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/60 backdrop-blur-sm">
           <h2 className="text-4xl font-display font-bold text-white mb-6 animate-pulse">READY COMMANDER?</h2>
           <Button onClick={startGame} size="lg" className="text-xl px-12 py-8 rounded-full bg-gradient-to-r from-primary to-accent hover:scale-105 transition-transform shadow-lg shadow-primary/40">
@@ -338,6 +384,11 @@ export function GameCanvas() {
       )}
     </div>
   );
+}
+
+function nextRandom(state: { rngSeed: number }) {
+  state.rngSeed = (state.rngSeed * 1664525 + 1013904223) >>> 0;
+  return state.rngSeed / 4_294_967_296;
 }
 
 function Result({ label, value, accent = false }: { label: string; value: string; accent?: boolean }) {
@@ -431,5 +482,46 @@ function drawPlayer(ctx: CanvasRenderingContext2D, x: number, y: number, ship: t
   ctx.beginPath();
   ctx.ellipse(8, 0, ship.id === "titan" ? 7 : 10, 4, 0, 0, Math.PI * 2);
   ctx.fill();
+  ctx.restore();
+}
+
+function drawRemotePlayer(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  color: string,
+  username: string,
+  playerNumber: number,
+) {
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.shadowBlur = 18;
+  ctx.shadowColor = color;
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.arc(0, 0, 27, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.fillStyle = color;
+  ctx.globalAlpha = 0.9;
+  ctx.beginPath();
+  ctx.moveTo(19, 0);
+  ctx.lineTo(-12, 11);
+  ctx.lineTo(-6, 0);
+  ctx.lineTo(-12, -11);
+  ctx.closePath();
+  ctx.fill();
+  ctx.globalAlpha = 1;
+  ctx.fillStyle = "#020617";
+  ctx.beginPath();
+  ctx.arc(0, 0, 8, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = color;
+  ctx.font = "bold 10px 'Share Tech Mono', monospace";
+  ctx.textAlign = "center";
+  ctx.fillText(`${playerNumber}`, 0, 3);
+  ctx.fillStyle = "#f8fafc";
+  ctx.font = "10px 'Share Tech Mono', monospace";
+  ctx.fillText(username.toUpperCase().slice(0, 14), 0, -34);
   ctx.restore();
 }

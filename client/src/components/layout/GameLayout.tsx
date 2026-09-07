@@ -43,6 +43,9 @@ export function GameLayout({ children }: { children: ReactNode }) {
                   <Link href="/leaderboard" className={`text-xs sm:text-sm font-medium transition-colors hover:text-primary ${location === '/leaderboard' ? 'text-primary' : 'text-muted-foreground'}`}>
                     LEADERBOARD
                   </Link>
+                  <Link href="/multiplayer" className={`text-xs sm:text-sm font-medium transition-colors hover:text-primary ${location === '/multiplayer' ? 'text-primary' : 'text-muted-foreground'}`}>
+                    MULTIPLAYER
+                  </Link>
                 </div>
 
                 <div className="flex items-center gap-3 pl-4 border-l border-white/10">
