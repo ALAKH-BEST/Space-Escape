@@ -11,7 +11,10 @@ const viteLogger = createLogger();
 export async function setupVite(server: Server, app: Express) {
   const serverOptions = {
     middlewareMode: true,
-    hmr: { server, path: "/vite-hmr" },
+    // The Replit preview proxy cannot reliably route Vite's dev-only HMR
+    // socket from middleware mode. Disable HMR to prevent the browser's
+    // reconnect loop; a normal refresh still picks up every source change.
+    hmr: false,
     allowedHosts: true as const,
   };
 
