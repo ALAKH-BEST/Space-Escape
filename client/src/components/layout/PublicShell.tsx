@@ -2,6 +2,7 @@ import { useEffect, type ReactNode } from "react";
 import { Link } from "wouter";
 import { Rocket } from "lucide-react";
 import { PublicFooter } from "@/components/layout/PublicFooter";
+import { ThemeSelector } from "@/components/theme/ThemeSelector";
 
 export function PublicShell({
   children,
@@ -40,9 +41,12 @@ export function PublicShell({
               ASTRO<span className="text-primary">DODGE</span>
             </span>
           </Link>
-          <Link href="/" className="text-xs font-mono text-muted-foreground hover:text-primary transition-colors">
-            BACK TO GAME
-          </Link>
+          <div className="flex items-center gap-4">
+            <ThemeSelector />
+            <Link href="/" className="text-xs font-mono text-muted-foreground hover:text-primary transition-colors">
+              BACK TO GAME
+            </Link>
+          </div>
         </div>
       </header>
       <main className="relative z-10 flex-1 container mx-auto px-4 py-10 sm:py-16">

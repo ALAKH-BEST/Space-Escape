@@ -26,6 +26,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Loader2, Rocket } from "lucide-react";
 import { motion } from "framer-motion";
 import { PublicFooter } from "@/components/layout/PublicFooter";
+import { ThemeSelector } from "@/components/theme/ThemeSelector";
 
 export default function AuthPage() {
   const [_, setLocation] = useLocation();
@@ -42,6 +43,9 @@ export default function AuthPage() {
 
   return (
     <div className="min-h-screen flex flex-col">
+      <div className="absolute right-4 top-4 z-20">
+        <ThemeSelector />
+      </div>
       <div className="flex-1 flex items-center justify-center p-4 relative overflow-hidden">
       {/* Animated Background Elements */}
       <div className="absolute inset-0 bg-background z-0">
