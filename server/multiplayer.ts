@@ -11,6 +11,7 @@ type RoomPlayer = {
   username: string;
   color: string;
   ready: boolean;
+  alive: boolean;
   x: number;
   y: number;
   score: number;
@@ -120,6 +121,7 @@ function joinRoom(socket: WebSocket, username: string, roomId: string, create: b
     username: normalizedUsername,
     color: PLAYER_COLORS[room.players.size] ?? PLAYER_COLORS[0],
     ready: false,
+    alive: true,
     x: 0.2,
     y: 0.5,
     score: 0,
@@ -152,6 +154,10 @@ function handleMessage(socket: WebSocket, raw: string) {
     entry.player.ready = Boolean(message.ready);
     const allReady = room.players.size > 0 && Array.from(room.players.values()).every(({ player }) => player.ready);
     if (allReady) {
+      room.players.forEach(({ player }) => {
+        player.alive = true;
+        player.score = 0;
+      });
       room.phase = "running";
       room.startedAt = Date.now();
     }
@@ -160,11 +166,13 @@ function handleMessage(socket: WebSocket, raw: string) {
   }
 
   if (message.type === "player:position" && room.phase === "running") {
+    if (!entry.player.alive) return;
     entry.player.x = Math.max(0, Math.min(1, Number(message.x) || 0));
     entry.player.y = Math.max(0, Math.min(1, Number(message.y) || 0));
-    entry.player.score = Math.max(0, Math.floor(Number(message.score) || 0));
+    entry.player.score = Math.max(entry.player.score, Math.floor(Number(message.score) || 0));
+    entry.player.alive = message.alive !== false;
     room.players.forEach(({ socket: peerSocket }) => {
-      if (peerSocket !== socket) send(peerSocket, { type: "player:update", player: entry.player });
+      send(peerSocket, { type: "player:update", player: entry.player });
     });
   }
 }

@@ -29,6 +29,13 @@ type Obstacle = {
   speed: number;
 };
 
+type DeathBurst = {
+  x: number;
+  y: number;
+  color: string;
+  startedAt: number;
+};
+
 const PLAYER_SIZE = 30;
 const OBSTACLE_SPEED = 3.5;
 const SPAWN_RATE = 1500;
@@ -38,7 +45,7 @@ export function GameCanvas({
 }: {
   multiplayer?: {
     room: MultiplayerRoom;
-    onPosition: (x: number, y: number, score: number) => void;
+    onPosition: (x: number, y: number, score: number, alive?: boolean) => void;
   };
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -76,6 +83,8 @@ export function GameCanvas({
     lastPositionBroadcast: 0,
   });
   const multiplayerRef = useRef(multiplayer);
+  const remoteAliveRef = useRef(new Map<string, boolean>());
+  const deathBurstsRef = useRef(new Map<string, DeathBurst>());
   useEffect(() => {
     multiplayerRef.current = multiplayer;
   }, [multiplayer]);
@@ -201,6 +210,8 @@ export function GameCanvas({
       rngSeed: multiplayerRef.current?.room.seed ?? Math.floor(Math.random() * 2_147_483_647),
       lastPositionBroadcast: 0,
     };
+    remoteAliveRef.current.clear();
+    deathBurstsRef.current.clear();
     setAbilityUi({
       label: ships[equippedShip].ability,
       status: equippedShip === "titan" ? "3 SHIELDS" : equippedShip === "vanguard" ? "NONE" : "READY — SPACE",
@@ -212,10 +223,21 @@ export function GameCanvas({
 
   const stopGame = () => {
     const state = gameStateRef.current;
+    if (!state.isPlaying) return;
     if (requestRef.current) cancelAnimationFrame(requestRef.current);
     state.isPlaying = false;
     const finalScore = Math.floor(state.score);
     const survivalTime = Math.max(0, (performance.now() - state.startedAt) / 1000);
+    const activeMultiplayer = multiplayerRef.current;
+    const canvas = canvasRef.current;
+    if (activeMultiplayer?.room.phase === "running" && canvas) {
+      activeMultiplayer.onPosition(
+        state.player.x / canvas.width,
+        state.player.y / canvas.height,
+        finalScore,
+        false,
+      );
+    }
     setGameState({
       isPlaying: false,
       score: finalScore,
@@ -299,11 +321,36 @@ export function GameCanvas({
       }
     }
 
+    state.score += 0.1 * (ship.id === "nova" && abilityActive ? 2 : 1);
+
     const activeMultiplayer = multiplayerRef.current;
     if (activeMultiplayer?.room.phase === "running") {
-      activeMultiplayer.room.players
-        .filter((player) => player.id !== activeMultiplayer.room.localPlayerId)
-        .forEach((player) => {
+      const visibleRemotePlayerIds = new Set<string>();
+      activeMultiplayer.room.players.forEach((player) => {
+        if (player.id === activeMultiplayer.room.localPlayerId) return;
+        visibleRemotePlayerIds.add(player.id);
+        const wasAlive = remoteAliveRef.current.get(player.id);
+        if (wasAlive === true && !player.alive) {
+          deathBurstsRef.current.set(player.id, {
+            x: player.x * canvas.width,
+            y: player.y * canvas.height,
+            color: player.color,
+            startedAt: performance.now(),
+          });
+        }
+        remoteAliveRef.current.set(player.id, player.alive);
+
+        const burst = deathBurstsRef.current.get(player.id);
+        if (burst) {
+          const progress = (performance.now() - burst.startedAt) / 900;
+          if (progress < 1) {
+            drawDeathBurst(ctx, burst.x, burst.y, burst.color, progress);
+          } else {
+            deathBurstsRef.current.delete(player.id);
+          }
+        }
+
+        if (player.alive) {
           drawRemotePlayer(
             ctx,
             player.x * canvas.width,
@@ -312,19 +359,23 @@ export function GameCanvas({
             player.username,
             activeMultiplayer.room.players.findIndex((item) => item.id === player.id) + 1,
           );
-        });
+        }
+      });
+      remoteAliveRef.current.forEach((_, playerId) => {
+        if (!visibleRemotePlayerIds.has(playerId)) remoteAliveRef.current.delete(playerId);
+      });
       if (timestamp - state.lastPositionBroadcast > 60) {
         activeMultiplayer.onPosition(
           state.player.x / canvas.width,
           state.player.y / canvas.height,
           state.score,
+          true,
         );
         state.lastPositionBroadcast = timestamp;
       }
     }
 
     drawPlayer(ctx, state.player.x, state.player.y, ship, abilityActive);
-    state.score += 0.1 * (ship.id === "nova" && abilityActive ? 2 : 1);
     setGameState((previous) => ({ ...previous, score: state.score }));
     requestRef.current = requestAnimationFrame(gameLoop);
   };
@@ -523,5 +574,38 @@ function drawRemotePlayer(
   ctx.fillStyle = "#f8fafc";
   ctx.font = "10px 'Share Tech Mono', monospace";
   ctx.fillText(username.toUpperCase().slice(0, 14), 0, -34);
+  ctx.restore();
+}
+
+function drawDeathBurst(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  color: string,
+  progress: number,
+) {
+  const radius = 12 + progress * 48;
+  const alpha = Math.max(0, 1 - progress);
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.globalAlpha = alpha;
+  ctx.shadowBlur = 26;
+  ctx.shadowColor = color;
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 3 + (1 - progress) * 3;
+  ctx.beginPath();
+  ctx.arc(0, 0, radius, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.strokeStyle = "#fef3c7";
+  ctx.lineWidth = 2;
+  for (let index = 0; index < 8; index += 1) {
+    const angle = (index / 8) * Math.PI * 2;
+    const innerRadius = radius * 0.55;
+    const outerRadius = radius + 12 * (1 - progress);
+    ctx.beginPath();
+    ctx.moveTo(Math.cos(angle) * innerRadius, Math.sin(angle) * innerRadius);
+    ctx.lineTo(Math.cos(angle) * outerRadius, Math.sin(angle) * outerRadius);
+    ctx.stroke();
+  }
   ctx.restore();
 }

@@ -214,7 +214,9 @@ function RunningRoom({
       <div className="flex flex-wrap gap-2">
         {room.players.map((player) => (
           <div key={player.id} className="rounded border border-white/10 bg-card/40 px-3 py-2 text-xs font-mono" style={{ color: player.color }}>
-            {player.username} · {player.score.toLocaleString()}
+            <span className={player.alive ? "" : "line-through opacity-50"}>{player.username}</span>
+            {" · "}
+            {player.alive ? player.score.toLocaleString() : "ELIMINATED"}
           </div>
         ))}
       </div>
