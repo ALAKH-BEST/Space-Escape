@@ -60,6 +60,8 @@ export function useSubmitScore() {
 }
 
 export function useStartRun() {
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: async (mode: "solo" | "multiplayer") => {
       const res = await fetch(apiUrl(api.runs.start.path), {
@@ -70,7 +72,10 @@ export function useStartRun() {
       });
       const responseText = await res.text();
       if (!res.ok) {
-        if (res.status === 401) throw new Error("Your session has expired. Please log in again.");
+        if (res.status === 401) {
+          queryClient.setQueryData(["/api/user"], null);
+          throw new Error("Your session has expired. Please log in again.");
+        }
         throw new Error(`Mission authorization failed (${res.status}).`);
       }
       return api.runs.start.responses[201].parse(JSON.parse(responseText));

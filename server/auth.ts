@@ -6,9 +6,10 @@ import { scrypt, randomBytes, timingSafeEqual } from "crypto";
 import { promisify } from "util";
 import { storage } from "./storage";
 import { User as SelectUser } from "@shared/schema";
-import MemoryStoreFactory from "memorystore";
+import connectPgSimple from "connect-pg-simple";
+import { pool } from "./db";
 
-const MemoryStore = MemoryStoreFactory(session);
+const PgSession = connectPgSimple(session);
 
 declare global {
   namespace Express {
@@ -36,8 +37,10 @@ export function setupAuth(app: Express) {
     secret: process.env.SESSION_SECRET || "secret_key",
     resave: false,
     saveUninitialized: false,
-    store: new MemoryStore({
-      checkPeriod: 86400000,
+    store: new PgSession({
+      pool,
+      tableName: "session",
+      createTableIfMissing: true,
     }),
   };
 
