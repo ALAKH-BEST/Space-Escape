@@ -5,6 +5,12 @@ import { ProgressionError, storage } from "./storage";
 import { api } from "@shared/routes";
 import { z } from "zod";
 import { isShipId } from "@shared/ships";
+import {
+  calculateAuthoritativeScore,
+  issueRun,
+  RunAuthorityError,
+  verifyRun,
+} from "./run-authority";
 
 export async function registerRoutes(httpServer: Server, app: Express): Promise<Server> {
   // Setup authentication
@@ -17,17 +23,39 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
   });
 
   app.post(api.scores.create.path, async (req, res) => {
-    if (!req.isAuthenticated()) {
-      return res.status(401).send();
+    try {
+      if (!req.isAuthenticated()) {
+        return res.status(401).send();
+      }
+
+      const input = api.scores.create.input.parse(req.body);
+      const claims = verifyRun(input.runId, input.runToken, req.user!.id);
+      const result = await storage.createScore({
+        userId: req.user!.id,
+        runId: claims.runId,
+        score: calculateAuthoritativeScore(claims.startedAt),
+      });
+
+      res.status(201).json(result);
+    } catch (error) {
+      if (error instanceof RunAuthorityError || error instanceof z.ZodError) {
+        return res.status(400).json({ message: error instanceof Error ? error.message : "Invalid score submission" });
+      }
+      throw error;
     }
-    
-    const input = api.scores.create.input.parse(req.body);
-    const result = await storage.createScore({
-      ...input,
-      userId: req.user!.id,
-    });
-    
-    res.status(201).json(result);
+  });
+
+  app.post(api.runs.start.path, async (req, res, next) => {
+    try {
+      if (!req.isAuthenticated()) return res.status(401).send();
+      const { mode } = api.runs.start.input.parse(req.body);
+      res.status(201).json(issueRun(req.user!.id, mode));
+    } catch (error) {
+      if (error instanceof z.ZodError || error instanceof RunAuthorityError) {
+        return res.status(400).json({ message: error instanceof Error ? error.message : "Invalid run" });
+      }
+      next(error);
+    }
   });
 
   app.get(api.progression.get.path, async (req, res, next) => {

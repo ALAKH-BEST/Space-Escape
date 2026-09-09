@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "wouter";
 import { Gem, Play, RotateCcw, Shield, Sparkles, Trophy, Zap } from "lucide-react";
-import { useSubmitScore } from "@/hooks/use-scores";
+import { useStartRun, useSubmitScore } from "@/hooks/use-scores";
 import { useProgression } from "@/hooks/use-progression";
 import { ships, type ShipId } from "@shared/ships";
 import { Button } from "@/components/ui/button";
@@ -45,14 +45,16 @@ export function GameCanvas({
 }: {
   multiplayer?: {
     room: MultiplayerRoom;
-    onPosition: (x: number, y: number, score: number, alive?: boolean) => void;
+    onPosition: (x: number, y: number) => void;
   };
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const requestRef = useRef<number>();
   const shipRef = useRef<ShipId>("vanguard");
   const scoreMutation = useSubmitScore();
+  const startRunMutation = useStartRun();
   const { data: progression } = useProgression();
+  const startingRunRef = useRef(false);
   const [gameState, setGameState] = useState<GameState>({
     isPlaying: false,
     score: 0,
@@ -76,6 +78,7 @@ export function GameCanvas({
     isPlaying: false,
     startedAt: 0,
     runId: "",
+    runToken: "",
     shieldCharges: 0,
     abilityActiveUntil: 0,
     abilityCooldownUntil: 0,
@@ -188,37 +191,44 @@ export function GameCanvas({
     setAbilityUi({ label: ship.ability, status: `ACTIVE — ${(duration / 1000).toFixed(1)}s`, active: true });
   };
 
-  const startGame = () => {
+  const startGame = async () => {
     const canvas = canvasRef.current;
-    if (!canvas) return;
+    if (!canvas || startingRunRef.current || gameStateRef.current.isPlaying) return;
+    startingRunRef.current = true;
     scoreMutation.reset();
-    const equippedShip = progression?.equippedShip ?? "vanguard";
-    shipRef.current = equippedShip;
-    const now = performance.now();
-    gameStateRef.current = {
-      ...gameStateRef.current,
-      player: { x: 50, y: canvas.height / 2 },
-      obstacles: [],
-      score: 0,
-      isPlaying: true,
-      lastSpawn: now,
-      startedAt: now,
-      runId: crypto.randomUUID(),
-      shieldCharges: equippedShip === "titan" ? 3 : 0,
-      abilityActiveUntil: 0,
-      abilityCooldownUntil: 0,
-      rngSeed: multiplayerRef.current?.room.seed ?? Math.floor(Math.random() * 2_147_483_647),
-      lastPositionBroadcast: 0,
-    };
-    remoteAliveRef.current.clear();
-    deathBurstsRef.current.clear();
-    setAbilityUi({
-      label: ships[equippedShip].ability,
-      status: equippedShip === "titan" ? "3 SHIELDS" : equippedShip === "vanguard" ? "NONE" : "READY — SPACE",
-      active: equippedShip === "titan",
-    });
-    setGameState({ isPlaying: true, score: 0, gameOver: false, survivalTime: 0, sector: 1 });
-    requestRef.current = requestAnimationFrame(gameLoop);
+    try {
+      const run = await startRunMutation.mutateAsync(multiplayerRef.current ? "multiplayer" : "solo");
+      const equippedShip = progression?.equippedShip ?? "vanguard";
+      shipRef.current = equippedShip;
+      const now = performance.now();
+      gameStateRef.current = {
+        ...gameStateRef.current,
+        player: { x: 50, y: canvas.height / 2 },
+        obstacles: [],
+        score: 0,
+        isPlaying: true,
+        lastSpawn: now,
+        startedAt: now,
+        runId: run.runId,
+        runToken: run.runToken,
+        shieldCharges: equippedShip === "titan" ? 3 : 0,
+        abilityActiveUntil: 0,
+        abilityCooldownUntil: 0,
+        rngSeed: multiplayerRef.current?.room.seed ?? Math.floor(Math.random() * 2_147_483_647),
+        lastPositionBroadcast: 0,
+      };
+      remoteAliveRef.current.clear();
+      deathBurstsRef.current.clear();
+      setAbilityUi({
+        label: ships[equippedShip].ability,
+        status: equippedShip === "titan" ? "3 SHIELDS" : equippedShip === "vanguard" ? "NONE" : "READY — SPACE",
+        active: equippedShip === "titan",
+      });
+      setGameState({ isPlaying: true, score: 0, gameOver: false, survivalTime: 0, sector: 1 });
+      requestRef.current = requestAnimationFrame(gameLoop);
+    } finally {
+      startingRunRef.current = false;
+    }
   };
 
   const stopGame = () => {
@@ -231,12 +241,7 @@ export function GameCanvas({
     const activeMultiplayer = multiplayerRef.current;
     const canvas = canvasRef.current;
     if (activeMultiplayer?.room.phase === "running" && canvas) {
-      activeMultiplayer.onPosition(
-        state.player.x / canvas.width,
-        state.player.y / canvas.height,
-        finalScore,
-        false,
-      );
+      activeMultiplayer.onPosition(state.player.x / canvas.width, state.player.y / canvas.height);
     }
     setGameState({
       isPlaying: false,
@@ -245,7 +250,20 @@ export function GameCanvas({
       survivalTime,
       sector: Math.max(1, Math.floor(finalScore / 100) + 1),
     });
-    scoreMutation.mutate({ score: finalScore, runId: state.runId });
+    if (state.runId && state.runToken) {
+      scoreMutation.mutate(
+        { runId: state.runId, runToken: state.runToken },
+        {
+          onSuccess: (result) => {
+            setGameState((previous) => ({
+              ...previous,
+              score: result.score.score,
+              sector: Math.max(1, Math.floor(result.score.score / 100) + 1),
+            }));
+          },
+        },
+      );
+    }
   };
 
   const gameLoop = (timestamp: number) => {
@@ -368,8 +386,6 @@ export function GameCanvas({
         activeMultiplayer.onPosition(
           state.player.x / canvas.width,
           state.player.y / canvas.height,
-          state.score,
-          true,
         );
         state.lastPositionBroadcast = timestamp;
       }

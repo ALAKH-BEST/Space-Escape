@@ -1,6 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "@shared/routes";
-import type { InsertScore } from "@shared/schema";
 import { useToast } from "@/hooks/use-toast";
 import { apiUrl } from "@/lib/apiBase";
 
@@ -23,7 +22,7 @@ export function useSubmitScore() {
   const { toast } = useToast();
 
   return useMutation({
-    mutationFn: async (data: InsertScore & { runId: string }) => {
+    mutationFn: async (data: { runId: string; runToken: string }) => {
       const res = await fetch(apiUrl(api.scores.create.path), {
         method: api.scores.create.method,
         headers: { "Content-Type": "application/json" },
@@ -56,6 +55,21 @@ export function useSubmitScore() {
         description: "Could not upload score to mainframe.",
         variant: "destructive",
       });
+    },
+  });
+}
+
+export function useStartRun() {
+  return useMutation({
+    mutationFn: async (mode: "solo" | "multiplayer") => {
+      const res = await fetch(apiUrl(api.runs.start.path), {
+        method: api.runs.start.method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ mode }),
+        credentials: "include",
+      });
+      if (!res.ok) throw new Error("Could not authorize mission");
+      return api.runs.start.responses[201].parse(await res.json());
     },
   });
 }

@@ -197,7 +197,7 @@ function RunningRoom({
   sendPosition,
 }: {
   room: NonNullable<ReturnType<typeof useMultiplayer>["room"]>;
-  sendPosition: (x: number, y: number, score: number) => void;
+  sendPosition: (x: number, y: number) => void;
 }) {
   return (
     <div className="space-y-5">

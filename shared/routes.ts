@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { insertUserSchema, insertScoreSchema, users, scores } from "./schema";
+import { insertUserSchema, users, scores } from "./schema";
 
 const shipIdSchema = z.enum(["vanguard", "phantom", "titan", "nova"]);
 
@@ -56,13 +56,34 @@ export const api = {
     create: {
       method: "POST" as const,
       path: "/api/scores",
-      input: insertScoreSchema.extend({ runId: z.string().uuid() }),
+      input: z.object({
+        runId: z.string().uuid(),
+        runToken: z.string().min(1),
+      }).strict(),
       responses: {
         201: z.object({
           score: z.custom<typeof scores.$inferSelect>(),
           gemsEarned: z.number(),
           totalGems: z.number(),
           duplicate: z.boolean(),
+        }),
+        401: z.void(),
+        400: z.object({ message: z.string() }),
+      },
+    },
+  },
+  runs: {
+    start: {
+      method: "POST" as const,
+      path: "/api/runs/start",
+      input: z.object({
+        mode: z.enum(["solo", "multiplayer"]),
+      }).strict(),
+      responses: {
+        201: z.object({
+          runId: z.string().uuid(),
+          runToken: z.string().min(1),
+          startedAt: z.number().int(),
         }),
         401: z.void(),
       },

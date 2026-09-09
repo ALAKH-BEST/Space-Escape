@@ -86,7 +86,7 @@ export function useMultiplayer(username: string | undefined) {
   );
   const setReady = useCallback((ready: boolean) => send({ type: "room:ready", ready }), [send]);
   const sendPosition = useCallback(
-    (x: number, y: number, score: number, alive = true) => send({ type: "player:position", x, y, score, alive }),
+    (x: number, y: number) => send({ type: "player:position", x, y }),
     [send],
   );
   const leaveRoom = useCallback(() => {

@@ -7,8 +7,9 @@
     "dev": "NODE_ENV=development tsx server/index.ts",
     "build": "tsx script/build.ts",
     "build:itch": "vite build --config vite.config.itch.ts",
-    "test": "npm run test:multiplayer",
+    "test": "npm run test:multiplayer && npm run test:run-authority",
     "test:multiplayer": "tsx --test server/multiplayer.test.ts",
+    "test:run-authority": "tsx --test server/run-authority.test.ts",
     "start": "NODE_ENV=production node dist/index.cjs",
     "check": "tsc",
     "db:push": "drizzle-kit push"

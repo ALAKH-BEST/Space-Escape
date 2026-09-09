@@ -2,6 +2,7 @@ import { users, scores, type User, type InsertUser, type Score, type InsertScore
 import { db } from "./db";
 import { eq, desc, and, sql } from "drizzle-orm";
 import { ships, type ShipId } from "@shared/ships";
+import { MAX_AUTHORITATIVE_SCORE } from "./run-authority";
 
 export type Progression = {
   gems: number;
@@ -45,6 +46,14 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createScore(score: InsertScore & { userId: number; runId: string }) {
+    if (
+      !Number.isInteger(score.score) ||
+      score.score < 0 ||
+      score.score > MAX_AUTHORITATIVE_SCORE
+    ) {
+      throw new ProgressionError("Invalid authoritative score");
+    }
+
     return db.transaction(async (tx) => {
       const [existing] = await tx
         .select()

@@ -1,10 +1,15 @@
 import type { Server } from "http";
 import { randomInt } from "crypto";
 import { WebSocket, WebSocketServer } from "ws";
+import {
+  calculateAuthoritativeScore,
+} from "./run-authority";
 
 const MAX_PLAYERS = 4;
 const ROOM_CODE_LENGTH = 6;
 const PLAYER_COLORS = ["#22d3ee", "#f472b6", "#facc15", "#a78bfa"];
+const PLAYER_HEARTBEAT_TIMEOUT_MS = 1_200;
+const MAX_POSITION_DELTA_PER_SECOND = 2.5;
 
 type RoomPlayer = {
   id: string;
@@ -15,6 +20,7 @@ type RoomPlayer = {
   x: number;
   y: number;
   score: number;
+  lastSeenAt: number;
 };
 
 type Room = {
@@ -62,6 +68,34 @@ function publicRoom(room: Room, localPlayerId: string) {
 function broadcastRoom(room: Room) {
   room.players.forEach(({ socket, player }) => {
     send(socket, { type: "room:update", room: publicRoom(room, player.id) });
+  });
+}
+
+function broadcastPlayer(room: Room, player: RoomPlayer) {
+  room.players.forEach(({ socket }) => {
+    send(socket, { type: "player:update", player });
+  });
+}
+
+function advanceRoom(room: Room, now: number) {
+  const startedAt = room.startedAt;
+  if (room.phase !== "running" || !startedAt) return;
+
+  room.players.forEach(({ player }) => {
+    if (player.alive && now - player.lastSeenAt > PLAYER_HEARTBEAT_TIMEOUT_MS) {
+      player.alive = false;
+      player.score = calculateAuthoritativeScore(startedAt, player.lastSeenAt);
+      broadcastPlayer(room, player);
+      return;
+    }
+
+    if (player.alive) {
+      const nextScore = calculateAuthoritativeScore(startedAt, now);
+      if (nextScore !== player.score) {
+        player.score = nextScore;
+        broadcastPlayer(room, player);
+      }
+    }
   });
 }
 
@@ -125,6 +159,7 @@ function joinRoom(socket: WebSocket, username: string, roomId: string, create: b
     x: 0.2,
     y: 0.5,
     score: 0,
+    lastSeenAt: Date.now(),
   };
   room.players.set(playerId, { socket, player });
   if (!room.hostId) room.hostId = playerId;
@@ -138,6 +173,9 @@ function handleMessage(socket: WebSocket, raw: string) {
   try {
     message = JSON.parse(raw);
   } catch {
+    return send(socket, { type: "room:error", message: "Invalid multiplayer message." });
+  }
+  if (!message || typeof message !== "object" || Array.isArray(message)) {
     return send(socket, { type: "room:error", message: "Invalid multiplayer message." });
   }
 
@@ -154,31 +192,62 @@ function handleMessage(socket: WebSocket, raw: string) {
     entry.player.ready = Boolean(message.ready);
     const allReady = room.players.size > 0 && Array.from(room.players.values()).every(({ player }) => player.ready);
     if (allReady) {
+      const startedAt = Date.now();
       room.players.forEach(({ player }) => {
         player.alive = true;
         player.score = 0;
+        player.lastSeenAt = startedAt;
+        player.x = 0.2;
+        player.y = 0.5;
       });
       room.phase = "running";
-      room.startedAt = Date.now();
+      room.startedAt = startedAt;
     }
     broadcastRoom(room);
     return;
   }
 
   if (message.type === "player:position" && room.phase === "running") {
+    const now = Date.now();
+    advanceRoom(room, now);
     if (!entry.player.alive) return;
-    entry.player.x = Math.max(0, Math.min(1, Number(message.x) || 0));
-    entry.player.y = Math.max(0, Math.min(1, Number(message.y) || 0));
-    entry.player.score = Math.max(entry.player.score, Math.floor(Number(message.score) || 0));
-    entry.player.alive = message.alive !== false;
-    room.players.forEach(({ socket: peerSocket }) => {
-      send(peerSocket, { type: "player:update", player: entry.player });
-    });
+    const x = Number(message.x);
+    const y = Number(message.y);
+    if (!Number.isFinite(x) || !Number.isFinite(y)) {
+      return send(socket, { type: "room:error", message: "Invalid ship position." });
+    }
+
+    const elapsedSeconds = Math.max(0.05, (now - entry.player.lastSeenAt) / 1000);
+    const maxDelta = MAX_POSITION_DELTA_PER_SECOND * elapsedSeconds;
+    entry.player.x = Math.max(
+      Math.max(0, entry.player.x - maxDelta),
+      Math.min(1, Math.min(entry.player.x + maxDelta, x)),
+    );
+    entry.player.y = Math.max(
+      Math.max(0, entry.player.y - maxDelta),
+      Math.min(1, Math.min(entry.player.y + maxDelta, y)),
+    );
+    entry.player.lastSeenAt = now;
+    entry.player.score = calculateAuthoritativeScore(room.startedAt ?? now, now);
+
+    if ("score" in message || "alive" in message) {
+      send(socket, {
+        type: "room:error",
+        message: "Score and elimination state are server-authoritative.",
+      });
+    }
+    broadcastPlayer(room, entry.player);
   }
 }
 
 export function setupMultiplayer(server: Server) {
   const webSocketServer = new WebSocketServer({ server, path: "/ws" });
+  const ticker = setInterval(() => {
+    const now = Date.now();
+    rooms.forEach((room) => advanceRoom(room, now));
+  }, 250);
+  ticker.unref();
+  server.once("close", () => clearInterval(ticker));
   webSocketServer.on("connection", (socket) => {
     socket.on("message", (message) => handleMessage(socket, message.toString()));
     socket.on("close", () => leaveRoom(socket));

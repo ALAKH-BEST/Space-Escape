@@ -68,7 +68,7 @@ async function closeSocket(socket: WebSocket) {
   });
 }
 
-test("keeps multiplayer scores and eliminations synchronized", async () => {
+test("rejects client score and alive tampering in multiplayer", async () => {
   const server = createServer();
   setupMultiplayer(server);
   await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", () => resolve()));
@@ -127,48 +127,40 @@ test("keeps multiplayer scores and eliminations synchronized", async () => {
 
     const scoreForPlayerOne = nextMessage(
       playerOne,
-      (message) => message.type === "player:update" && message.player?.score === 42,
+      (message) => message.type === "player:update" && message.player?.username === "Pilot One",
     );
     const scoreForPlayerTwo = nextMessage(
       playerTwo,
-      (message) => message.type === "player:update" && message.player?.score === 42,
+      (message) => message.type === "player:update" && message.player?.username === "Pilot One",
     );
-    send(playerOne, { type: "player:position", x: 0.3, y: 0.4, score: 42, alive: true });
+    const tamperRejected = nextMessage(
+      playerOne,
+      (message) => message.type === "room:error" && message.player === undefined,
+    );
+    send(playerOne, { type: "player:position", x: 0.3, y: 0.4, score: 999_999_999, alive: false });
     const [scoreUpdateOne, scoreUpdateTwo] = await Promise.all([scoreForPlayerOne, scoreForPlayerTwo]);
     assert.equal(scoreUpdateOne.player?.username, "Pilot One");
     assert.equal(scoreUpdateTwo.player?.username, "Pilot One");
     assert.equal(scoreUpdateOne.player?.alive, true);
     assert.equal(scoreUpdateTwo.player?.alive, true);
+    assert.ok((scoreUpdateOne.player?.score ?? 0) < 999_999_999);
+    assert.ok((scoreUpdateTwo.player?.score ?? 0) < 999_999_999);
+    assert.equal(scoreUpdateOne.player?.alive, true);
+    await tamperRejected;
 
     const deathForPlayerOne = nextMessage(
       playerOne,
-      (message) => message.type === "player:update" && message.player?.alive === false,
+      (message) => message.type === "player:update" && message.player?.username === "Pilot One" && message.player?.alive === false,
+      2_500,
     );
     const deathForPlayerTwo = nextMessage(
       playerTwo,
-      (message) => message.type === "player:update" && message.player?.alive === false,
+      (message) => message.type === "player:update" && message.player?.username === "Pilot One" && message.player?.alive === false,
+      2_500,
     );
-    send(playerOne, { type: "player:position", x: 0.5, y: 0.6, score: 99, alive: false });
     const [deathUpdateOne, deathUpdateTwo] = await Promise.all([deathForPlayerOne, deathForPlayerTwo]);
-    assert.equal(deathUpdateOne.player?.username, "Pilot One");
-    assert.equal(deathUpdateTwo.player?.username, "Pilot One");
-    assert.equal(deathUpdateOne.player?.score, 99);
-    assert.equal(deathUpdateTwo.player?.score, 99);
-    assert.equal(deathUpdateOne.player?.alive, false);
-    assert.equal(deathUpdateTwo.player?.alive, false);
-
-    const ignoredByPlayerOne = nextMessage(
-      playerOne,
-      (message) => message.type === "player:update" && message.player?.username === "Pilot One",
-      200,
-    );
-    const ignoredByPlayerTwo = nextMessage(
-      playerTwo,
-      (message) => message.type === "player:update" && message.player?.username === "Pilot One",
-      200,
-    );
-    send(playerOne, { type: "player:position", x: 0.9, y: 0.9, score: 999, alive: true });
-    await Promise.all([assert.rejects(ignoredByPlayerOne), assert.rejects(ignoredByPlayerTwo)]);
+    assert.ok((deathUpdateOne.player?.score ?? 0) < 999_999_999);
+    assert.ok((deathUpdateTwo.player?.score ?? 0) < 999_999_999);
   } finally {
     await Promise.all([closeSocket(playerOne), closeSocket(playerTwo)]);
     await new Promise<void>((resolve, reject) => server.close((error) => (error ? reject(error) : resolve())));
