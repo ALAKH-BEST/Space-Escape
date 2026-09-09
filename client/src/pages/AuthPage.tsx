@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { insertUserSchema, type InsertUser } from "@shared/schema";
@@ -35,11 +35,11 @@ export default function AuthPage() {
   const registerMutation = useRegister();
   const [activeTab, setActiveTab] = useState("login");
 
-  // Redirect if already logged in
-  if (user) {
-    setLocation("/game");
-    return null;
-  }
+  useEffect(() => {
+    if (user) setLocation("/game");
+  }, [user, setLocation]);
+
+  if (user) return null;
 
   return (
     <div className="min-h-screen flex flex-col">

@@ -68,8 +68,12 @@ export function useStartRun() {
         body: JSON.stringify({ mode }),
         credentials: "include",
       });
-      if (!res.ok) throw new Error("Could not authorize mission");
-      return api.runs.start.responses[201].parse(await res.json());
+      const responseText = await res.text();
+      if (!res.ok) {
+        if (res.status === 401) throw new Error("Your session has expired. Please log in again.");
+        throw new Error(`Mission authorization failed (${res.status}).`);
+      }
+      return api.runs.start.responses[201].parse(JSON.parse(responseText));
     },
   });
 }
