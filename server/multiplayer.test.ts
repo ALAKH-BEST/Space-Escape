@@ -18,8 +18,14 @@ type MultiplayerMessage = {
   room?: {
     roomId: string;
     localPlayerId: string;
-    phase: "lobby" | "running";
+    phase: "lobby" | "running" | "finished";
     players: Player[];
+    finalRankings: Array<{
+      rank: number;
+      playerId: string;
+      username: string;
+      score: number;
+    }>;
   };
   player?: Player;
 };
@@ -158,9 +164,34 @@ test("rejects client score and alive tampering in multiplayer", async () => {
       (message) => message.type === "player:update" && message.player?.username === "Pilot One" && message.player?.alive === false,
       2_500,
     );
-    const [deathUpdateOne, deathUpdateTwo] = await Promise.all([deathForPlayerOne, deathForPlayerTwo]);
+    const finishedForPlayerOne = nextMessage(
+      playerOne,
+      (message) => message.type === "room:update" && message.room?.phase === "finished",
+      2_500,
+    );
+    const finishedForPlayerTwo = nextMessage(
+      playerTwo,
+      (message) => message.type === "room:update" && message.room?.phase === "finished",
+      2_500,
+    );
+    const [deathUpdateOne, deathUpdateTwo, finishedUpdateOne, finishedUpdateTwo] = await Promise.all([
+      deathForPlayerOne,
+      deathForPlayerTwo,
+      finishedForPlayerOne,
+      finishedForPlayerTwo,
+    ]);
     assert.ok((deathUpdateOne.player?.score ?? 0) < 999_999_999);
     assert.ok((deathUpdateTwo.player?.score ?? 0) < 999_999_999);
+    assert.equal(finishedUpdateOne.room?.finalRankings.length, 2);
+    assert.deepEqual(
+      finishedUpdateOne.room?.finalRankings.map((ranking) => ranking.rank),
+      [1, 2],
+    );
+    assert.deepEqual(
+      finishedUpdateOne.room?.finalRankings.map((ranking) => ranking.username).sort(),
+      ["Pilot One", "Pilot Two"],
+    );
+    assert.deepEqual(finishedUpdateTwo.room?.finalRankings, finishedUpdateOne.room?.finalRankings);
   } finally {
     await Promise.all([closeSocket(playerOne), closeSocket(playerTwo)]);
     await new Promise<void>((resolve, reject) => server.close((error) => (error ? reject(error) : resolve())));

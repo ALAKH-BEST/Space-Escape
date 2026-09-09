@@ -27,9 +27,17 @@ type Room = {
   id: string;
   hostId: string;
   seed: number;
-  phase: "lobby" | "running";
+  phase: "lobby" | "running" | "finished";
   startedAt: number | null;
+  finalRankings: FinalRanking[] | null;
   players: Map<string, { socket: WebSocket; player: RoomPlayer }>;
+};
+
+type FinalRanking = {
+  rank: number;
+  playerId: string;
+  username: string;
+  score: number;
 };
 
 const rooms = new Map<string, Room>();
@@ -62,6 +70,7 @@ function publicRoom(room: Room, localPlayerId: string) {
     seed: room.seed,
     startedAt: room.startedAt,
     players: Array.from(room.players.values()).map(({ player }) => player),
+    finalRankings: room.finalRankings ?? [],
   };
 }
 
@@ -75,6 +84,18 @@ function broadcastPlayer(room: Room, player: RoomPlayer) {
   room.players.forEach(({ socket }) => {
     send(socket, { type: "player:update", player });
   });
+}
+
+function calculateFinalRankings(room: Room): FinalRanking[] {
+  return Array.from(room.players.values())
+    .map(({ player }) => player)
+    .sort((left, right) => right.score - left.score || left.id.localeCompare(right.id))
+    .map((player, index) => ({
+      rank: index + 1,
+      playerId: player.id,
+      username: player.username,
+      score: player.score,
+    }));
 }
 
 function advanceRoom(room: Room, now: number) {
@@ -97,6 +118,12 @@ function advanceRoom(room: Room, now: number) {
       }
     }
   });
+
+  if (room.players.size > 0 && Array.from(room.players.values()).every(({ player }) => !player.alive)) {
+    room.phase = "finished";
+    room.finalRankings = calculateFinalRankings(room);
+    broadcastRoom(room);
+  }
 }
 
 function leaveRoom(socket: WebSocket) {
@@ -106,6 +133,19 @@ function leaveRoom(socket: WebSocket) {
 
   const room = rooms.get(connection.roomId);
   if (!room) return;
+
+  const entry = room.players.get(connection.playerId);
+  if (!entry) return;
+
+  if (room.phase === "running" && room.startedAt) {
+    entry.player.alive = false;
+    entry.player.score = calculateAuthoritativeScore(room.startedAt, entry.player.lastSeenAt);
+    broadcastPlayer(room, entry.player);
+    advanceRoom(room, Date.now());
+    if (room.players.size > 0 && room.phase === "running") broadcastRoom(room);
+    return;
+  }
+
   room.players.delete(connection.playerId);
 
   if (room.players.size === 0) {
@@ -115,13 +155,6 @@ function leaveRoom(socket: WebSocket) {
 
   if (room.hostId === connection.playerId) {
     room.hostId = room.players.keys().next().value as string;
-  }
-  if (room.phase === "running") {
-    room.phase = "lobby";
-    room.startedAt = null;
-    room.players.forEach((entry) => {
-      entry.player.ready = false;
-    });
   }
   broadcastRoom(room);
 }
@@ -134,7 +167,7 @@ function joinRoom(socket: WebSocket, username: string, roomId: string, create: b
   let room = rooms.get(id);
   if (!room && !create) return send(socket, { type: "room:error", message: "That room no longer exists." });
   if (room && room.players.size >= MAX_PLAYERS) return send(socket, { type: "room:error", message: "That room is full." });
-  if (room && room.phase === "running") return send(socket, { type: "room:error", message: "That mission has already started." });
+  if (room && room.phase !== "lobby") return send(socket, { type: "room:error", message: "That mission has already started or finished." });
 
   if (connections.has(socket)) leaveRoom(socket);
 
@@ -145,6 +178,7 @@ function joinRoom(socket: WebSocket, username: string, roomId: string, create: b
       seed: randomInt(1, 2_147_483_647),
       phase: "lobby",
       startedAt: null,
+      finalRankings: null,
       players: new Map(),
     };
   }
@@ -189,6 +223,9 @@ function handleMessage(socket: WebSocket, raw: string) {
   if (!room || !entry) return;
 
   if (message.type === "room:ready") {
+    if (room.phase !== "lobby") {
+      return send(socket, { type: "room:error", message: "This room is not accepting ready states." });
+    }
     entry.player.ready = Boolean(message.ready);
     const allReady = room.players.size > 0 && Array.from(room.players.values()).every(({ player }) => player.ready);
     if (allReady) {
@@ -202,6 +239,7 @@ function handleMessage(socket: WebSocket, raw: string) {
       });
       room.phase = "running";
       room.startedAt = startedAt;
+      room.finalRankings = null;
     }
     broadcastRoom(room);
     return;

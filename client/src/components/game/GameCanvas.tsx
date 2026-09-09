@@ -9,6 +9,7 @@ import type { MultiplayerRoom } from "@/hooks/use-multiplayer";
 
 interface GameState {
   isPlaying: boolean;
+  spectating: boolean;
   score: number;
   gameOver: boolean;
   survivalTime: number;
@@ -57,6 +58,7 @@ export function GameCanvas({
   const startingRunRef = useRef(false);
   const [gameState, setGameState] = useState<GameState>({
     isPlaying: false,
+    spectating: false,
     score: 0,
     gameOver: false,
     survivalTime: 0,
@@ -76,6 +78,7 @@ export function GameCanvas({
     lastSpawn: 0,
     score: 0,
     isPlaying: false,
+    spectating: false,
     startedAt: 0,
     runId: "",
     runToken: "",
@@ -119,13 +122,21 @@ export function GameCanvas({
 
   useEffect(() => {
     if (multiplayer?.room.phase === "running" && multiplayer.room.startedAt && !gameStateRef.current.isPlaying) {
-      startGame();
+      if (!gameStateRef.current.spectating) startGame();
     }
   }, [multiplayer?.room.phase, multiplayer?.room.startedAt]);
 
   useEffect(() => {
+    const localPlayer = multiplayer?.room.players.find((player) => player.id === multiplayer.room.localPlayerId);
+    if (multiplayer?.room.phase === "running" && localPlayer && !localPlayer.alive && gameStateRef.current.isPlaying) {
+      stopGame();
+    }
+  }, [multiplayer?.room.phase, multiplayer?.room.players]);
+
+  useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       const state = gameStateRef.current;
+      if (!state.isPlaying) return;
       if (e.code === "Space" && state.isPlaying) {
         e.preventDefault();
         activateAbility();
@@ -207,6 +218,7 @@ export function GameCanvas({
         obstacles: [],
         score: 0,
         isPlaying: true,
+        spectating: false,
         lastSpawn: now,
         startedAt: now,
         runId: run.runId,
@@ -224,7 +236,7 @@ export function GameCanvas({
         status: equippedShip === "titan" ? "3 SHIELDS" : equippedShip === "vanguard" ? "NONE" : "READY — SPACE",
         active: equippedShip === "titan",
       });
-      setGameState({ isPlaying: true, score: 0, gameOver: false, survivalTime: 0, sector: 1 });
+       setGameState({ isPlaying: true, spectating: false, score: 0, gameOver: false, survivalTime: 0, sector: 1 });
       requestRef.current = requestAnimationFrame(gameLoop);
     } finally {
       startingRunRef.current = false;
@@ -240,16 +252,20 @@ export function GameCanvas({
     const survivalTime = Math.max(0, (performance.now() - state.startedAt) / 1000);
     const activeMultiplayer = multiplayerRef.current;
     const canvas = canvasRef.current;
-    if (activeMultiplayer?.room.phase === "running" && canvas) {
+    const isMultiplayerRun = activeMultiplayer?.room.phase === "running";
+    if (isMultiplayerRun && canvas) {
       activeMultiplayer.onPosition(state.player.x / canvas.width, state.player.y / canvas.height);
     }
     setGameState({
       isPlaying: false,
+      spectating: isMultiplayerRun,
       score: finalScore,
-      gameOver: true,
+      gameOver: !isMultiplayerRun,
       survivalTime,
       sector: Math.max(1, Math.floor(finalScore / 100) + 1),
     });
+    state.spectating = isMultiplayerRun;
+    if (state.spectating) requestRef.current = requestAnimationFrame(gameLoop);
     if (state.runId && state.runToken) {
       scoreMutation.mutate(
         { runId: state.runId, runToken: state.runToken },
@@ -271,20 +287,13 @@ export function GameCanvas({
     const ctx = canvas?.getContext("2d");
     const state = gameStateRef.current;
     const ship = ships[shipRef.current];
-    if (!canvas || !ctx || !state.isPlaying) return;
+    if (!canvas || !ctx || (!state.isPlaying && !state.spectating)) return;
 
     ctx.fillStyle = "#0b0f19";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     const now = performance.now();
     const abilityActive = now < state.abilityActiveUntil;
-    const movementSpeed = (4.5 + ship.speed * 0.4) * (0.8 + ship.handling * 0.05) * (ship.id === "nova" && abilityActive ? 1.5 : 1);
-    if (state.keys.ArrowUp || state.keys.w) state.player.y -= movementSpeed;
-    if (state.keys.ArrowDown || state.keys.s) state.player.y += movementSpeed;
-    if (state.keys.ArrowLeft || state.keys.a) state.player.x -= movementSpeed;
-    if (state.keys.ArrowRight || state.keys.d) state.player.x += movementSpeed;
-    state.player.y = Math.max(PLAYER_SIZE, Math.min(canvas.height - PLAYER_SIZE, state.player.y));
-    state.player.x = Math.max(PLAYER_SIZE, Math.min(canvas.width - PLAYER_SIZE, state.player.x));
 
     state.stars.forEach((star) => {
       star.x -= star.speed;
@@ -295,54 +304,64 @@ export function GameCanvas({
       ctx.fill();
     });
 
-    if (timestamp - state.lastSpawn > SPAWN_RATE - Math.min(700, state.score * 0.5)) {
-      const types: Obstacle["type"][] = ["planet", "asteroid", "stone"];
-      const type = types[Math.floor(nextRandom(state) * types.length)];
-      const size = type === "planet" ? 40 : type === "asteroid" ? 25 : 10;
-      const speed = type === "planet" ? OBSTACLE_SPEED * 0.8 : type === "asteroid" ? OBSTACLE_SPEED * 1.2 : OBSTACLE_SPEED * 1.5;
-      state.obstacles.push({
-        x: canvas.width + 50,
-        y: nextRandom(state) * (canvas.height - 100) + 50,
-        type,
-        size,
-        speed: speed + state.score / 500,
-      });
-      state.lastSpawn = timestamp;
-    }
+    if (state.isPlaying) {
+      const movementSpeed = (4.5 + ship.speed * 0.4) * (0.8 + ship.handling * 0.05) * (ship.id === "nova" && abilityActive ? 1.5 : 1);
+      if (state.keys.ArrowUp || state.keys.w) state.player.y -= movementSpeed;
+      if (state.keys.ArrowDown || state.keys.s) state.player.y += movementSpeed;
+      if (state.keys.ArrowLeft || state.keys.a) state.player.x -= movementSpeed;
+      if (state.keys.ArrowRight || state.keys.d) state.player.x += movementSpeed;
+      state.player.y = Math.max(PLAYER_SIZE, Math.min(canvas.height - PLAYER_SIZE, state.player.y));
+      state.player.x = Math.max(PLAYER_SIZE, Math.min(canvas.width - PLAYER_SIZE, state.player.x));
 
-    for (let index = state.obstacles.length - 1; index >= 0; index--) {
-      const obstacle = state.obstacles[index];
-      obstacle.x -= obstacle.speed;
-      drawObstacle(ctx, obstacle);
+      if (timestamp - state.lastSpawn > SPAWN_RATE - Math.min(700, state.score * 0.5)) {
+        const types: Obstacle["type"][] = ["planet", "asteroid", "stone"];
+        const type = types[Math.floor(nextRandom(state) * types.length)];
+        const size = type === "planet" ? 40 : type === "asteroid" ? 25 : 10;
+        const speed = type === "planet" ? OBSTACLE_SPEED * 0.8 : type === "asteroid" ? OBSTACLE_SPEED * 1.2 : OBSTACLE_SPEED * 1.5;
+        state.obstacles.push({
+          x: canvas.width + 50,
+          y: nextRandom(state) * (canvas.height - 100) + 50,
+          type,
+          size,
+          speed: speed + state.score / 500,
+        });
+        state.lastSpawn = timestamp;
+      }
 
-      const dx = state.player.x - obstacle.x;
-      const dy = state.player.y - obstacle.y;
-      const distance = Math.sqrt(dx * dx + dy * dy);
-      const collisionRadius = PLAYER_SIZE / 1.5 + obstacle.size - ship.shield * 0.5;
-      if (distance < collisionRadius) {
-        if (ship.id === "phantom" && abilityActive) {
-          continue;
+      for (let index = state.obstacles.length - 1; index >= 0; index--) {
+        const obstacle = state.obstacles[index];
+        obstacle.x -= obstacle.speed;
+        drawObstacle(ctx, obstacle);
+
+        const dx = state.player.x - obstacle.x;
+        const dy = state.player.y - obstacle.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        const collisionRadius = PLAYER_SIZE / 1.5 + obstacle.size - ship.shield * 0.5;
+        if (distance < collisionRadius) {
+          if (ship.id === "phantom" && abilityActive) {
+            continue;
+          }
+          if (ship.id === "titan" && state.shieldCharges > 0) {
+            state.shieldCharges -= 1;
+            state.obstacles.splice(index, 1);
+            setAbilityUi({ label: "FORTRESS", status: `${state.shieldCharges} SHIELDS`, active: state.shieldCharges > 0 });
+            continue;
+          }
+          stopGame();
+          return;
         }
-        if (ship.id === "titan" && state.shieldCharges > 0) {
-          state.shieldCharges -= 1;
+
+        if (obstacle.x < -100) {
           state.obstacles.splice(index, 1);
-          setAbilityUi({ label: "FORTRESS", status: `${state.shieldCharges} SHIELDS`, active: state.shieldCharges > 0 });
-          continue;
+          state.score += 10 * (ship.id === "nova" && abilityActive ? 2 : 1);
         }
-        stopGame();
-        return;
       }
 
-      if (obstacle.x < -100) {
-        state.obstacles.splice(index, 1);
-        state.score += 10 * (ship.id === "nova" && abilityActive ? 2 : 1);
-      }
+      state.score += 0.1 * (ship.id === "nova" && abilityActive ? 2 : 1);
     }
-
-    state.score += 0.1 * (ship.id === "nova" && abilityActive ? 2 : 1);
 
     const activeMultiplayer = multiplayerRef.current;
-    if (activeMultiplayer?.room.phase === "running") {
+    if (activeMultiplayer?.room.phase === "running" || activeMultiplayer?.room.phase === "finished") {
       const visibleRemotePlayerIds = new Set<string>();
       activeMultiplayer.room.players.forEach((player) => {
         if (player.id === activeMultiplayer.room.localPlayerId) return;
@@ -382,7 +401,7 @@ export function GameCanvas({
       remoteAliveRef.current.forEach((_, playerId) => {
         if (!visibleRemotePlayerIds.has(playerId)) remoteAliveRef.current.delete(playerId);
       });
-      if (timestamp - state.lastPositionBroadcast > 60) {
+      if (state.isPlaying && timestamp - state.lastPositionBroadcast > 60) {
         activeMultiplayer.onPosition(
           state.player.x / canvas.width,
           state.player.y / canvas.height,
@@ -391,7 +410,7 @@ export function GameCanvas({
       }
     }
 
-    drawPlayer(ctx, state.player.x, state.player.y, ship, abilityActive);
+    if (state.isPlaying) drawPlayer(ctx, state.player.x, state.player.y, ship, abilityActive);
     setGameState((previous) => ({ ...previous, score: state.score }));
     requestRef.current = requestAnimationFrame(gameLoop);
   };
@@ -416,6 +435,15 @@ export function GameCanvas({
           {currentShip.id === "titan" ? <Shield className="h-5 w-5 text-amber-300" /> : <Sparkles className="h-5 w-5 text-cyan-300" />}
           <span><span className="block text-[10px] tracking-widest text-muted-foreground">{abilityUi.label}</span><span className="block text-xs text-white">{abilityUi.status}</span></span>
         </button>
+      )}
+
+      {multiplayer && gameState.spectating && multiplayer.room.phase === "running" && (
+        <div className="absolute inset-0 pointer-events-none flex items-start justify-center pt-5">
+          <div className="rounded-lg border border-cyan-300/40 bg-black/70 px-5 py-3 text-center font-mono backdrop-blur-sm">
+            <div className="text-sm font-bold tracking-[0.3em] text-cyan-300">SPECTATOR MODE</div>
+            <div className="mt-1 text-[10px] tracking-widest text-muted-foreground">SHIP ELIMINATED · WATCH THE REMAINING COMMANDERS</div>
+          </div>
+        </div>
       )}
 
        {!gameState.isPlaying && !gameState.gameOver && !multiplayer && (
