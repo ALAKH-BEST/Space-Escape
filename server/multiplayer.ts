@@ -9,6 +9,7 @@ const MAX_PLAYERS = 4;
 const ROOM_CODE_LENGTH = 6;
 const PLAYER_COLORS = ["#22d3ee", "#f472b6", "#facc15", "#a78bfa"];
 const PLAYER_HEARTBEAT_TIMEOUT_MS = 1_200;
+const ROOM_LAUNCH_GRACE_MS = 3_000;
 const MAX_POSITION_DELTA_PER_SECOND = 2.5;
 
 type RoomPlayer = {
@@ -101,6 +102,7 @@ function calculateFinalRankings(room: Room): FinalRanking[] {
 function advanceRoom(room: Room, now: number) {
   const startedAt = room.startedAt;
   if (room.phase !== "running" || !startedAt) return;
+  if (now - startedAt < ROOM_LAUNCH_GRACE_MS) return;
 
   room.players.forEach(({ player }) => {
     if (player.alive && now - player.lastSeenAt > PLAYER_HEARTBEAT_TIMEOUT_MS) {

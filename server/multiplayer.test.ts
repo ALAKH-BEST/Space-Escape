@@ -157,22 +157,22 @@ test("rejects client score and alive tampering in multiplayer", async () => {
     const deathForPlayerOne = nextMessage(
       playerOne,
       (message) => message.type === "player:update" && message.player?.username === "Pilot One" && message.player?.alive === false,
-      2_500,
+      5_000,
     );
     const deathForPlayerTwo = nextMessage(
       playerTwo,
       (message) => message.type === "player:update" && message.player?.username === "Pilot One" && message.player?.alive === false,
-      2_500,
+      5_000,
     );
     const finishedForPlayerOne = nextMessage(
       playerOne,
       (message) => message.type === "room:update" && message.room?.phase === "finished",
-      2_500,
+      5_000,
     );
     const finishedForPlayerTwo = nextMessage(
       playerTwo,
       (message) => message.type === "room:update" && message.room?.phase === "finished",
-      2_500,
+      5_000,
     );
     const [deathUpdateOne, deathUpdateTwo, finishedUpdateOne, finishedUpdateTwo] = await Promise.all([
       deathForPlayerOne,

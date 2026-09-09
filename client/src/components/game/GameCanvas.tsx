@@ -3,6 +3,7 @@ import { Link } from "wouter";
 import { Gem, Play, RotateCcw, Shield, Sparkles, Trophy, Zap } from "lucide-react";
 import { useStartRun, useSubmitScore } from "@/hooks/use-scores";
 import { useProgression } from "@/hooks/use-progression";
+import { useToast } from "@/hooks/use-toast";
 import { ships, type ShipId } from "@shared/ships";
 import { Button } from "@/components/ui/button";
 import type { MultiplayerRoom } from "@/hooks/use-multiplayer";
@@ -54,6 +55,7 @@ export function GameCanvas({
   const shipRef = useRef<ShipId>("vanguard");
   const scoreMutation = useSubmitScore();
   const startRunMutation = useStartRun();
+  const { toast } = useToast();
   const { data: progression } = useProgression();
   const startingRunRef = useRef(false);
   const [gameState, setGameState] = useState<GameState>({
@@ -236,8 +238,14 @@ export function GameCanvas({
         status: equippedShip === "titan" ? "3 SHIELDS" : equippedShip === "vanguard" ? "NONE" : "READY — SPACE",
         active: equippedShip === "titan",
       });
-       setGameState({ isPlaying: true, spectating: false, score: 0, gameOver: false, survivalTime: 0, sector: 1 });
+      setGameState({ isPlaying: true, spectating: false, score: 0, gameOver: false, survivalTime: 0, sector: 1 });
       requestRef.current = requestAnimationFrame(gameLoop);
+    } catch (error) {
+      toast({
+        title: "Mission launch failed",
+        description: error instanceof Error ? error.message : "Could not authorize this mission.",
+        variant: "destructive",
+      });
     } finally {
       startingRunRef.current = false;
     }
