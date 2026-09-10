@@ -1,3 +1,4 @@
 - [Static hosting backend configuration](static-hosting.md) — itch.io builds need a real published backend origin supplied at build time.
 - [Multiplayer room architecture](multiplayer-rooms.md) — four-player room state currently lives in the Node process and syncs over `/ws`.
 - [Server-authoritative scoring](server-authoritative-scoring.md) — scores and rewards must derive from server-issued run authorization, never client score fields.
+- [Workflow refresh for server changes](workflow-refresh.md) — verify the running process start time when behavior contradicts source; stale workflows can retain old server modules.

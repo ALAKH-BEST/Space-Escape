@@ -33,8 +33,14 @@ export function useLogin() {
       });
 
       if (!res.ok) {
-        const error = await res.json();
-        throw new Error(error.message || "Login failed");
+        const text = await res.text();
+        let message = "Login failed";
+        try {
+          message = JSON.parse(text).message || message;
+        } catch {
+          if (text) message = text;
+        }
+        throw new Error(message);
       }
       return await res.json();
     },
