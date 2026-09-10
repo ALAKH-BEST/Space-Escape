@@ -68,7 +68,16 @@ export function useStartRun() {
         body: JSON.stringify({ mode }),
         credentials: "include",
       });
-      if (!res.ok) throw new Error("Could not authorize mission");
+      if (!res.ok) {
+        let message = `Mission authorization failed (${res.status})`;
+        try {
+          const data = await res.json();
+          if (typeof data?.message === "string" && data.message.trim()) message = data.message;
+        } catch {
+          // Keep the status-based message when the server response is not JSON.
+        }
+        throw new Error(message);
+      }
       return api.runs.start.responses[201].parse(await res.json());
     },
   });
