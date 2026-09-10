@@ -11,6 +11,18 @@ import { pool } from "./db";
 
 const PgSession = connectPgSimple(session);
 
+const SESSION_TABLE_SQL = `
+  CREATE TABLE IF NOT EXISTS "session" (
+    "sid" varchar NOT NULL COLLATE "default",
+    "sess" json NOT NULL,
+    "expire" timestamp(6) NOT NULL,
+    CONSTRAINT "session_pkey" PRIMARY KEY ("sid")
+  );
+
+  CREATE INDEX IF NOT EXISTS "IDX_session_expire"
+    ON "session" ("expire");
+`;
+
 declare global {
   namespace Express {
     interface User extends SelectUser {}
@@ -32,7 +44,12 @@ async function comparePasswords(supplied: string, stored: string) {
   return timingSafeEqual(hashedBuf, suppliedBuf);
 }
 
-export function setupAuth(app: Express) {
+export async function setupAuth(app: Express) {
+  // Create the session table here instead of relying on connect-pg-simple to
+  // read its package-local table.sql file. The server build bundles that
+  // package, so the package-local path is not present in production.
+  await pool.query(SESSION_TABLE_SQL);
+
   const sessionSettings: session.SessionOptions = {
     secret: process.env.SESSION_SECRET || "secret_key",
     resave: false,
@@ -40,7 +57,7 @@ export function setupAuth(app: Express) {
     store: new PgSession({
       pool,
       tableName: "session",
-      createTableIfMissing: true,
+      createTableIfMissing: false,
     }),
   };
 

@@ -14,7 +14,7 @@ import {
 
 export async function registerRoutes(httpServer: Server, app: Express): Promise<Server> {
   // Setup authentication
-  setupAuth(app);
+  await setupAuth(app);
 
   // Scores API
   app.get(api.scores.list.path, async (req, res) => {
