@@ -4,10 +4,11 @@ import { rm, readFile } from "fs/promises";
 
 // server deps to bundle to reduce openat(2) syscalls
 // which helps cold start times
+// connect-pg-simple is intentionally NOT bundled: auth uses memorystore,
+// and bundling it can make its package-local table.sql lookup resolve to dist/table.sql.
 const allowlist = [
   "@google/generative-ai",
   "axios",
-  "connect-pg-simple",
   "cors",
   "date-fns",
   "drizzle-orm",
