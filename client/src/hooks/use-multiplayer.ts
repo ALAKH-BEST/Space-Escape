@@ -12,23 +12,15 @@ export type MultiplayerPlayer = {
   score: number;
 };
 
-export type MultiplayerRanking = {
-  rank: number;
-  playerId: string;
-  username: string;
-  score: number;
-};
-
 export type MultiplayerRoom = {
   roomId: string;
   hostId: string;
   localPlayerId: string;
   maxPlayers: number;
-  phase: "lobby" | "running" | "finished";
+  phase: "lobby" | "running";
   seed: number;
   startedAt: number | null;
   players: MultiplayerPlayer[];
-  finalRankings: MultiplayerRanking[];
 };
 
 function websocketUrl() {

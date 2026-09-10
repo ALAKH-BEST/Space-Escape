@@ -6,22 +6,9 @@ import { scrypt, randomBytes, timingSafeEqual } from "crypto";
 import { promisify } from "util";
 import { storage } from "./storage";
 import { User as SelectUser } from "@shared/schema";
-import connectPgSimple from "connect-pg-simple";
-import { pool } from "./db";
+import MemoryStoreFactory from "memorystore";
 
-const PgSession = connectPgSimple(session);
-
-const SESSION_TABLE_SQL = `
-  CREATE TABLE IF NOT EXISTS "session" (
-    "sid" varchar NOT NULL COLLATE "default",
-    "sess" json NOT NULL,
-    "expire" timestamp(6) NOT NULL,
-    CONSTRAINT "session_pkey" PRIMARY KEY ("sid")
-  );
-
-  CREATE INDEX IF NOT EXISTS "IDX_session_expire"
-    ON "session" ("expire");
-`;
+const MemoryStore = MemoryStoreFactory(session);
 
 declare global {
   namespace Express {
@@ -44,20 +31,13 @@ async function comparePasswords(supplied: string, stored: string) {
   return timingSafeEqual(hashedBuf, suppliedBuf);
 }
 
-export async function setupAuth(app: Express) {
-  // Create the session table here instead of relying on connect-pg-simple to
-  // read its package-local table.sql file. The server build bundles that
-  // package, so the package-local path is not present in production.
-  await pool.query(SESSION_TABLE_SQL);
-
+export function setupAuth(app: Express) {
   const sessionSettings: session.SessionOptions = {
     secret: process.env.SESSION_SECRET || "secret_key",
     resave: false,
     saveUninitialized: false,
-    store: new PgSession({
-      pool,
-      tableName: "session",
-      createTableIfMissing: false,
+    store: new MemoryStore({
+      checkPeriod: 86400000,
     }),
   };
 

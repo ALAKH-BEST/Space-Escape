@@ -59,8 +59,6 @@ export default function MultiplayerPage() {
           </div>
         ) : multiplayer.room.phase === "running" ? (
           <RunningRoom room={multiplayer.room} sendPosition={multiplayer.sendPosition} />
-        ) : multiplayer.room.phase === "finished" ? (
-          <FinishedRoom room={multiplayer.room} onLeave={multiplayer.leaveRoom} />
         ) : (
           <Lobby
             room={multiplayer.room}
@@ -224,50 +222,4 @@ function RunningRoom({
       </div>
     </div>
   );
-}
-
-function FinishedRoom({
-  room,
-  onLeave,
-}: {
-  room: NonNullable<ReturnType<typeof useMultiplayer>["room"]>;
-  onLeave: () => void;
-}) {
-  return (
-    <Card className="mx-auto mt-8 max-w-3xl border-primary/30 bg-card/60 shadow-2xl shadow-primary/10 backdrop-blur-xl">
-      <CardHeader className="text-center">
-        <CardTitle className="font-display text-3xl tracking-[0.2em] text-white">MISSION COMPLETE</CardTitle>
-        <CardDescription className="mt-2 font-mono tracking-widest text-emerald-300">
-          ALL COMMANDERS ELIMINATED · FINAL RANKINGS
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-3">
-        {room.finalRankings.map((ranking) => (
-          <div
-            key={ranking.playerId}
-            className={`flex items-center justify-between rounded-lg border px-4 py-4 ${
-              ranking.rank === 1 ? "border-amber-300/50 bg-amber-300/10" : "border-white/10 bg-background/40"
-            }`}
-          >
-            <div className="flex items-center gap-4">
-              <span className="w-10 text-center font-display text-2xl text-amber-200">{formatRank(ranking.rank)}</span>
-              <div className="font-mono text-sm tracking-wider text-white">{ranking.username}</div>
-            </div>
-            <div className="font-display text-xl text-cyan-300">{ranking.score.toLocaleString()}</div>
-          </div>
-        ))}
-        <Button variant="ghost" onClick={onLeave} className="mx-auto mt-5 flex font-mono text-xs text-muted-foreground hover:text-destructive">
-          <LogOut className="mr-2 h-4 w-4" /> LEAVE ROOM
-        </Button>
-      </CardContent>
-    </Card>
-  );
-}
-
-function formatRank(rank: number) {
-  if (rank % 100 >= 11 && rank % 100 <= 13) return `${rank}th`;
-  if (rank % 10 === 1) return `${rank}st`;
-  if (rank % 10 === 2) return `${rank}nd`;
-  if (rank % 10 === 3) return `${rank}rd`;
-  return `${rank}th`;
 }
