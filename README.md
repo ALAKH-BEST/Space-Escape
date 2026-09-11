@@ -4,13 +4,13 @@ Players compete to survive, react quickly to game events, and achieve the highes
 
 ->> Features
 
-Real-time multiplayer gameplay
-WebSocket-based state synchronization
-Server-authoritative game logic
-Authentication & persistent sessions
-PostgreSQL-backed leaderboard
-Spectator mode
-Final rankings
+Real-time multiplayer gameplay,
+WebSocket-based state synchronization,
+Server-authoritative game logic,
+Authentication & persistent sessions,
+PostgreSQL-backed leaderboard,
+Spectator mode,
+Final rankings,
 Automated multiplayer/server-authority tests
 
 ->> Tech Stack
