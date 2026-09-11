@@ -14,4 +14,5 @@ Final rankings
 Automated multiplayer/server-authority tests
 
 ->> Tech Stack
+
 React · TypeScript · Node.js · Express · WebSockets · PostgreSQL · Drizzle ORM · Tailwind CSS
