@@ -85,7 +85,7 @@ function ShipCard({
               </Badge>
               <span className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest">{ship.role}</span>
             </div>
-            <h2 className="text-2xl font-display font-bold text-white">{ship.name}</h2>
+            <h2 className="text-2xl font-display font-bold text-foreground">{ship.name}</h2>
           </div>
           <ShipVisual shipId={ship.id} color={ship.color} />
         </CardHeader>
