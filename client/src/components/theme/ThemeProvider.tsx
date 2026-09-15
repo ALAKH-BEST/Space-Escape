@@ -31,6 +31,18 @@ export const themes = [
     description: "Dark red mystery",
     swatches: ["#090507", "#991b1b", "#7e22ce"],
   },
+  {
+    id: "starlight-white",
+    name: "Starlight White",
+    description: "Silky pearl sci-fi",
+    swatches: ["#f4f0e8", "#b08d57", "#7c8da6"],
+  },
+  {
+    id: "nebula-green",
+    name: "Nebula Green",
+    description: "Emerald cosmic atmosphere",
+    swatches: ["#061a16", "#10b981", "#5eead4"],
+  },
 ] as const;
 
 export type ThemeId = (typeof themes)[number]["id"];
