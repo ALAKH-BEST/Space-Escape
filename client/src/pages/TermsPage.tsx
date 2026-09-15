@@ -20,9 +20,9 @@ export default function TermsPage() {
             </div>
             <div className="space-y-6 text-muted-foreground leading-relaxed">
               <p>ASTRODODGE is an independent student game project. By using the website, you agree to use the service responsibly and respect the integrity of the game and its community.</p>
-              <section className="space-y-2"><h2 className="text-lg font-display font-bold text-white">Fair Play</h2><p>Do not attempt to disrupt the service, impersonate another commander, manipulate leaderboard records, or use the game to harm other players.</p></section>
-              <section className="space-y-2"><h2 className="text-lg font-display font-bold text-white">Service Changes</h2><p>ASTRODODGE may change, improve, or temporarily suspend features as the project develops.</p></section>
-              <section className="space-y-2"><h2 className="text-lg font-display font-bold text-white">Contact</h2><p>Questions about these terms can be sent to <a href="mailto:astrododge1@gmail.com" className="text-primary hover:text-accent transition-colors">astrododge1@gmail.com</a>.</p></section>
+              <section className="space-y-2"><h2 className="text-lg font-display font-bold text-foreground">Fair Play</h2><p>Do not attempt to disrupt the service, impersonate another commander, manipulate leaderboard records, or use the game to harm other players.</p></section>
+              <section className="space-y-2"><h2 className="text-lg font-display font-bold text-foreground">Service Changes</h2><p>ASTRODODGE may change, improve, or temporarily suspend features as the project develops.</p></section>
+              <section className="space-y-2"><h2 className="text-lg font-display font-bold text-foreground">Contact</h2><p>Questions about these terms can be sent to <a href="mailto:astrododge1@gmail.com" className="text-primary hover:text-accent transition-colors">astrododge1@gmail.com</a>.</p></section>
             </div>
           </CardContent>
         </Card>
