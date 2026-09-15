@@ -31,7 +31,7 @@ export default function GamePage() {
               </div>
               
               <div className="space-y-4">
-                <h1 className="text-6xl font-display font-bold text-white tracking-tighter">
+                <h1 className="text-6xl font-display font-bold text-foreground tracking-tighter">
                   ASTRODODGE
                 </h1>
                 <p className="text-xl text-muted-foreground font-mono max-w-lg mx-auto">
@@ -54,17 +54,17 @@ export default function GamePage() {
                 <div className="p-4 rounded-xl bg-white/5 border border-white/10 backdrop-blur">
                   <Target className="w-6 h-6 text-accent mx-auto mb-2" />
                   <div className="text-[10px] font-mono text-muted-foreground uppercase">Objective</div>
-                  <div className="text-sm font-bold text-white">Survive</div>
+                  <div className="text-sm font-bold text-foreground">Survive</div>
                 </div>
                 <div className="p-4 rounded-xl bg-white/5 border border-white/10 backdrop-blur">
                   <Rocket className="w-6 h-6 text-primary mx-auto mb-2" />
                   <div className="text-[10px] font-mono text-muted-foreground uppercase">Ship</div>
-                  <div className="text-sm font-bold text-white">{currentShip.name}</div>
+                  <div className="text-sm font-bold text-foreground">{currentShip.name}</div>
                 </div>
                 <div className="p-4 rounded-xl bg-white/5 border border-white/10 backdrop-blur">
                   <Trophy className="w-6 h-6 text-yellow-500 mx-auto mb-2" />
                   <div className="text-[10px] font-mono text-muted-foreground uppercase">Status</div>
-                  <div className="text-sm font-bold text-white">Ready</div>
+                  <div className="text-sm font-bold text-foreground">Ready</div>
                 </div>
               </div>
 
@@ -81,7 +81,7 @@ export default function GamePage() {
             >
               <div className="flex items-center justify-between">
                 <div>
-                  <h1 className="text-4xl font-display font-bold text-white mb-2">
+                  <h1 className="text-4xl font-display font-bold text-foreground mb-2">
                     SECTOR 7: ASTEROID FIELD
                   </h1>
                   <p className="text-muted-foreground font-mono">
@@ -125,7 +125,7 @@ function StatsCard({ label, value, delay }: { label: string; value: string; dela
       <div className="text-xs font-mono text-muted-foreground uppercase tracking-widest mb-2">
         {label}
       </div>
-      <div className="text-2xl font-display font-bold text-white">
+      <div className="text-2xl font-display font-bold text-foreground">
         {value}
       </div>
     </Card>
