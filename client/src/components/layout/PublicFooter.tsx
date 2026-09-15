@@ -10,7 +10,7 @@ export function PublicFooter() {
             <Rocket className="h-4 w-4 text-white" />
           </div>
           <div>
-            <div className="text-sm font-display font-bold tracking-wider text-white">
+            <div className="text-sm font-display font-bold tracking-wider text-foreground">
               ASTRO<span className="text-primary">DODGE</span>
             </div>
             <div className="text-[10px] font-mono text-muted-foreground tracking-widest">
