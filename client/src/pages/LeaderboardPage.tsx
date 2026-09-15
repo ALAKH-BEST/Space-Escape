@@ -49,8 +49,8 @@ export default function LeaderboardPage() {
                 <TableBody>
                   {scores && scores.length > 0 ? (
                     scores.map((score, index) => (
-                      <TableRow 
-                        key={score.id} 
+                      <TableRow
+                        key={score.id}
                         className="border-white/5 hover:bg-white/5 transition-colors group"
                       >
                         <TableCell className="font-mono font-bold text-lg">
@@ -64,7 +64,7 @@ export default function LeaderboardPage() {
                             <div className="h-8 w-8 rounded-full bg-primary/20 flex items-center justify-center">
                               <User className="h-4 w-4 text-primary" />
                             </div>
-                            <span className="font-medium text-white group-hover:text-primary transition-colors">
+                            <span className="font-medium text-foreground group-hover:text-primary transition-colors">
                               {score.username}
                             </span>
                           </div>
