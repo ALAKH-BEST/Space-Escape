@@ -97,6 +97,50 @@
   --glow-two: 88 28 135;
 }
 
+[data-theme="starlight-white"] {
+  --background: 42 24% 94%;
+  --foreground: 224 28% 16%;
+  --primary: 31 34% 43%;
+  --primary-foreground: 42 24% 97%;
+  --secondary: 214 24% 48%;
+  --secondary-foreground: 42 24% 97%;
+  --muted: 40 18% 87%;
+  --muted-foreground: 220 14% 38%;
+  --accent: 35 44% 62%;
+  --accent-foreground: 224 28% 16%;
+  --border: 35 18% 76%;
+  --input: 35 18% 80%;
+  --ring: 31 34% 43%;
+  --card: 40 28% 98%;
+  --card-foreground: 224 28% 16%;
+  --popover: 40 28% 98%;
+  --popover-foreground: 224 28% 16%;
+  --glow-one: 176 146 110;
+  --glow-two: 148 163 184;
+}
+
+[data-theme="nebula-green"] {
+  --background: 160 48% 5%;
+  --foreground: 152 25% 95%;
+  --primary: 158 84% 39%;
+  --primary-foreground: 160 48% 5%;
+  --secondary: 171 66% 45%;
+  --secondary-foreground: 160 48% 5%;
+  --accent: 162 72% 56%;
+  --accent-foreground: 160 48% 5%;
+  --muted: 161 34% 11%;
+  --muted-foreground: 154 18% 66%;
+  --border: 160 35% 22%;
+  --input: 160 35% 18%;
+  --ring: 158 84% 39%;
+  --card: 160 42% 7%;
+  --card-foreground: 152 25% 95%;
+  --popover: 160 42% 7%;
+  --popover-foreground: 152 25% 95%;
+  --glow-one: 16 185 129;
+  --glow-two: 45 212 191;
+}
+
 @layer base {
   * {
     @apply border-border;
@@ -143,7 +187,7 @@
 }
 ::-webkit-scrollbar-thumb {
   background: hsl(var(--border)); 
-  border-radius: 4px;
+  border-radius: 4px; 
 }
 ::-webkit-scrollbar-thumb:hover {
   background: hsl(var(--muted-foreground)); 
@@ -156,4 +200,13 @@
 
 .neon-text {
   text-shadow: 0 0 5px theme('colors.primary.DEFAULT');
+}
+
+[data-theme="starlight-white"] h1,
+[data-theme="starlight-white"] h2,
+[data-theme="starlight-white"] h3,
+[data-theme="starlight-white"] h4,
+[data-theme="starlight-white"] h5,
+[data-theme="starlight-white"] h6 {
+  background-image: linear-gradient(to right, hsl(224 28% 16%), hsl(220 14% 38%));
 }
