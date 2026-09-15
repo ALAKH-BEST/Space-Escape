@@ -67,7 +67,7 @@ export default function PrivacyPage() {
 }
 
 function PolicySection({ title, children }: { title: string; children: React.ReactNode }) {
-  return <section className="space-y-3"><h2 className="text-lg font-display font-bold text-white">{title}</h2>{children}</section>;
+  return <section className="space-y-3"><h2 className="text-lg font-display font-bold text-foreground">{title}</h2>{children}</section>;
 }
 
 function BulletList({ items }: { items: string[] }) {
