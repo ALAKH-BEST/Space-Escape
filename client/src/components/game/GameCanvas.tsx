@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "wouter";
+import { AnimatePresence, motion } from "framer-motion";
 import { Gem, Play, RotateCcw, Shield, Sparkles, Trophy, Zap } from "lucide-react";
 import { useStartRun, useSubmitScore } from "@/hooks/use-scores";
 import { useProgression } from "@/hooks/use-progression";
@@ -45,6 +46,7 @@ type DeathBurst = {
 const PLAYER_SIZE = 30;
 const OBSTACLE_SPEED = 3.5;
 const SPAWN_RATE = 1500;
+const SECTOR_TRANSITION_MS = 1600;
 
 export function GameCanvas({
   multiplayer,
@@ -65,6 +67,12 @@ export function GameCanvas({
   const startRunMutation = useStartRun();
   const { data: progression, isLoading: isProgressionLoading } = useProgression();
   const startingSectorNumber = getSectorNumberById(initialSectorId);
+  const backgroundSectorRef = useRef(startingSectorNumber);
+  const sectorTransitionRef = useRef<{
+    from: number;
+    to: number;
+    startedAt: number;
+  } | null>(null);
   const startingRunRef = useRef(false);
   const autoStartAttemptedRef = useRef(false);
   const [gameState, setGameState] = useState<GameState>({
@@ -213,6 +221,8 @@ export function GameCanvas({
       const equippedShip = progression?.equippedShip ?? "vanguard";
       shipRef.current = equippedShip;
       const now = performance.now();
+      backgroundSectorRef.current = startingSectorNumber;
+      sectorTransitionRef.current = null;
       gameStateRef.current = {
         ...gameStateRef.current,
         player: { x: 50, y: canvas.height / 2 },
@@ -299,13 +309,29 @@ export function GameCanvas({
     const ship = ships[shipRef.current];
     if (!canvas || !ctx || !state.isPlaying) return;
 
-    drawSectorEnvironment(
-      ctx,
-      canvas.width,
-      canvas.height,
-      startingSectorNumber + Math.floor(state.score / 100),
-      timestamp,
-    );
+    const activeSector = startingSectorNumber + Math.floor(state.score / 100);
+    if (activeSector !== backgroundSectorRef.current) {
+      sectorTransitionRef.current = {
+        from: backgroundSectorRef.current,
+        to: activeSector,
+        startedAt: timestamp,
+      };
+      backgroundSectorRef.current = activeSector;
+    }
+
+    const sectorTransition = sectorTransitionRef.current;
+    if (sectorTransition) {
+      const progress = Math.min(1, (timestamp - sectorTransition.startedAt) / SECTOR_TRANSITION_MS);
+      const easedProgress = progress * progress * (3 - 2 * progress);
+      drawSectorEnvironment(ctx, canvas.width, canvas.height, sectorTransition.from, timestamp);
+      ctx.save();
+      ctx.globalAlpha = easedProgress;
+      drawSectorEnvironment(ctx, canvas.width, canvas.height, sectorTransition.to, timestamp);
+      ctx.restore();
+      if (progress >= 1) sectorTransitionRef.current = null;
+    } else {
+      drawSectorEnvironment(ctx, canvas.width, canvas.height, activeSector, timestamp);
+    }
 
     const now = performance.now();
     const abilityActive = now < state.abilityActiveUntil;
@@ -439,9 +465,19 @@ export function GameCanvas({
         {gameState.isPlaying && (
           <>
             <div className="text-[10px] text-muted-foreground tracking-widest">{currentShip.name}</div>
-            <div className="text-[9px] font-mono tracking-[0.18em] text-white/55">
-              {currentEnvironment.shortName} · SECTOR {String(displayedSector).padStart(2, "0")}
-            </div>
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={displayedSector}
+                initial={{ opacity: 0, y: 4, filter: "blur(3px)" }}
+                animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                exit={{ opacity: 0, y: -3, filter: "blur(2px)" }}
+                transition={{ duration: 0.35, ease: "easeOut" }}
+                aria-live="polite"
+                className="text-[9px] font-mono tracking-[0.18em] text-white/55"
+              >
+                {currentEnvironment.shortName} · SECTOR {String(displayedSector).padStart(2, "0")}
+              </motion.div>
+            </AnimatePresence>
           </>
         )}
       </div>
