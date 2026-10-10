@@ -3,6 +3,7 @@ import { Link } from "wouter";
 import { Gem, Play, RotateCcw, Shield, Sparkles, Trophy, Zap } from "lucide-react";
 import { useStartRun, useSubmitScore } from "@/hooks/use-scores";
 import { useProgression } from "@/hooks/use-progression";
+import { drawSectorEnvironment, getSectorEnvironmentByNumber } from "@/lib/sector-environments";
 import { ships, type ShipId } from "@shared/ships";
 import { Button } from "@/components/ui/button";
 import type { MultiplayerRoom } from "@/hooks/use-multiplayer";
@@ -273,8 +274,13 @@ export function GameCanvas({
     const ship = ships[shipRef.current];
     if (!canvas || !ctx || !state.isPlaying) return;
 
-    ctx.fillStyle = "#0b0f19";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    drawSectorEnvironment(
+      ctx,
+      canvas.width,
+      canvas.height,
+      Math.floor(state.score / 100) + 1,
+      timestamp,
+    );
 
     const now = performance.now();
     const abilityActive = now < state.abilityActiveUntil;
@@ -397,13 +403,22 @@ export function GameCanvas({
   };
 
   const currentShip = ships[shipRef.current];
+  const displayedSector = Math.max(1, Math.floor(gameState.score / 100) + 1);
+  const currentEnvironment = getSectorEnvironmentByNumber(displayedSector);
 
   return (
     <div className="relative w-full aspect-video rounded-xl overflow-hidden border-2 border-primary/30 shadow-2xl shadow-primary/20 bg-black">
       <canvas ref={canvasRef} className="w-full h-full block" />
       <div className="absolute top-4 right-4 text-right font-mono text-white">
         <div className="text-2xl font-bold neon-text">SCORE: {Math.floor(gameState.score)}</div>
-        {gameState.isPlaying && <div className="text-[10px] text-muted-foreground tracking-widest">{currentShip.name}</div>}
+        {gameState.isPlaying && (
+          <>
+            <div className="text-[10px] text-muted-foreground tracking-widest">{currentShip.name}</div>
+            <div className="text-[9px] font-mono tracking-[0.18em] text-white/55">
+              {currentEnvironment.shortName} · SECTOR {String(displayedSector).padStart(2, "0")}
+            </div>
+          </>
+        )}
       </div>
 
       {gameState.isPlaying && (

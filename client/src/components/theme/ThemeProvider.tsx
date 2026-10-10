@@ -2,16 +2,22 @@ import { createContext, useContext, useEffect, useMemo, useState, type ReactNode
 
 export const themes = [
   {
-    id: "nebula-green",
-    name: "Nebula Green",
-    description: "Emerald cosmic atmosphere",
-    swatches: ["#061a16", "#10b981", "#5eead4"],
-  },
-  {
     id: "deep-space",
     name: "Deep Space",
     description: "Calm premium sci-fi",
     swatches: ["#070b1f", "#4f46e5", "#38bdf8"],
+  },
+  {
+    id: "starlight-white",
+    name: "Starlight White",
+    description: "Silky pearl sci-fi",
+    swatches: ["#f4f0e8", "#b08d57", "#7c8da6"],
+  },
+  {
+    id: "nebula-green",
+    name: "Nebula Green",
+    description: "Emerald cosmic atmosphere",
+    swatches: ["#061a16", "#10b981", "#5eead4"],
   },
   {
     id: "neon-cyberpunk",
@@ -37,17 +43,11 @@ export const themes = [
     description: "Dark red mystery",
     swatches: ["#090507", "#991b1b", "#7e22ce"],
   },
-  {
-    id: "starlight-white",
-    name: "Starlight White",
-    description: "Silky pearl sci-fi",
-    swatches: ["#f4f0e8", "#b08d57", "#7c8da6"],
-  },
 ] as const;
 
 export type ThemeId = (typeof themes)[number]["id"];
 
-const defaultTheme: ThemeId = "nebula-green";
+const defaultTheme: ThemeId = "deep-space";
 const storageKey = "astrododge-theme";
 
 type ThemeContextValue = {

@@ -1,0 +1,345 @@
+.hangar-scene {
+  --sector-background: #080716;
+  --sector-deep: #17102d;
+  --sector-nebula: #8b5cf6;
+  --sector-planet: #51418c;
+  --sector-accent: #c4b5fd;
+  --sector-debris: #d8d1ff;
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  min-height: 610px;
+  border: 1px solid hsl(var(--primary) / 0.24);
+  border-radius: 1.2rem;
+  background:
+    linear-gradient(122deg, color-mix(in srgb, var(--sector-background) 76%, transparent), color-mix(in srgb, var(--sector-deep) 88%, transparent)),
+    var(--sector-background);
+  box-shadow: 0 24px 90px rgba(0, 0, 0, 0.24), inset 0 0 70px rgba(0, 0, 0, 0.35);
+}
+
+.hangar-scene::before,
+.hangar-scene::after {
+  position: absolute;
+  z-index: -1;
+  inset: -18%;
+  content: "";
+  pointer-events: none;
+}
+
+.hangar-scene::before {
+  background:
+    radial-gradient(ellipse at 32% 56%, color-mix(in srgb, var(--sector-nebula) 48%, transparent), transparent 38%),
+    radial-gradient(ellipse at 72% 37%, color-mix(in srgb, var(--sector-planet) 54%, transparent), transparent 35%),
+    linear-gradient(135deg, var(--sector-background), var(--sector-deep));
+  filter: blur(26px);
+  opacity: 0.9;
+  animation: hangar-nebula-drift 26s ease-in-out infinite alternate;
+}
+
+.hangar-scene::after {
+  inset: 0;
+  background-image:
+    radial-gradient(circle, rgba(255, 255, 255, 0.72) 0 1px, transparent 1.5px),
+    radial-gradient(circle, rgba(255, 255, 255, 0.44) 0 1px, transparent 1.5px),
+    linear-gradient(110deg, transparent 30%, rgba(255, 255, 255, 0.025), transparent 72%);
+  background-position: 14px 25px, 88px 72px, center;
+  background-size: 142px 142px, 217px 217px, 100% 100%;
+  opacity: 0.3;
+}
+
+.hangar-scene-content {
+  position: relative;
+  z-index: 2;
+  padding: 1.25rem;
+}
+
+.hangar-nebula {
+  position: absolute;
+  z-index: -1;
+  inset: -25%;
+  background: radial-gradient(ellipse at 44% 56%, color-mix(in srgb, var(--sector-nebula) 18%, transparent), transparent 47%);
+  filter: blur(30px);
+  opacity: 0.72;
+  animation: hangar-nebula-pulse 17s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+
+.hangar-starfield {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.56) 0.7px, transparent 1px);
+  background-size: 39px 39px;
+  mask-image: linear-gradient(90deg, transparent 0%, black 26%, black 100%);
+  opacity: 0.26;
+  pointer-events: none;
+}
+
+.hangar-distant-planet {
+  position: absolute;
+  z-index: 0;
+  top: 13%;
+  right: 8%;
+  width: clamp(105px, 17vw, 206px);
+  aspect-ratio: 1;
+  border: 1px solid color-mix(in srgb, var(--sector-accent) 28%, transparent);
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 31% 28%, rgba(255, 255, 255, 0.45), transparent 13%),
+    radial-gradient(circle at 36% 30%, color-mix(in srgb, var(--sector-accent) 60%, white), var(--sector-planet) 42%, var(--sector-background) 84%);
+  box-shadow:
+    inset -24px -10px 36px rgba(0, 0, 0, 0.58),
+    0 0 44px color-mix(in srgb, var(--sector-nebula) 24%, transparent);
+  opacity: 0.78;
+  pointer-events: none;
+}
+
+.hangar-planet-ring {
+  position: absolute;
+  top: 36%;
+  left: -22%;
+  width: 146%;
+  height: 31%;
+  border: 1px solid color-mix(in srgb, var(--sector-accent) 48%, transparent);
+  border-radius: 50%;
+  transform: rotate(-22deg);
+  box-shadow: 0 0 14px color-mix(in srgb, var(--sector-nebula) 18%, transparent);
+}
+
+.hangar-debris {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.hangar-debris-piece {
+  position: absolute;
+  top: var(--debris-y);
+  left: var(--debris-x);
+  width: 8px;
+  height: 4px;
+  border: 1px solid color-mix(in srgb, var(--sector-debris) 70%, transparent);
+  background: color-mix(in srgb, var(--sector-debris) 26%, transparent);
+  box-shadow: 0 0 12px color-mix(in srgb, var(--sector-nebula) 54%, transparent);
+  opacity: 0.44;
+  transform: scale(var(--debris-scale)) rotate(28deg);
+  animation: hangar-debris-drift 13s linear var(--debris-delay) infinite;
+}
+
+.hangar-scene-grid {
+  display: grid;
+  grid-template-columns: minmax(240px, 0.88fr) minmax(300px, 1.12fr);
+  align-items: center;
+  gap: clamp(1rem, 3vw, 3rem);
+  min-height: 385px;
+  padding: 1.5rem 0 1rem;
+}
+
+.hangar-vessel-info {
+  position: relative;
+  z-index: 2;
+}
+
+.hangar-ship-view {
+  position: relative;
+  display: flex;
+  min-width: 0;
+  height: clamp(250px, 31vw, 380px);
+  align-items: center;
+  justify-content: center;
+  perspective: 1050px;
+  transform-style: preserve-3d;
+}
+
+.hangar-planet-glow {
+  position: absolute;
+  top: 9%;
+  right: 8%;
+  width: 56%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle, color-mix(in srgb, var(--sector-nebula) 24%, transparent), transparent 69%);
+  filter: blur(12px);
+}
+
+.hangar-ship-orbit {
+  position: absolute;
+  width: 82%;
+  height: 37%;
+  border: 1px solid color-mix(in srgb, var(--sector-accent) 40%, transparent);
+  border-radius: 50%;
+  transform: rotate(-18deg);
+  box-shadow: 0 0 20px color-mix(in srgb, var(--sector-nebula) 18%, transparent);
+}
+
+.hangar-ship-platform {
+  position: absolute;
+  bottom: 15%;
+  width: 66%;
+  height: 12%;
+  border: 1px solid color-mix(in srgb, var(--sector-accent) 24%, transparent);
+  border-radius: 50%;
+  background: radial-gradient(ellipse, color-mix(in srgb, var(--sector-nebula) 26%, transparent), transparent 68%);
+  box-shadow: 0 18px 34px color-mix(in srgb, var(--sector-nebula) 17%, transparent);
+  transform: rotateX(58deg);
+}
+
+.hangar-ship-model {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  width: min(100%, 470px);
+  align-items: center;
+  justify-content: center;
+  transform-style: preserve-3d;
+  filter: drop-shadow(0 20px 28px rgba(0, 0, 0, 0.62)) drop-shadow(0 0 22px var(--ship-glow));
+  animation: hangar-ship-rotation 18s linear infinite;
+}
+
+.hangar-ship-svg {
+  display: block;
+  width: 100%;
+  overflow: visible;
+}
+
+.hangar-view-label {
+  position: absolute;
+  right: 0;
+  bottom: 1%;
+  left: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono, monospace);
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  color: rgba(255, 255, 255, 0.58);
+}
+
+.hangar-live-dot {
+  width: 6px;
+  height: 6px;
+  margin-right: 8px;
+  border-radius: 50%;
+  background: var(--sector-accent);
+  box-shadow: 0 0 10px var(--sector-nebula);
+}
+
+.hangar-sector-row {
+  position: relative;
+  z-index: 2;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: 1rem;
+}
+
+.hangar-sector-button {
+  display: flex;
+  min-width: 0;
+  min-height: 54px;
+  align-items: center;
+  gap: 0.65rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.6rem;
+  background: rgba(2, 6, 23, 0.38);
+  padding: 0.55rem 0.65rem;
+  text-align: left;
+  transition: border-color 160ms ease, background-color 160ms ease, transform 160ms ease, box-shadow 160ms ease;
+}
+
+.hangar-sector-button:hover {
+  border-color: color-mix(in srgb, var(--sector-accent) 60%, transparent);
+  transform: translateY(-2px);
+}
+
+.hangar-sector-button:focus-visible {
+  outline: 2px solid var(--sector-accent);
+  outline-offset: 2px;
+}
+
+.hangar-sector-button.is-active {
+  border-color: var(--sector-accent);
+  background: color-mix(in srgb, var(--sector-nebula) 14%, rgba(2, 6, 23, 0.72));
+  box-shadow: inset 0 0 18px color-mix(in srgb, var(--sector-nebula) 12%, transparent);
+}
+
+.hangar-sector-swatch {
+  flex: 0 0 auto;
+  width: 22px;
+  height: 22px;
+  border: 1px solid color-mix(in srgb, var(--sector-accent) 76%, transparent);
+  border-radius: 50%;
+  background: radial-gradient(circle at 34% 30%, white, var(--sector-nebula) 29%, var(--sector-background) 78%);
+  box-shadow: 0 0 13px color-mix(in srgb, var(--sector-nebula) 42%, transparent);
+}
+
+@keyframes hangar-nebula-drift {
+  from { transform: translate3d(-2%, 1%, 0) rotate(-3deg) scale(1); }
+  to { transform: translate3d(3%, -2%, 0) rotate(4deg) scale(1.08); }
+}
+
+@keyframes hangar-nebula-pulse {
+  from { opacity: 0.45; transform: translate3d(-2%, 0, 0) scale(0.98); }
+  to { opacity: 0.86; transform: translate3d(2%, -1%, 0) scale(1.06); }
+}
+
+@keyframes hangar-debris-drift {
+  from { margin-left: 0; margin-top: 0; }
+  to { margin-left: -52px; margin-top: 38px; }
+}
+
+@keyframes hangar-ship-rotation {
+  from { transform: rotateY(0deg) rotateX(8deg) translateY(0); }
+  25% { transform: rotateY(90deg) rotateX(2deg) translateY(-7px); }
+  50% { transform: rotateY(180deg) rotateX(-6deg) translateY(0); }
+  75% { transform: rotateY(270deg) rotateX(2deg) translateY(7px); }
+  to { transform: rotateY(360deg) rotateX(8deg) translateY(0); }
+}
+
+@media (max-width: 760px) {
+  .hangar-scene {
+    min-height: auto;
+  }
+
+  .hangar-scene-content {
+    padding: 1rem;
+  }
+
+  .hangar-scene-grid {
+    grid-template-columns: 1fr;
+    gap: 0.25rem;
+    padding: 1.4rem 0 0.9rem;
+  }
+
+  .hangar-ship-view {
+    grid-row: 1;
+    height: clamp(210px, 58vw, 300px);
+  }
+
+  .hangar-distant-planet {
+    top: 17%;
+    right: 4%;
+    width: 35vw;
+    max-width: 150px;
+  }
+
+  .hangar-view-label {
+    bottom: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hangar-scene::before,
+  .hangar-nebula,
+  .hangar-debris-piece,
+  .hangar-ship-model {
+    animation: none !important;
+  }
+
+  .hangar-sector-button,
+  .hangar-sector-button:hover {
+    transition: none;
+    transform: none;
+  }
+}
