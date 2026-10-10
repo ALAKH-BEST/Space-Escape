@@ -25,7 +25,7 @@ interface AbilityUi {
 type Obstacle = {
   x: number;
   y: number;
-  type: "planet" | "asteroid" | "stone";
+  type: "asteroid" | "stone";
   size: number;
   speed: number;
 };
@@ -43,19 +43,22 @@ const SPAWN_RATE = 1500;
 
 export function GameCanvas({
   multiplayer,
+  autoStart = false,
 }: {
   multiplayer?: {
     room: MultiplayerRoom;
     onPosition: (x: number, y: number) => void;
   };
+  autoStart?: boolean;
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const requestRef = useRef<number>();
   const shipRef = useRef<ShipId>("vanguard");
   const scoreMutation = useSubmitScore();
   const startRunMutation = useStartRun();
-  const { data: progression } = useProgression();
+  const { data: progression, isLoading: isProgressionLoading } = useProgression();
   const startingRunRef = useRef(false);
+  const autoStartAttemptedRef = useRef(false);
   const [gameState, setGameState] = useState<GameState>({
     isPlaying: false,
     score: 0,
@@ -232,6 +235,20 @@ export function GameCanvas({
     }
   };
 
+  useEffect(() => {
+    if (
+      !autoStart
+      || isProgressionLoading
+      || autoStartAttemptedRef.current
+      || multiplayerRef.current
+    ) return;
+
+    autoStartAttemptedRef.current = true;
+    void startGame().catch(() => {
+      // useStartRun reports authorization failures to the pilot.
+    });
+  }, [autoStart, isProgressionLoading, progression?.equippedShip]);
+
   const stopGame = () => {
     const state = gameStateRef.current;
     if (!state.isPlaying) return;
@@ -302,10 +319,10 @@ export function GameCanvas({
     });
 
     if (timestamp - state.lastSpawn > SPAWN_RATE - Math.min(700, state.score * 0.5)) {
-      const types: Obstacle["type"][] = ["planet", "asteroid", "stone"];
+      const types: Obstacle["type"][] = ["asteroid", "stone"];
       const type = types[Math.floor(nextRandom(state) * types.length)];
-      const size = type === "planet" ? 40 : type === "asteroid" ? 25 : 10;
-      const speed = type === "planet" ? OBSTACLE_SPEED * 0.8 : type === "asteroid" ? OBSTACLE_SPEED * 1.2 : OBSTACLE_SPEED * 1.5;
+      const size = type === "asteroid" ? 25 : 10;
+      const speed = type === "asteroid" ? OBSTACLE_SPEED * 1.2 : OBSTACLE_SPEED * 1.5;
       state.obstacles.push({
         x: canvas.width + 50,
         y: nextRandom(state) * (canvas.height - 100) + 50,
@@ -436,8 +453,8 @@ export function GameCanvas({
        {!gameState.isPlaying && !gameState.gameOver && !multiplayer && (
         <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/60 backdrop-blur-sm">
           <h2 className="text-4xl font-display font-bold text-white mb-6 animate-pulse">READY COMMANDER?</h2>
-          <Button onClick={startGame} size="lg" className="text-xl px-12 py-8 rounded-full bg-gradient-to-r from-primary to-accent hover:scale-105 transition-transform shadow-lg shadow-primary/40">
-            <Play className="mr-3 h-8 w-8" /> LAUNCH MISSION
+          <Button onClick={startGame} disabled={startRunMutation.isPending} size="lg" className="text-xl px-12 py-8 rounded-full bg-gradient-to-r from-primary to-accent hover:scale-105 transition-transform shadow-lg shadow-primary/40">
+            <Play className="mr-3 h-8 w-8" /> {startRunMutation.isPending ? "AUTHORIZING..." : "LAUNCH MISSION"}
           </Button>
           <div className="mt-8 text-muted-foreground font-mono text-sm">CONTROLS: ARROW KEYS OR WASD · ABILITY: SPACE</div>
         </div>
@@ -479,23 +496,7 @@ function Result({ label, value, accent = false }: { label: string; value: string
 
 function drawObstacle(ctx: CanvasRenderingContext2D, obstacle: Obstacle) {
   ctx.save();
-  if (obstacle.type === "planet") {
-    const gradient = ctx.createRadialGradient(obstacle.x - obstacle.size / 3, obstacle.y - obstacle.size / 3, obstacle.size / 10, obstacle.x, obstacle.y, obstacle.size);
-    gradient.addColorStop(0, "#818cf8");
-    gradient.addColorStop(0.6, "#4f46e5");
-    gradient.addColorStop(1, "#312e81");
-    ctx.shadowBlur = 15;
-    ctx.shadowColor = "rgba(79, 70, 229, 0.4)";
-    ctx.beginPath();
-    ctx.fillStyle = gradient;
-    ctx.arc(obstacle.x, obstacle.y, obstacle.size, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.strokeStyle = "rgba(255, 255, 255, 0.1)";
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.ellipse(obstacle.x, obstacle.y, obstacle.size * 1.5, obstacle.size * 0.4, Math.PI / 4, 0, Math.PI * 2);
-    ctx.stroke();
-  } else if (obstacle.type === "asteroid") {
+  if (obstacle.type === "asteroid") {
     ctx.fillStyle = "#475569";
     ctx.strokeStyle = "#1e293b";
     ctx.beginPath();

@@ -60,6 +60,8 @@ export function useSubmitScore() {
 }
 
 export function useStartRun() {
+  const { toast } = useToast();
+
   return useMutation({
     mutationFn: async (mode: "solo" | "multiplayer") => {
       const res = await fetch(apiUrl(api.runs.start.path), {
@@ -79,6 +81,13 @@ export function useStartRun() {
         throw new Error(message);
       }
       return api.runs.start.responses[201].parse(await res.json());
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "MISSION LAUNCH FAILED",
+        description: error.message,
+        variant: "destructive",
+      });
     },
   });
 }

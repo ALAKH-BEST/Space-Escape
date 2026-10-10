@@ -1,7 +1,7 @@
 import { useEffect, useState, type CSSProperties } from "react";
 import { motion } from "framer-motion";
 import { ArrowUpRight, Check, Gem, Gauge, LockKeyhole, Orbit, Rocket, Shield, Sparkles, Zap } from "lucide-react";
-import { Link } from "wouter";
+import { useLocation } from "wouter";
 import { GameLayout } from "@/components/layout/GameLayout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
@@ -17,6 +17,7 @@ export default function HangarPage() {
   const { data: progression, isLoading } = useProgression();
   const purchase = usePurchaseShip();
   const equip = useEquipShip();
+  const [, setLocation] = useLocation();
   const [previewShipId, setPreviewShipId] = useState<ShipId>("vanguard");
   const [selectedSectorIndex, setSelectedSectorIndex] = useState(0);
 
@@ -29,6 +30,19 @@ export default function HangarPage() {
   const equippedShip = progression?.equippedShip ?? "vanguard";
   const isPreviewShipOwned = progression?.ownedShips.includes(previewShipId) ?? false;
   const isPreviewShipEquipped = equippedShip === previewShipId;
+
+  const launchMission = async () => {
+    if (!progression || !isPreviewShipOwned || purchase.isPending || equip.isPending) return;
+
+    try {
+      if (progression.equippedShip !== previewShipId) {
+        await equip.mutateAsync({ shipId: previewShipId });
+      }
+      setLocation("/game?launch=1");
+    } catch {
+      // The equip mutation displays the reason for a rejected Hangar command.
+    }
+  };
 
   return (
     <GameLayout>
@@ -58,11 +72,11 @@ export default function HangarPage() {
           loading={isLoading}
           owned={isPreviewShipOwned}
           equipped={isPreviewShipEquipped}
-          equippedShipName={ships[equippedShip].name}
           canAfford={(progression?.gems ?? 0) >= previewShip.price}
           busy={purchase.isPending || equip.isPending}
           onPurchase={() => purchase.mutate({ shipId: previewShipId })}
           onEquip={() => equip.mutate({ shipId: previewShipId })}
+          onLaunchMission={launchMission}
           onSelectSector={setSelectedSectorIndex}
         />
 
@@ -113,11 +127,11 @@ function HangarScene({
   loading,
   owned,
   equipped,
-  equippedShipName,
   canAfford,
   busy,
   onPurchase,
   onEquip,
+  onLaunchMission,
   onSelectSector,
 }: {
   ship: ShipDefinition;
@@ -127,11 +141,11 @@ function HangarScene({
   loading: boolean;
   owned: boolean;
   equipped: boolean;
-  equippedShipName: string;
   canAfford: boolean;
   busy: boolean;
   onPurchase: () => void;
   onEquip: () => void;
+  onLaunchMission: () => void;
   onSelectSector: (index: number) => void;
 }) {
   const sectorStyle = {
@@ -220,15 +234,25 @@ function HangarScene({
                   {canAfford ? <><Gem className="mr-2 h-4 w-4" /> UNLOCK · {ship.price.toLocaleString()}</> : <><LockKeyhole className="mr-2 h-4 w-4" /> NEED {ship.price.toLocaleString()}</>}
                 </Button>
               )}
-              <Button asChild variant="outline" className="border-white/20 bg-black/20 font-mono text-xs tracking-widest text-white hover:bg-white/10 hover:text-white">
-                <Link href="/game">
-                  LAUNCH MISSION <ArrowUpRight className="ml-2 h-4 w-4" />
-                </Link>
+              <Button
+                type="button"
+                onClick={onLaunchMission}
+                disabled={!owned || loading || busy}
+                variant="outline"
+                className="border-white/20 bg-black/20 font-mono text-xs tracking-widest text-white hover:bg-white/10 hover:text-white"
+              >
+                {owned ? "LAUNCH MISSION" : "UNLOCK SHIP TO LAUNCH"}
+                <ArrowUpRight className="ml-2 h-4 w-4" />
               </Button>
             </div>
-            {!equipped && (
+            {owned && !equipped && (
               <p className="mt-3 text-[10px] font-mono text-white/45">
-                MISSION LAUNCHES WITH {equippedShipName}
+                LAUNCHING WILL EQUIP {ship.name.toUpperCase()}
+              </p>
+            )}
+            {!owned && (
+              <p className="mt-3 text-[10px] font-mono text-white/45">
+                UNLOCK THIS SHIP BEFORE LAUNCHING A MISSION
               </p>
             )}
           </div>

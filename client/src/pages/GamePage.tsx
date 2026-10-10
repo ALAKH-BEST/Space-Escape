@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { GameLayout } from "@/components/layout/GameLayout";
 import { GameCanvas } from "@/components/game/GameCanvas";
 import { Card } from "@/components/ui/card";
@@ -9,9 +9,18 @@ import { useProgression } from "@/hooks/use-progression";
 import { ships } from "@shared/ships";
 
 export default function GamePage() {
-  const [showGame, setShowGame] = useState(false);
+  const [launchFromHangar] = useState(
+    () => new URLSearchParams(window.location.search).get("launch") === "1",
+  );
+  const [showGame, setShowGame] = useState(launchFromHangar);
   const { data: progression } = useProgression();
   const currentShip = ships[progression?.equippedShip ?? "vanguard"];
+
+  useEffect(() => {
+    if (launchFromHangar) {
+      window.history.replaceState(window.history.state, "", window.location.pathname);
+    }
+  }, [launchFromHangar]);
 
   return (
     <GameLayout>
@@ -98,7 +107,7 @@ export default function GamePage() {
                 </Button>
               </div>
 
-              <GameCanvas />
+              <GameCanvas autoStart={launchFromHangar} />
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <StatsCard label="CURRENT RANK" value="CADET" delay={0} />

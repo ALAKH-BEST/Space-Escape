@@ -114,45 +114,6 @@ export function drawSectorEnvironment(
   ctx.fillStyle = nebula;
   ctx.fillRect(0, 0, width, height);
 
-  const planetRadius = Math.min(width, height) * 0.16;
-  const planetX = width * 0.82 + Math.sin(timestamp * 0.00004) * 8;
-  const planetY = height * 0.3;
-  ctx.save();
-  ctx.globalAlpha = 0.72;
-  ctx.shadowBlur = 24;
-  ctx.shadowColor = `${palette.nebula}55`;
-  const planet = ctx.createRadialGradient(
-    planetX - planetRadius * 0.42,
-    planetY - planetRadius * 0.42,
-    planetRadius * 0.03,
-    planetX,
-    planetY,
-    planetRadius,
-  );
-  planet.addColorStop(0, palette.accent);
-  planet.addColorStop(0.32, palette.planet);
-  planet.addColorStop(1, palette.background);
-  ctx.fillStyle = planet;
-  ctx.beginPath();
-  ctx.arc(planetX, planetY, planetRadius, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.shadowBlur = 0;
-  ctx.globalAlpha = 0.24;
-  ctx.strokeStyle = palette.accent;
-  ctx.lineWidth = Math.max(1, planetRadius * 0.025);
-  ctx.beginPath();
-  ctx.ellipse(
-    planetX,
-    planetY,
-    planetRadius * 1.55,
-    planetRadius * 0.42,
-    -0.32,
-    0,
-    Math.PI * 2,
-  );
-  ctx.stroke();
-  ctx.restore();
-
   for (let index = 0; index < 12; index += 1) {
     const driftSpeed = 0.012 + (index % 4) * 0.006;
     const travel = (timestamp * driftSpeed + index * 197.3) % (width + 80);
