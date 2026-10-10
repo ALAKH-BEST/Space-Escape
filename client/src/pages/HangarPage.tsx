@@ -38,7 +38,7 @@ export default function HangarPage() {
       if (progression.equippedShip !== previewShipId) {
         await equip.mutateAsync({ shipId: previewShipId });
       }
-      setLocation("/game?launch=1");
+      setLocation(`/game?launch=1&sector=${encodeURIComponent(selectedSector.id)}`);
     } catch {
       // The equip mutation displays the reason for a rejected Hangar command.
     }

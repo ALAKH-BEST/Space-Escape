@@ -6,12 +6,19 @@ import { Info, Play, Rocket, Trophy, Target } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
 import { useProgression } from "@/hooks/use-progression";
+import { getSectorEnvironmentById } from "@/lib/sector-environments";
 import { ships } from "@shared/ships";
 
 export default function GamePage() {
-  const [launchFromHangar] = useState(
-    () => new URLSearchParams(window.location.search).get("launch") === "1",
-  );
+  const [launchRequest] = useState(() => {
+    const query = new URLSearchParams(window.location.search);
+    return {
+      direct: query.get("launch") === "1",
+      sector: getSectorEnvironmentById(query.get("sector")),
+    };
+  });
+  const launchFromHangar = launchRequest.direct;
+  const launchSector = launchRequest.sector;
   const [showGame, setShowGame] = useState(launchFromHangar);
   const { data: progression } = useProgression();
   const currentShip = ships[progression?.equippedShip ?? "vanguard"];
@@ -91,7 +98,7 @@ export default function GamePage() {
               <div className="flex items-center justify-between">
                 <div>
                   <h1 className="text-4xl font-display font-bold text-foreground mb-2">
-                    SECTOR 7: ASTEROID FIELD
+                    STARTING SECTOR: {launchSector.name.toUpperCase()}
                   </h1>
                   <p className="text-muted-foreground font-mono">
                     OBJECTIVE: SURVIVE AS LONG AS POSSIBLE
@@ -107,7 +114,7 @@ export default function GamePage() {
                 </Button>
               </div>
 
-              <GameCanvas autoStart={launchFromHangar} />
+              <GameCanvas autoStart={launchFromHangar} initialSectorId={launchSector.id} />
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <StatsCard label="CURRENT RANK" value="CADET" delay={0} />

@@ -73,6 +73,15 @@ export const sectorEnvironments = [
 
 export type SectorEnvironment = (typeof sectorEnvironments)[number];
 
+export function getSectorEnvironmentById(sectorId: string | null | undefined): SectorEnvironment {
+  return sectorEnvironments.find((environment) => environment.id === sectorId) ?? sectorEnvironments[0];
+}
+
+export function getSectorNumberById(sectorId: string | null | undefined): number {
+  const index = sectorEnvironments.findIndex((environment) => environment.id === sectorId);
+  return index < 0 ? 1 : index + 1;
+}
+
 export function getSectorEnvironmentByNumber(sectorNumber: number): SectorEnvironment {
   const normalizedNumber = Number.isFinite(sectorNumber)
     ? Math.max(1, Math.floor(sectorNumber))

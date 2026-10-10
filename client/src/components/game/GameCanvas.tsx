@@ -3,7 +3,12 @@ import { Link } from "wouter";
 import { Gem, Play, RotateCcw, Shield, Sparkles, Trophy, Zap } from "lucide-react";
 import { useStartRun, useSubmitScore } from "@/hooks/use-scores";
 import { useProgression } from "@/hooks/use-progression";
-import { drawSectorEnvironment, getSectorEnvironmentByNumber } from "@/lib/sector-environments";
+import {
+  drawSectorEnvironment,
+  getSectorEnvironmentByNumber,
+  getSectorNumberById,
+  type SectorEnvironment,
+} from "@/lib/sector-environments";
 import { ships, type ShipId } from "@shared/ships";
 import { Button } from "@/components/ui/button";
 import type { MultiplayerRoom } from "@/hooks/use-multiplayer";
@@ -44,12 +49,14 @@ const SPAWN_RATE = 1500;
 export function GameCanvas({
   multiplayer,
   autoStart = false,
+  initialSectorId = "violet-expanse",
 }: {
   multiplayer?: {
     room: MultiplayerRoom;
     onPosition: (x: number, y: number) => void;
   };
   autoStart?: boolean;
+  initialSectorId?: SectorEnvironment["id"];
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const requestRef = useRef<number>();
@@ -57,6 +64,7 @@ export function GameCanvas({
   const scoreMutation = useSubmitScore();
   const startRunMutation = useStartRun();
   const { data: progression, isLoading: isProgressionLoading } = useProgression();
+  const startingSectorNumber = getSectorNumberById(initialSectorId);
   const startingRunRef = useRef(false);
   const autoStartAttemptedRef = useRef(false);
   const [gameState, setGameState] = useState<GameState>({
@@ -228,7 +236,7 @@ export function GameCanvas({
         status: equippedShip === "titan" ? "3 SHIELDS" : equippedShip === "vanguard" ? "NONE" : "READY — SPACE",
         active: equippedShip === "titan",
       });
-      setGameState({ isPlaying: true, score: 0, gameOver: false, survivalTime: 0, sector: 1 });
+      setGameState({ isPlaying: true, score: 0, gameOver: false, survivalTime: 0, sector: startingSectorNumber });
       requestRef.current = requestAnimationFrame(gameLoop);
     } finally {
       startingRunRef.current = false;
@@ -266,7 +274,7 @@ export function GameCanvas({
       score: finalScore,
       gameOver: true,
       survivalTime,
-      sector: Math.max(1, Math.floor(finalScore / 100) + 1),
+      sector: startingSectorNumber + Math.floor(finalScore / 100),
     });
     if (state.runId && state.runToken) {
       scoreMutation.mutate(
@@ -276,7 +284,7 @@ export function GameCanvas({
             setGameState((previous) => ({
               ...previous,
               score: result.score.score,
-              sector: Math.max(1, Math.floor(result.score.score / 100) + 1),
+              sector: startingSectorNumber + Math.floor(result.score.score / 100),
             }));
           },
         },
@@ -295,7 +303,7 @@ export function GameCanvas({
       ctx,
       canvas.width,
       canvas.height,
-      Math.floor(state.score / 100) + 1,
+      startingSectorNumber + Math.floor(state.score / 100),
       timestamp,
     );
 
@@ -420,7 +428,7 @@ export function GameCanvas({
   };
 
   const currentShip = ships[shipRef.current];
-  const displayedSector = Math.max(1, Math.floor(gameState.score / 100) + 1);
+  const displayedSector = startingSectorNumber + Math.floor(gameState.score / 100);
   const currentEnvironment = getSectorEnvironmentByNumber(displayedSector);
 
   return (
