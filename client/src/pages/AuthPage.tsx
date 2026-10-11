@@ -27,6 +27,7 @@ import { Loader2, Rocket } from "lucide-react";
 import { motion } from "framer-motion";
 import { PublicFooter } from "@/components/layout/PublicFooter";
 import { ThemeSelector } from "@/components/theme/ThemeSelector";
+import { PwaInstallPrompt } from "@/components/PwaInstallPrompt";
 
 export default function AuthPage() {
   const [_, setLocation] = useLocation();
@@ -47,6 +48,9 @@ export default function AuthPage() {
     <div className="min-h-screen flex flex-col">
       <div className="absolute right-4 top-4 z-20">
         <ThemeSelector />
+      </div>
+      <div className="absolute left-4 top-4 z-20">
+        <PwaInstallPrompt />
       </div>
       <div className="flex-1 flex items-center justify-center p-4 relative overflow-hidden">
       {/* Animated Background Elements */}

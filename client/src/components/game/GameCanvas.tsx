@@ -5,6 +5,7 @@ import { Gem, Play, RotateCcw, Shield, Sparkles, Trophy, Zap } from "lucide-reac
 import { useStartRun, useSubmitScore } from "@/hooks/use-scores";
 import { useProgression } from "@/hooks/use-progression";
 import { AchievementToast } from "@/components/game/AchievementToast";
+import { MobileControls } from "@/components/game/MobileControls";
 import { unlockAchievementAudio } from "@/lib/achievement-audio";
 import {
   FIRST_FLIGHT_STORAGE_KEY,
@@ -533,8 +534,9 @@ export function GameCanvas({
   const currentEnvironment = getSectorEnvironmentByNumber(displayedSector);
 
   return (
-    <div className="relative w-full aspect-video rounded-xl overflow-hidden border-2 border-primary/30 shadow-2xl shadow-primary/20 bg-black">
+    <div className="mobile-game-frame relative w-full aspect-video rounded-xl overflow-hidden border-2 border-primary/30 shadow-2xl shadow-primary/20 bg-black">
       <canvas ref={canvasRef} className="w-full h-full block" />
+      {gameState.isPlaying && <MobileControls keys={gameStateRef.current.keys} />}
       <AchievementToast
         notice={achievementQueue[0] ?? null}
         onDismiss={dismissAchievement}
