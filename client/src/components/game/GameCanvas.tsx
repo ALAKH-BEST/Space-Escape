@@ -1,9 +1,18 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Link } from "wouter";
 import { AnimatePresence, motion } from "framer-motion";
 import { Gem, Play, RotateCcw, Shield, Sparkles, Trophy, Zap } from "lucide-react";
 import { useStartRun, useSubmitScore } from "@/hooks/use-scores";
 import { useProgression } from "@/hooks/use-progression";
+import { AchievementToast } from "@/components/game/AchievementToast";
+import { unlockAchievementAudio } from "@/lib/achievement-audio";
+import {
+  FIRST_FLIGHT_STORAGE_KEY,
+  isLastPilotStanding,
+  isNearMiss,
+  type AchievementId,
+  type AchievementNotice,
+} from "@/lib/game-achievements";
 import {
   drawSectorEnvironment,
   getSectorEnvironmentByNumber,
@@ -87,6 +96,21 @@ export function GameCanvas({
     status: "SELECT A SHIP",
     active: false,
   });
+  const [achievementQueue, setAchievementQueue] = useState<AchievementNotice[]>([]);
+  const notificationSequenceRef = useRef(0);
+  const earnedAchievementsRef = useRef(new Set<AchievementId>());
+  const nearMissStreakRef = useRef(0);
+  const sawLiveOpponentRef = useRef(false);
+  const firstFlightSeenRef = useRef(readFirstFlightFlag());
+  const awardAchievement = useCallback((id: AchievementId) => {
+    if (earnedAchievementsRef.current.has(id)) return;
+    earnedAchievementsRef.current.add(id);
+    const sequence = ++notificationSequenceRef.current;
+    setAchievementQueue((queue) => [...queue, { id, sequence }]);
+  }, []);
+  const dismissAchievement = useCallback(() => {
+    setAchievementQueue((queue) => queue.slice(1));
+  }, []);
 
   const gameStateRef = useRef({
     player: { x: 50, y: 200 },
@@ -111,6 +135,16 @@ export function GameCanvas({
   useEffect(() => {
     multiplayerRef.current = multiplayer;
   }, [multiplayer]);
+
+  useEffect(() => {
+    const unlock = () => unlockAchievementAudio();
+    window.addEventListener("pointerdown", unlock, true);
+    window.addEventListener("keydown", unlock, true);
+    return () => {
+      window.removeEventListener("pointerdown", unlock, true);
+      window.removeEventListener("keydown", unlock, true);
+    };
+  }, []);
 
   const selectedShip = ships[shipRef.current];
 
@@ -175,6 +209,25 @@ export function GameCanvas({
       if (!state.isPlaying) return;
       const ship = ships[shipRef.current];
       const now = performance.now();
+      const elapsedSeconds = Math.max(0, (now - state.startedAt) / 1000);
+      if (elapsedSeconds >= 30) awardAchievement("longHaul");
+      if (elapsedSeconds >= 100) awardAchievement("centuryClub");
+      if (state.score >= 400) awardAchievement("deepSpaceVoyager");
+
+      const activeMultiplayer = multiplayerRef.current;
+      if (activeMultiplayer?.room.phase === "running") {
+        const players = activeMultiplayer.room.players;
+        if (players.some((player) => player.id !== activeMultiplayer.room.localPlayerId && player.alive)) {
+          sawLiveOpponentRef.current = true;
+        }
+        if (
+          sawLiveOpponentRef.current
+          && isLastPilotStanding(players, activeMultiplayer.room.localPlayerId)
+        ) {
+          awardAchievement("lastPilotStanding");
+        }
+      }
+
       if (ship.id === "titan") {
         setAbilityUi({ label: "FORTRESS", status: `${state.shieldCharges} SHIELDS`, active: state.shieldCharges > 0 });
       } else if (ship.id === "vanguard") {
@@ -196,7 +249,7 @@ export function GameCanvas({
       }
     }, 100);
     return () => window.clearInterval(timer);
-  }, []);
+  }, [awardAchievement]);
 
   const activateAbility = () => {
     const state = gameStateRef.current;
@@ -214,6 +267,7 @@ export function GameCanvas({
   const startGame = async () => {
     const canvas = canvasRef.current;
     if (!canvas || startingRunRef.current || gameStateRef.current.isPlaying) return;
+    unlockAchievementAudio();
     startingRunRef.current = true;
     scoreMutation.reset();
     try {
@@ -221,6 +275,9 @@ export function GameCanvas({
       const equippedShip = progression?.equippedShip ?? "vanguard";
       shipRef.current = equippedShip;
       const now = performance.now();
+      earnedAchievementsRef.current = new Set();
+      nearMissStreakRef.current = 0;
+      sawLiveOpponentRef.current = false;
       backgroundSectorRef.current = startingSectorNumber;
       sectorTransitionRef.current = null;
       gameStateRef.current = {
@@ -239,6 +296,15 @@ export function GameCanvas({
         rngSeed: multiplayerRef.current?.room.seed ?? Math.floor(Math.random() * 2_147_483_647),
         lastPositionBroadcast: 0,
       };
+      if (!firstFlightSeenRef.current) {
+        firstFlightSeenRef.current = true;
+        try {
+          window.localStorage.setItem(FIRST_FLIGHT_STORAGE_KEY, "1");
+        } catch {
+          // Keep this session's first-flight state even if browser storage is disabled.
+        }
+        awardAchievement("firstFlight");
+      }
       remoteAliveRef.current.clear();
       deathBurstsRef.current.clear();
       setAbilityUi({
@@ -369,6 +435,7 @@ export function GameCanvas({
 
     for (let index = state.obstacles.length - 1; index >= 0; index--) {
       const obstacle = state.obstacles[index];
+      const wasAheadOfPlayer = obstacle.x > state.player.x;
       obstacle.x -= obstacle.speed;
       drawObstacle(ctx, obstacle);
 
@@ -376,6 +443,14 @@ export function GameCanvas({
       const dy = state.player.y - obstacle.y;
       const distance = Math.sqrt(dx * dx + dy * dy);
       const collisionRadius = PLAYER_SIZE / 1.5 + obstacle.size - ship.shield * 0.5;
+      if (wasAheadOfPlayer && obstacle.x <= state.player.x) {
+        if (isNearMiss(distance, collisionRadius)) {
+          nearMissStreakRef.current += 1;
+          if (nearMissStreakRef.current >= 3) awardAchievement("asteroidWhisperer");
+        } else {
+          nearMissStreakRef.current = 0;
+        }
+      }
       if (distance < collisionRadius) {
         if (ship.id === "phantom" && abilityActive) {
           continue;
@@ -460,6 +535,10 @@ export function GameCanvas({
   return (
     <div className="relative w-full aspect-video rounded-xl overflow-hidden border-2 border-primary/30 shadow-2xl shadow-primary/20 bg-black">
       <canvas ref={canvasRef} className="w-full h-full block" />
+      <AchievementToast
+        notice={achievementQueue[0] ?? null}
+        onDismiss={dismissAchievement}
+      />
       <div className="absolute top-4 right-4 text-right font-mono text-white">
         <div className="text-2xl font-bold neon-text">SCORE: {Math.floor(gameState.score)}</div>
         {gameState.isPlaying && (
@@ -527,6 +606,15 @@ export function GameCanvas({
       )}
     </div>
   );
+}
+
+function readFirstFlightFlag() {
+  if (typeof window === "undefined") return false;
+  try {
+    return window.localStorage.getItem(FIRST_FLIGHT_STORAGE_KEY) === "1";
+  } catch {
+    return false;
+  }
 }
 
 function nextRandom(state: { rngSeed: number }) {
