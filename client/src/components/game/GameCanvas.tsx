@@ -8,6 +8,7 @@ import { AchievementToast } from "@/components/game/AchievementToast";
 import { MobileControls } from "@/components/game/MobileControls";
 import { MusicToggle } from "@/components/game/MusicToggle";
 import { unlockAchievementAudio } from "@/lib/achievement-audio";
+import { playCollisionSound } from "@/lib/collision-sound";
 import {
   FIRST_FLIGHT_STORAGE_KEY,
   isLastPilotStanding,
@@ -461,8 +462,10 @@ export function GameCanvas({
           state.shieldCharges -= 1;
           state.obstacles.splice(index, 1);
           setAbilityUi({ label: "FORTRESS", status: `${state.shieldCharges} SHIELDS`, active: state.shieldCharges > 0 });
+          playCollisionSound("shield");
           continue;
         }
+        playCollisionSound("explosion");
         stopGame();
         return;
       }
