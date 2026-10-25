@@ -3,6 +3,7 @@ import { Link } from "wouter";
 import { Rocket } from "lucide-react";
 import { PublicFooter } from "@/components/layout/PublicFooter";
 import { ThemeSelector } from "@/components/theme/ThemeSelector";
+import { MusicToggle } from "@/components/game/MusicToggle";
 
 export function PublicShell({
   children,
@@ -42,6 +43,7 @@ export function PublicShell({
             </span>
           </Link>
           <div className="flex items-center gap-4">
+            <MusicToggle className="relative" />
             <ThemeSelector />
             <Link href="/" className="text-xs font-mono text-muted-foreground hover:text-primary transition-colors">
               BACK TO GAME

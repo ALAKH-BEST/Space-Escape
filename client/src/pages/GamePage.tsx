@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { GameLayout } from "@/components/layout/GameLayout";
 import { GameCanvas } from "@/components/game/GameCanvas";
 import { MusicToggle } from "@/components/game/MusicToggle";
-import { startMusic, stopMusic } from "@/lib/background-music";
 import { Card } from "@/components/ui/card";
 import { Info, Play, Rocket, Trophy, Target } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -31,8 +30,6 @@ export default function GamePage() {
     }
   }, [launchFromHangar]);
 
-  useEffect(() => () => stopMusic(0.4), []);
-
   return (
     <GameLayout>
       <div className="max-w-5xl mx-auto space-y-8 pb-12">
@@ -45,7 +42,6 @@ export default function GamePage() {
               exit={{ opacity: 0, scale: 1.05 }}
               className="relative flex flex-col items-center justify-center min-h-[60vh] text-center space-y-8"
             >
-              <HomeMusic />
               <MusicToggle className="absolute right-0 top-0 z-20" />
               <div className="relative">
                 <div className="absolute inset-0 bg-primary/20 blur-3xl rounded-full" />
@@ -139,15 +135,6 @@ export default function GamePage() {
       </div>
     </GameLayout>
   );
-}
-
-// Plays the soundtrack on the home screen. It keeps playing into the mission
-// (the game canvas takes over from here) and stops when the page is left.
-function HomeMusic() {
-  useEffect(() => {
-    startMusic();
-  }, []);
-  return null;
 }
 
 function StatsCard({ label, value, delay }: { label: string; value: string; delay: number }) {
