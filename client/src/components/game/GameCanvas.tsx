@@ -8,7 +8,6 @@ import { AchievementToast } from "@/components/game/AchievementToast";
 import { MobileControls } from "@/components/game/MobileControls";
 import { MusicToggle } from "@/components/game/MusicToggle";
 import { unlockAchievementAudio } from "@/lib/achievement-audio";
-import { startMusic, stopMusic } from "@/lib/background-music";
 import {
   FIRST_FLIGHT_STORAGE_KEY,
   isLastPilotStanding,
@@ -138,8 +137,6 @@ export function GameCanvas({
   useEffect(() => {
     multiplayerRef.current = multiplayer;
   }, [multiplayer]);
-
-  useEffect(() => () => stopMusic(0.4), []);
 
   useEffect(() => {
     const unlock = () => unlockAchievementAudio();
@@ -318,7 +315,6 @@ export function GameCanvas({
         active: equippedShip === "titan",
       });
       setGameState({ isPlaying: true, score: 0, gameOver: false, survivalTime: 0, sector: startingSectorNumber });
-      startMusic();
       requestRef.current = requestAnimationFrame(gameLoop);
     } finally {
       startingRunRef.current = false;
@@ -344,7 +340,6 @@ export function GameCanvas({
     if (!state.isPlaying) return;
     if (requestRef.current) cancelAnimationFrame(requestRef.current);
     state.isPlaying = false;
-    stopMusic();
     const finalScore = Math.floor(state.score);
     const survivalTime = Math.max(0, (performance.now() - state.startedAt) / 1000);
     const activeMultiplayer = multiplayerRef.current;

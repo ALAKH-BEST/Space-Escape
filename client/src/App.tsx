@@ -1,4 +1,6 @@
-import { Switch, Route, Redirect } from "wouter";
+import { useEffect } from "react";
+import { Switch, Route, Redirect, useLocation } from "wouter";
+import { startMusic, stopMusic } from "@/lib/background-music";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
@@ -60,12 +62,31 @@ function Router() {
   );
 }
 
+// The soundtrack plays on every page that has a mute button (everything except
+// the login screen), so it keeps looping as you move between pages.
+const MUSIC_ROUTES = ["/game", "/hangar", "/leaderboard", "/multiplayer", "/about", "/privacy", "/terms"];
+
+function AppMusic() {
+  const [location] = useLocation();
+  const shouldPlay = MUSIC_ROUTES.includes(location);
+
+  useEffect(() => {
+    if (shouldPlay) startMusic();
+    else stopMusic();
+  }, [shouldPlay]);
+
+  useEffect(() => () => stopMusic(0.4), []);
+
+  return null;
+}
+
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
         <TooltipProvider>
           <GoogleAnalytics />
+          <AppMusic />
           <Router />
           <Toaster />
         </TooltipProvider>
