@@ -8,6 +8,7 @@ import { AchievementToast } from "@/components/game/AchievementToast";
 import { MobileControls } from "@/components/game/MobileControls";
 import { MusicToggle } from "@/components/game/MusicToggle";
 import { unlockAchievementAudio } from "@/lib/achievement-audio";
+import { playAbilitySound } from "@/lib/ability-sounds";
 import { playCollisionSound } from "@/lib/collision-sound";
 import {
   FIRST_FLIGHT_STORAGE_KEY,
@@ -103,6 +104,7 @@ export function GameCanvas({
   const notificationSequenceRef = useRef(0);
   const earnedAchievementsRef = useRef(new Set<AchievementId>());
   const nearMissStreakRef = useRef(0);
+  const abilityWasActiveRef = useRef(false);
   const sawLiveOpponentRef = useRef(false);
   const firstFlightSeenRef = useRef(readFirstFlightFlag());
   const awardAchievement = useCallback((id: AchievementId) => {
@@ -265,6 +267,7 @@ export function GameCanvas({
     state.abilityActiveUntil = now + duration;
     state.abilityCooldownUntil = now + cooldown;
     setAbilityUi({ label: ship.ability, status: `ACTIVE — ${(duration / 1000).toFixed(1)}s`, active: true });
+    playAbilitySound(ship.id === "phantom" ? "phase" : "overdrive");
   };
 
   const startGame = async () => {
@@ -280,6 +283,7 @@ export function GameCanvas({
       const now = performance.now();
       earnedAchievementsRef.current = new Set();
       nearMissStreakRef.current = 0;
+      abilityWasActiveRef.current = false;
       sawLiveOpponentRef.current = false;
       backgroundSectorRef.current = startingSectorNumber;
       sectorTransitionRef.current = null;
@@ -315,6 +319,7 @@ export function GameCanvas({
         status: equippedShip === "titan" ? "3 SHIELDS" : equippedShip === "vanguard" ? "NONE" : "READY — SPACE",
         active: equippedShip === "titan",
       });
+      if (equippedShip === "titan") playAbilitySound("fortress");
       setGameState({ isPlaying: true, score: 0, gameOver: false, survivalTime: 0, sector: startingSectorNumber });
       requestRef.current = requestAnimationFrame(gameLoop);
     } finally {
@@ -404,6 +409,10 @@ export function GameCanvas({
 
     const now = performance.now();
     const abilityActive = now < state.abilityActiveUntil;
+    if (abilityWasActiveRef.current && !abilityActive && (ship.id === "phantom" || ship.id === "nova")) {
+      playAbilitySound(ship.id === "phantom" ? "phaseEnd" : "overdriveEnd");
+    }
+    abilityWasActiveRef.current = abilityActive;
     const movementSpeed = (4.5 + ship.speed * 0.4) * (0.8 + ship.handling * 0.05) * (ship.id === "nova" && abilityActive ? 1.5 : 1);
     if (state.keys.ArrowUp || state.keys.w) state.player.y -= movementSpeed;
     if (state.keys.ArrowDown || state.keys.s) state.player.y += movementSpeed;

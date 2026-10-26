@@ -8,7 +8,7 @@ export type CollisionKind = "explosion" | "shield";
 
 let audioContext: AudioContext | null = null;
 
-function getAudioContext(): AudioContext | null {
+export function getSfxContext(): AudioContext | null {
   if (typeof window === "undefined" || typeof window.AudioContext === "undefined") return null;
   try {
     if (!audioContext || audioContext.state === "closed") audioContext = new window.AudioContext();
@@ -90,7 +90,7 @@ export function buildCollisionSound(context: BaseAudioContext, when: number, kin
 
 export function playCollisionSound(kind: CollisionKind) {
   if (isMusicMuted()) return;
-  const context = getAudioContext();
+  const context = getSfxContext();
   if (!context) return;
   try {
     if (context.state !== "running") void context.resume().catch(() => undefined);
