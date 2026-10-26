@@ -6,6 +6,7 @@
 // unobtrusive so it sits underneath gameplay and the achievement chime.
 
 const MUTE_STORAGE_KEY = "astrododge:music-muted:v1";
+const VOLUME_STORAGE_KEY = "astrododge:audio-volume:v1";
 
 export const MUSIC_STEP_SECONDS = 0.5;
 const STEPS_PER_BAR = 8;
@@ -194,7 +195,20 @@ function readMutedPreference() {
   }
 }
 
+function readVolumePreference() {
+  if (typeof window === "undefined") return 1;
+  try {
+    const stored = window.localStorage.getItem(VOLUME_STORAGE_KEY);
+    if (stored === null) return 1;
+    const value = Number(stored);
+    return Number.isFinite(value) ? Math.min(1, Math.max(0, value)) : 1;
+  } catch {
+    return 1;
+  }
+}
+
 let muted = readMutedPreference();
+let volume = readVolumePreference();
 const muteListeners = new Set<() => void>();
 
 export function isMusicMuted() {
@@ -206,6 +220,49 @@ export function subscribeMusicMuted(listener: () => void) {
   return () => {
     muteListeners.delete(listener);
   };
+}
+
+/** The player's volume setting from 0 (silent) to 1 (full, the default). */
+export function getAudioVolume() {
+  return volume;
+}
+
+export const subscribeAudioVolume = subscribeMusicMuted;
+
+// Perceived loudness is roughly logarithmic, so the slider position is squared
+// to give an even-feeling range. At full volume this is exactly 1.
+function volumeToGain(level: number) {
+  return level * level;
+}
+
+/** Multiplier for the music: the volume setting (mute is handled by stopping playback). */
+export function getMusicVolumeGain() {
+  return volumeToGain(volume);
+}
+
+/** Multiplier for sound effects: 0 when muted, otherwise the volume setting. */
+export function getAudioGain() {
+  return muted ? 0 : volumeToGain(volume);
+}
+
+export function setAudioVolume(nextVolume: number) {
+  const clamped = Math.min(1, Math.max(0, Number.isFinite(nextVolume) ? nextVolume : 1));
+  if (clamped === volume) return;
+  volume = clamped;
+  try {
+    window.localStorage.setItem(VOLUME_STORAGE_KEY, String(clamped));
+  } catch {
+    // Keep the choice for this session even if browser storage is disabled.
+  }
+  muteListeners.forEach((listener) => listener());
+  sync();
+  if (graph && schedulerTimer !== null) {
+    try {
+      rampMaster(MUSIC_LEVEL * getMusicVolumeGain(), 0.08);
+    } catch {
+      // Ignore: the next sync re-applies the level.
+    }
+  }
 }
 
 export function setMusicMuted(nextMuted: boolean) {
@@ -314,7 +371,7 @@ function begin() {
 
   try {
     if (!graph) graph = createMusicGraph(context);
-    rampMaster(MUSIC_LEVEL, FADE_IN_SECONDS);
+    rampMaster(MUSIC_LEVEL * getMusicVolumeGain(), FADE_IN_SECONDS);
     if (schedulerTimer === null) {
       nextStepTime = Math.max(nextStepTime, context.currentTime + 0.1);
       tick();
@@ -355,7 +412,7 @@ function halt(fadeSeconds: number) {
 
 function sync() {
   const pageHidden = typeof document !== "undefined" && document.hidden;
-  if (wantPlaying && !muted && !pageHidden) {
+  if (wantPlaying && !muted && volume > 0 && !pageHidden) {
     begin();
   } else {
     halt(wantPlaying ? QUICK_FADE_SECONDS : stopFadeSeconds);

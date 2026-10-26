@@ -1,7 +1,7 @@
 // Short ship-ability sound effects for ASTRODODGE, synthesized with the Web
-// Audio API (no audio files). Respects the music mute button.
+// Audio API (no audio files). Respects the mute button and volume setting.
 
-import { isMusicMuted } from "@/lib/background-music";
+import { getAudioGain } from "@/lib/background-music";
 import { getSfxContext } from "@/lib/collision-sound";
 
 export type AbilitySoundKind = "phase" | "phaseEnd" | "overdrive" | "overdriveEnd" | "fortress";
@@ -100,11 +100,11 @@ function glide(
   oscillator.stop(when + length + 0.02);
 }
 
-export function buildAbilitySound(context: BaseAudioContext, when: number, kind: AbilitySoundKind) {
+export function buildAbilitySound(context: BaseAudioContext, when: number, kind: AbilitySoundKind, volume = 1) {
   switch (kind) {
     case "phase": {
       // Phantom X - Phase Shift: an airy, shimmering upward sweep.
-      const out = createOutput(context, 0.42);
+      const out = createOutput(context, 0.42 * volume);
       sweptNoise(context, out, when, 0.5, 500, 3200, 0.3, "bandpass", 3);
       glide(context, out, when, 0.5, "sine", 330, 990, 0.22, 0.08);
       glide(context, out, when, 0.5, "sine", 330, 990, 0.18, 0.08, 9);
@@ -112,14 +112,14 @@ export function buildAbilitySound(context: BaseAudioContext, when: number, kind:
     }
     case "phaseEnd": {
       // Phase Shift fading away: the sweep reversed and softer.
-      const out = createOutput(context, 0.4);
+      const out = createOutput(context, 0.4 * volume);
       sweptNoise(context, out, when, 0.32, 2600, 450, 0.25, "bandpass", 3);
       glide(context, out, when, 0.32, "sine", 880, 330, 0.18, 0.03);
       break;
     }
     case "overdrive": {
       // Nova - Overdrive: a rising engine power-up with a low kick.
-      const out = createOutput(context, 0.42);
+      const out = createOutput(context, 0.42 * volume);
       glide(context, out, when, 0.55, "sawtooth", 110, 520, 0.2, 0.03, 0, { from: 400, to: 3500 });
       sweptNoise(context, out, when, 0.45, 1200, 300, 0.2, "lowpass", 0.7);
       glide(context, out, when, 0.25, "sine", 90, 45, 0.45, 0.01);
@@ -127,13 +127,13 @@ export function buildAbilitySound(context: BaseAudioContext, when: number, kind:
     }
     case "overdriveEnd": {
       // Overdrive winding down: pitch and brightness fall away.
-      const out = createOutput(context, 0.4);
+      const out = createOutput(context, 0.4 * volume);
       glide(context, out, when, 0.4, "sawtooth", 420, 90, 0.16, 0.02, 0, { from: 2500, to: 300 });
       break;
     }
     case "fortress": {
       // Titan MK II - Fortress: a metallic shield-up hum with a bright ping.
-      const out = createOutput(context, 0.32);
+      const out = createOutput(context, 0.32 * volume);
       glide(context, out, when, 0.8, "sine", 190, 196, 0.26, 0.15);
       glide(context, out, when, 0.8, "sine", 285, 294, 0.2, 0.15);
       glide(context, out, when, 0.8, "triangle", 380, 392, 0.12, 0.15);
@@ -145,12 +145,13 @@ export function buildAbilitySound(context: BaseAudioContext, when: number, kind:
 }
 
 export function playAbilitySound(kind: AbilitySoundKind) {
-  if (isMusicMuted()) return;
+  const volume = getAudioGain();
+  if (volume <= 0) return;
   const context = getSfxContext();
   if (!context) return;
   try {
     if (context.state !== "running") void context.resume().catch(() => undefined);
-    buildAbilitySound(context, context.currentTime + 0.01, kind);
+    buildAbilitySound(context, context.currentTime + 0.01, kind, volume);
   } catch {
     // A missing audio device or blocked browser context must not affect the run.
   }
