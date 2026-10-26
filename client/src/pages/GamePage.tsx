@@ -42,7 +42,7 @@ export default function GamePage() {
               exit={{ opacity: 0, scale: 1.05 }}
               className="relative flex flex-col items-center justify-center min-h-[60vh] text-center space-y-8"
             >
-              <MusicToggle className="absolute right-0 top-0 z-20" />
+              <MusicToggle className="absolute right-0 top-0 z-20" popoverAlign="right" />
               <div className="relative">
                 <div className="absolute inset-0 bg-primary/20 blur-3xl rounded-full" />
                 <Rocket className="w-24 h-24 text-primary relative z-10 animate-bounce" />

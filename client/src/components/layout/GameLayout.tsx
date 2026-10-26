@@ -50,7 +50,7 @@ export function GameLayout({ children }: { children: ReactNode }) {
                 </div>
 
                 <div className="flex items-center gap-3 pl-4 border-l border-white/10">
-                  {location !== "/game" && <MusicToggle className="relative" />}
+                  {location !== "/game" && <MusicToggle className="relative" popoverAlign="right" />}
                    <ThemeSelector />
                   <div className="hidden sm:flex items-center gap-1.5 text-sm font-mono text-cyan-300" title="Gem balance">
                     <Gem className="h-4 w-4" />

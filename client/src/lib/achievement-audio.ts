@@ -1,3 +1,5 @@
+import { getAudioGain } from "@/lib/background-music";
+
 let audioContext: AudioContext | null = null;
 let pendingChimes = 0;
 let nextChimeTime = 0;
@@ -13,6 +15,8 @@ function getAudioContext(): AudioContext | null {
 }
 
 function scheduleChime(context: AudioContext) {
+  const volume = getAudioGain();
+  if (volume <= 0) return;
   try {
     const startAt = Math.max(context.currentTime + 0.015, nextChimeTime);
     const notes = [523.25, 659.25, 783.99, 1046.5];
@@ -24,7 +28,7 @@ function scheduleChime(context: AudioContext) {
       oscillator.type = "sine";
       oscillator.frequency.setValueAtTime(frequency, noteStart);
       envelope.gain.setValueAtTime(0.0001, noteStart);
-      envelope.gain.exponentialRampToValueAtTime(0.055, noteStart + 0.02);
+      envelope.gain.exponentialRampToValueAtTime(0.055 * volume, noteStart + 0.02);
       envelope.gain.exponentialRampToValueAtTime(0.0001, noteStart + 0.36);
       oscillator.connect(envelope);
       envelope.connect(context.destination);

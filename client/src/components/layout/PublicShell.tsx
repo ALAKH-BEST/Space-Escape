@@ -43,7 +43,7 @@ export function PublicShell({
             </span>
           </Link>
           <div className="flex items-center gap-4">
-            <MusicToggle className="relative" />
+            <MusicToggle className="relative" popoverAlign="right" />
             <ThemeSelector />
             <Link href="/" className="text-xs font-mono text-muted-foreground hover:text-primary transition-colors">
               BACK TO GAME

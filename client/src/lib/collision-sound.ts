@@ -1,8 +1,8 @@
 // Impact sounds for ASTRODODGE, synthesized with the Web Audio API (no audio
 // files): a deep "boom" when the ship is destroyed and a lighter thud when the
-// Titan's shield absorbs a hit. Respects the music mute button.
+// Titan's shield absorbs a hit. Respects the mute button and volume setting.
 
-import { isMusicMuted } from "@/lib/background-music";
+import { getAudioGain } from "@/lib/background-music";
 
 export type CollisionKind = "explosion" | "shield";
 
@@ -18,12 +18,12 @@ export function getSfxContext(): AudioContext | null {
   }
 }
 
-export function buildCollisionSound(context: BaseAudioContext, when: number, kind: CollisionKind) {
+export function buildCollisionSound(context: BaseAudioContext, when: number, kind: CollisionKind, volume = 1) {
   const strong = kind === "explosion";
   const duration = strong ? 0.95 : 0.4;
 
   const output = context.createGain();
-  output.gain.value = strong ? 0.28 : 0.18;
+  output.gain.value = (strong ? 0.28 : 0.18) * volume;
   const limiter = context.createDynamicsCompressor();
   limiter.threshold.value = -14;
   limiter.knee.value = 12;
@@ -89,12 +89,13 @@ export function buildCollisionSound(context: BaseAudioContext, when: number, kin
 }
 
 export function playCollisionSound(kind: CollisionKind) {
-  if (isMusicMuted()) return;
+  const volume = getAudioGain();
+  if (volume <= 0) return;
   const context = getSfxContext();
   if (!context) return;
   try {
     if (context.state !== "running") void context.resume().catch(() => undefined);
-    buildCollisionSound(context, context.currentTime + 0.01, kind);
+    buildCollisionSound(context, context.currentTime + 0.01, kind, volume);
   } catch {
     // A missing audio device or blocked browser context must not affect the run.
   }
