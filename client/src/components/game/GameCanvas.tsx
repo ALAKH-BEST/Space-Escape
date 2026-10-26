@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Link } from "wouter";
 import { AnimatePresence, motion } from "framer-motion";
 import { Gem, Play, RotateCcw, Shield, Sparkles, Trophy, Zap } from "lucide-react";
-import { useStartRun, useSubmitScore } from "@/hooks/use-scores";
+import { sendRunHeartbeat, useStartRun, useSubmitScore } from "@/hooks/use-scores";
 import { useProgression } from "@/hooks/use-progression";
 import { AchievementToast } from "@/components/game/AchievementToast";
 import { MobileControls } from "@/components/game/MobileControls";
@@ -59,6 +59,7 @@ const PLAYER_SIZE = 30;
 const OBSTACLE_SPEED = 3.5;
 const SPAWN_RATE = 1500;
 const SECTOR_TRANSITION_MS = 1600;
+const RUN_HEARTBEAT_MS = 2000;
 
 export function GameCanvas({
   multiplayer,
@@ -253,6 +254,28 @@ export function GameCanvas({
     }, 100);
     return () => window.clearInterval(timer);
   }, [awardAchievement]);
+
+  // While a run is being played, check in with the server every couple of
+  // seconds so it can tell the run was genuinely active. This only touches the
+  // run token; it never reads or changes anything the game loop uses.
+  useEffect(() => {
+    let inFlight = false;
+    const timer = window.setInterval(() => {
+      const { isPlaying, runId, runToken } = gameStateRef.current;
+      if (!isPlaying || !runId || !runToken || inFlight || document.hidden) return;
+      inFlight = true;
+      void sendRunHeartbeat(runId, runToken)
+        .then((nextToken) => {
+          if (nextToken && gameStateRef.current.runId === runId) {
+            gameStateRef.current.runToken = nextToken;
+          }
+        })
+        .finally(() => {
+          inFlight = false;
+        });
+    }, RUN_HEARTBEAT_MS);
+    return () => window.clearInterval(timer);
+  }, []);
 
   const activateAbility = () => {
     const state = gameStateRef.current;

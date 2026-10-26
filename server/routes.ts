@@ -6,8 +6,10 @@ import { api } from "@shared/routes";
 import { z } from "zod";
 import { isShipId } from "@shared/ships";
 import {
-  calculateAuthoritativeScore,
+  calculateRunScore,
   issueRun,
+  legacyRunTokensAllowed,
+  refreshRun,
   RunAuthorityError,
   verifyRun,
 } from "./run-authority";
@@ -33,7 +35,7 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
       const result = await storage.createScore({
         userId: req.user!.id,
         runId: claims.runId,
-        score: calculateAuthoritativeScore(claims.startedAt),
+        score: calculateRunScore(claims),
       });
 
       res.status(201).json(result);
@@ -48,11 +50,28 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
   app.post(api.runs.start.path, async (req, res, next) => {
     try {
       if (!req.isAuthenticated()) return res.status(401).send();
-      const { mode } = api.runs.start.input.parse(req.body);
-      res.status(201).json(issueRun(req.user!.id, mode));
+      const { mode, heartbeat } = api.runs.start.input.parse(req.body);
+      res.status(201).json(
+        issueRun(req.user!.id, mode, { legacy: legacyRunTokensAllowed() && !heartbeat }),
+      );
     } catch (error) {
       if (error instanceof z.ZodError || error instanceof RunAuthorityError) {
         return res.status(400).json({ message: error instanceof Error ? error.message : "Invalid run" });
+      }
+      next(error);
+    }
+  });
+
+  // The running game checks in every couple of seconds so the server can tell
+  // how long a run was genuinely being played (see run-authority.ts).
+  app.post(api.runs.heartbeat.path, (req, res, next) => {
+    try {
+      if (!req.isAuthenticated()) return res.status(401).send();
+      const { runId, runToken } = api.runs.heartbeat.input.parse(req.body);
+      res.json(refreshRun(runId, runToken, req.user!.id));
+    } catch (error) {
+      if (error instanceof z.ZodError || error instanceof RunAuthorityError) {
+        return res.status(400).json({ message: error instanceof Error ? error.message : "Invalid heartbeat" });
       }
       next(error);
     }
