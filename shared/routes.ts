@@ -78,6 +78,7 @@ export const api = {
       path: "/api/runs/start",
       input: z.object({
         mode: z.enum(["solo", "multiplayer"]),
+        heartbeat: z.boolean().optional(),
       }).strict(),
       responses: {
         201: z.object({
@@ -86,6 +87,21 @@ export const api = {
           startedAt: z.number().int(),
         }),
         401: z.void(),
+      },
+    },
+    heartbeat: {
+      method: "POST" as const,
+      path: "/api/runs/heartbeat",
+      input: z.object({
+        runId: z.string().uuid(),
+        runToken: z.string().min(1),
+      }).strict(),
+      responses: {
+        200: z.object({
+          runToken: z.string().min(1),
+        }),
+        401: z.void(),
+        400: z.object({ message: z.string() }),
       },
     },
   },

@@ -67,7 +67,7 @@ export function useStartRun() {
       const res = await fetch(apiUrl(api.runs.start.path), {
         method: api.runs.start.method,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ mode }),
+        body: JSON.stringify({ mode, heartbeat: true }),
         credentials: "include",
       });
       if (!res.ok) {
@@ -90,6 +90,31 @@ export function useStartRun() {
       });
     },
   });
+}
+
+/**
+ * Lets the server know a run is still being played and returns the refreshed
+ * run token. Best-effort: any failure resolves to null and never affects play.
+ */
+export async function sendRunHeartbeat(runId: string, runToken: string): Promise<string | null> {
+  const controller = new AbortController();
+  // A hung request must not block the next heartbeat.
+  const timeout = window.setTimeout(() => controller.abort(), 6000);
+  try {
+    const res = await fetch(apiUrl(api.runs.heartbeat.path), {
+      method: api.runs.heartbeat.method,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ runId, runToken }),
+      credentials: "include",
+      signal: controller.signal,
+    });
+    if (!res.ok) return null;
+    return api.runs.heartbeat.responses[200].parse(await res.json()).runToken;
+  } catch {
+    return null;
+  } finally {
+    window.clearTimeout(timeout);
+  }
 }
 
 export type ScoreResult = ReturnType<typeof api.scores.create.responses[201]["parse"]>;
