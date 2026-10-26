@@ -1,9 +1,13 @@
-// Calm, procedural space-ambient soundtrack for ASTRODODGE.
+// Procedural space soundtrack for ASTRODODGE.
 //
-// The music is synthesized with the Web Audio API (slow evolving pads, a soft
-// bass note and a sparse, echoing pluck) so it needs no audio files, loops
-// seamlessly and adds nothing to the bundle. It is deliberately quiet and
-// unobtrusive so it sits underneath gameplay and the achievement chime.
+// The music is synthesized with the Web Audio API so it needs no audio files,
+// loops seamlessly and adds nothing to the bundle. There are two tracks:
+//   - "calm": slow evolving pads, a soft bass note and a sparse, echoing pluck
+//     for the home screen and menus.
+//   - "mission": a lighter, driving groove (soft pulse, bouncing bass and a
+//     running arpeggio) that plays while a mission is in progress.
+// Both are deliberately quiet so they sit underneath gameplay, the sound
+// effects and the achievement chime.
 
 const MUTE_STORAGE_KEY = "astrododge:music-muted:v1";
 const VOLUME_STORAGE_KEY = "astrododge:audio-volume:v1";
@@ -42,6 +46,39 @@ const PROGRESSION: readonly Chord[] = [
 const ARP_STEPS = [0, 3, 6, 8, 11, 14];
 const ARP_NOTE_INDEX = [0, 2, 1, 3, 2, 1];
 
+export type MusicMode = "calm" | "mission";
+
+// Mission track: 120 bpm eighth-note steps, four-second chords, 32-second loop.
+export const MISSION_STEP_SECONDS = 0.25;
+const MISSION_STEPS_PER_BAR = 8;
+const MISSION_STEPS_PER_CHORD = 16;
+export const MISSION_LOOP_STEPS = 128;
+export const MISSION_LOOP_SECONDS = MISSION_LOOP_STEPS * MISSION_STEP_SECONDS;
+const MISSION_PAD_GAIN = 0.034;
+const MISSION_BASS_GAIN = 0.1;
+const MISSION_KICK_GAIN = 0.15;
+const MISSION_PLUCK_GAIN = 0.055;
+const MODE_SWITCH_FADE_OUT_SECONDS = 0.9;
+const MODE_SWITCH_FADE_IN_SECONDS = 1.2;
+
+// Am9 - Fmaj7 - Cadd9 - Gadd6, then Dm9 - Fmaj7 - Cadd9 - Gadd6 (MIDI notes).
+const MISSION_PROGRESSION: readonly Chord[] = [
+  { bass: 33, pad: [57, 60, 64, 71], arp: [69, 72, 76, 79] },
+  { bass: 29, pad: [53, 57, 60, 64], arp: [65, 69, 72, 76] },
+  { bass: 36, pad: [55, 60, 64, 74], arp: [67, 72, 76, 79] },
+  { bass: 31, pad: [55, 59, 62, 64], arp: [67, 71, 74, 79] },
+  { bass: 26, pad: [53, 57, 60, 64], arp: [65, 69, 72, 74] },
+  { bass: 29, pad: [53, 57, 60, 64], arp: [65, 69, 72, 76] },
+  { bass: 36, pad: [55, 60, 64, 74], arp: [67, 72, 76, 79] },
+  { bass: 31, pad: [55, 59, 62, 64], arp: [67, 71, 74, 79] },
+];
+
+// Bass pattern within each bar: [step, semitones above the chord root].
+const MISSION_BASS_PATTERN: ReadonlyArray<readonly [number, number]> = [
+  [0, 0], [2, 0], [3, 12], [4, 0], [6, 0], [7, 7],
+];
+const MISSION_ARP_INDEX = [0, 1, 2, 3, 2, 1, 2, 3];
+
 export type MusicGraph = {
   bus: GainNode;
   master: GainNode;
@@ -49,16 +86,27 @@ export type MusicGraph = {
   lfo: OscillatorNode;
 };
 
+const MODE_STEP_SECONDS: Record<MusicMode, number> = {
+  calm: MUSIC_STEP_SECONDS,
+  mission: MISSION_STEP_SECONDS,
+};
+const MODE_LOOP_STEPS: Record<MusicMode, number> = {
+  calm: MUSIC_LOOP_STEPS,
+  mission: MISSION_LOOP_STEPS,
+};
+
 function midiToHz(note: number) {
   return 440 * Math.pow(2, (note - 69) / 12);
 }
 
-export function createMusicGraph(context: BaseAudioContext): MusicGraph {
+export function createMusicGraph(context: BaseAudioContext, mode: MusicMode = "calm"): MusicGraph {
+  const mission = mode === "mission";
+  const stepSeconds = MODE_STEP_SECONDS[mode];
   const bus = context.createGain();
   const filter = context.createBiquadFilter();
   filter.type = "lowpass";
-  filter.frequency.value = 1500;
-  filter.Q.value = 0.4;
+  filter.frequency.value = mission ? 2600 : 1500;
+  filter.Q.value = mission ? 0.5 : 0.4;
   const master = context.createGain();
   master.gain.value = 0;
 
@@ -70,8 +118,8 @@ export function createMusicGraph(context: BaseAudioContext): MusicGraph {
   const lfo = context.createOscillator();
   const lfoDepth = context.createGain();
   lfo.type = "sine";
-  lfo.frequency.value = 0.045;
-  lfoDepth.gain.value = 320;
+  lfo.frequency.value = mission ? 0.08 : 0.045;
+  lfoDepth.gain.value = mission ? 500 : 320;
   lfo.connect(lfoDepth);
   lfoDepth.connect(filter.frequency);
   lfo.start();
@@ -80,7 +128,7 @@ export function createMusicGraph(context: BaseAudioContext): MusicGraph {
   const delaySend = context.createGain();
   delaySend.gain.value = 0.55;
   const delay = context.createDelay(2);
-  delay.delayTime.value = MUSIC_STEP_SECONDS * 1.5;
+  delay.delayTime.value = stepSeconds * 1.5;
   const feedback = context.createGain();
   feedback.gain.value = 0.36;
   const feedbackTone = context.createBiquadFilter();
@@ -98,13 +146,21 @@ export function createMusicGraph(context: BaseAudioContext): MusicGraph {
   return { bus, master, delaySend, lfo };
 }
 
-function playPad(context: BaseAudioContext, graph: MusicGraph, note: number, when: number, hold: number) {
-  const attack = 2.2;
-  const release = 2.4;
+function playPad(
+  context: BaseAudioContext,
+  graph: MusicGraph,
+  note: number,
+  when: number,
+  hold: number,
+  options: { attack?: number; release?: number; gain?: number } = {},
+) {
+  const attack = options.attack ?? 2.2;
+  const release = options.release ?? 2.4;
+  const padGain = options.gain ?? PAD_GAIN;
   const envelope = context.createGain();
   envelope.gain.setValueAtTime(0.0001, when);
-  envelope.gain.exponentialRampToValueAtTime(PAD_GAIN, when + attack);
-  envelope.gain.setValueAtTime(PAD_GAIN, when + hold);
+  envelope.gain.exponentialRampToValueAtTime(padGain, when + attack);
+  envelope.gain.setValueAtTime(padGain, when + hold);
   envelope.gain.exponentialRampToValueAtTime(0.0001, when + hold + release);
   envelope.connect(graph.bus);
 
@@ -165,7 +221,110 @@ function playPluck(context: BaseAudioContext, graph: MusicGraph, note: number, w
   });
 }
 
-export function scheduleMusicStep(context: BaseAudioContext, graph: MusicGraph, step: number, when: number) {
+// A soft, low "heartbeat" pulse rather than a hard kick drum.
+function playPulse(context: BaseAudioContext, graph: MusicGraph, when: number) {
+  const oscillator = context.createOscillator();
+  const envelope = context.createGain();
+  oscillator.type = "sine";
+  oscillator.frequency.setValueAtTime(115, when);
+  oscillator.frequency.exponentialRampToValueAtTime(46, when + 0.14);
+  envelope.gain.setValueAtTime(0.0001, when);
+  envelope.gain.exponentialRampToValueAtTime(MISSION_KICK_GAIN, when + 0.008);
+  envelope.gain.exponentialRampToValueAtTime(0.0001, when + 0.26);
+  oscillator.connect(envelope);
+  envelope.connect(graph.bus);
+  oscillator.start(when);
+  oscillator.stop(when + 0.3);
+}
+
+function playMissionBass(context: BaseAudioContext, graph: MusicGraph, note: number, when: number) {
+  const envelope = context.createGain();
+  envelope.gain.setValueAtTime(0.0001, when);
+  envelope.gain.exponentialRampToValueAtTime(MISSION_BASS_GAIN, when + 0.012);
+  envelope.gain.exponentialRampToValueAtTime(0.0001, when + 0.3);
+  envelope.connect(graph.bus);
+
+  [
+    { type: "sine" as OscillatorType, level: 1 },
+    { type: "triangle" as OscillatorType, level: 0.35 },
+  ].forEach(({ type, level }) => {
+    const oscillator = context.createOscillator();
+    const voiceGain = context.createGain();
+    oscillator.type = type;
+    oscillator.frequency.setValueAtTime(midiToHz(note), when);
+    voiceGain.gain.value = level;
+    oscillator.connect(voiceGain);
+    voiceGain.connect(envelope);
+    oscillator.start(when);
+    oscillator.stop(when + 0.34);
+  });
+}
+
+function playMissionPluck(context: BaseAudioContext, graph: MusicGraph, note: number, when: number, level: number) {
+  const envelope = context.createGain();
+  envelope.gain.setValueAtTime(0.0001, when);
+  envelope.gain.exponentialRampToValueAtTime(MISSION_PLUCK_GAIN * level, when + 0.008);
+  envelope.gain.exponentialRampToValueAtTime(0.0001, when + 0.5);
+  envelope.connect(graph.bus);
+  envelope.connect(graph.delaySend);
+
+  [
+    { type: "triangle" as OscillatorType, ratio: 1, level: 1 },
+    { type: "sine" as OscillatorType, ratio: 2, level: 0.2 },
+  ].forEach(({ type, ratio, level: partial }) => {
+    const oscillator = context.createOscillator();
+    const partialGain = context.createGain();
+    oscillator.type = type;
+    oscillator.frequency.setValueAtTime(midiToHz(note) * ratio, when);
+    partialGain.gain.value = partial;
+    oscillator.connect(partialGain);
+    partialGain.connect(envelope);
+    oscillator.start(when);
+    oscillator.stop(when + 0.55);
+  });
+}
+
+function scheduleMissionStep(context: BaseAudioContext, graph: MusicGraph, step: number, when: number) {
+  const loopStep = step % MISSION_LOOP_STEPS;
+  const chord = MISSION_PROGRESSION[Math.floor(loopStep / MISSION_STEPS_PER_CHORD) % MISSION_PROGRESSION.length];
+  const withinChord = loopStep % MISSION_STEPS_PER_CHORD;
+  const withinBar = loopStep % MISSION_STEPS_PER_BAR;
+
+  if (withinChord === 0) {
+    chord.pad.forEach((note) =>
+      playPad(context, graph, note, when, MISSION_STEPS_PER_CHORD * MISSION_STEP_SECONDS, {
+        attack: 1,
+        release: 1.6,
+        gain: MISSION_PAD_GAIN,
+      }),
+    );
+  }
+  if (withinBar === 0 || withinBar === 4) {
+    playPulse(context, graph, when);
+  }
+  MISSION_BASS_PATTERN.forEach(([patternStep, semitones]) => {
+    if (patternStep === withinBar) playMissionBass(context, graph, chord.bass + semitones, when);
+  });
+  playMissionPluck(
+    context,
+    graph,
+    chord.arp[MISSION_ARP_INDEX[withinBar] % chord.arp.length],
+    when,
+    withinBar % 2 === 0 ? 1 : 0.7,
+  );
+}
+
+export function scheduleMusicStep(
+  context: BaseAudioContext,
+  graph: MusicGraph,
+  step: number,
+  when: number,
+  mode: MusicMode = "calm",
+) {
+  if (mode === "mission") {
+    scheduleMissionStep(context, graph, step, when);
+    return;
+  }
   const loopStep = step % MUSIC_LOOP_STEPS;
   const chord = PROGRESSION[Math.floor(loopStep / STEPS_PER_CHORD) % PROGRESSION.length];
   const withinChord = loopStep % STEPS_PER_CHORD;
@@ -287,6 +446,8 @@ export function toggleMusicMuted() {
 
 let audioContext: AudioContext | null = null;
 let graph: MusicGraph | null = null;
+let graphMode: MusicMode = "calm";
+let musicMode: MusicMode = "calm";
 let schedulerTimer: number | null = null;
 let teardownTimer: number | null = null;
 let nextStepTime = 0;
@@ -332,10 +493,12 @@ function tick() {
   try {
     if (nextStepTime < context.currentTime - 0.25) nextStepTime = context.currentTime + 0.05;
     const horizon = context.currentTime + LOOKAHEAD_SECONDS;
+    const stepSeconds = MODE_STEP_SECONDS[graphMode];
+    const loopSteps = MODE_LOOP_STEPS[graphMode];
     while (nextStepTime < horizon) {
-      scheduleMusicStep(context, activeGraph, nextStep, nextStepTime);
-      nextStep = (nextStep + 1) % MUSIC_LOOP_STEPS;
-      nextStepTime += MUSIC_STEP_SECONDS;
+      scheduleMusicStep(context, activeGraph, nextStep, nextStepTime, graphMode);
+      nextStep = (nextStep + 1) % loopSteps;
+      nextStepTime += stepSeconds;
     }
   } catch {
     // A missing audio device or blocked browser context must not affect the run.
@@ -370,7 +533,19 @@ function begin() {
   }
 
   try {
-    if (!graph) graph = createMusicGraph(context);
+    if (graph && graphMode !== musicMode) {
+      // A mode change arrived while playback was paused (muted, hidden tab...).
+      retireGraph(graph, QUICK_FADE_SECONDS);
+      graph = null;
+    }
+    if (!graph) {
+      if (graphMode !== musicMode) {
+        graphMode = musicMode;
+        nextStep = 0;
+        nextStepTime = context.currentTime + 0.1;
+      }
+      graph = createMusicGraph(context, musicMode);
+    }
     rampMaster(MUSIC_LEVEL * getMusicVolumeGain(), FADE_IN_SECONDS);
     if (schedulerTimer === null) {
       nextStepTime = Math.max(nextStepTime, context.currentTime + 0.1);
@@ -408,6 +583,56 @@ function halt(fadeSeconds: number) {
     if (graph === activeGraph) graph = null;
     void context.suspend().catch(() => undefined);
   }, fadeSeconds * 1000 + 120);
+}
+
+// Fade an old graph out and free it, without touching the audio context.
+function retireGraph(old: MusicGraph, fadeSeconds: number) {
+  const context = audioContext;
+  try {
+    if (context) {
+      const now = context.currentTime;
+      old.master.gain.cancelScheduledValues(now);
+      old.master.gain.setValueAtTime(old.master.gain.value, now);
+      old.master.gain.linearRampToValueAtTime(0, now + Math.max(0.01, fadeSeconds));
+    }
+  } catch {
+    // Ignore: the teardown below still silences the graph.
+  }
+  window.setTimeout(() => {
+    try {
+      old.master.disconnect();
+      old.lfo.stop();
+    } catch {
+      // Already disconnected.
+    }
+  }, fadeSeconds * 1000 + 150);
+}
+
+/**
+ * Choose which track plays: "calm" for the home screen and menus, "mission"
+ * while a mission is in progress. If music is playing, the two crossfade;
+ * otherwise the choice is applied the next time playback starts.
+ */
+export function setMusicMode(nextMode: MusicMode) {
+  if (nextMode === musicMode) return;
+  musicMode = nextMode;
+  const context = audioContext;
+  if (!context || !graph || schedulerTimer === null) return;
+  try {
+    retireGraph(graph, MODE_SWITCH_FADE_OUT_SECONDS);
+    graph = createMusicGraph(context, nextMode);
+    graphMode = nextMode;
+    nextStep = 0;
+    nextStepTime = context.currentTime + 0.1;
+    rampMaster(MUSIC_LEVEL * getMusicVolumeGain(), MODE_SWITCH_FADE_IN_SECONDS);
+    tick();
+  } catch {
+    // Audio is a nicety; never let it break the game.
+  }
+}
+
+export function getMusicMode() {
+  return musicMode;
 }
 
 function sync() {

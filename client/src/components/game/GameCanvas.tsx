@@ -9,6 +9,7 @@ import { MobileControls } from "@/components/game/MobileControls";
 import { MusicToggle } from "@/components/game/MusicToggle";
 import { unlockAchievementAudio } from "@/lib/achievement-audio";
 import { playAbilitySound } from "@/lib/ability-sounds";
+import { setMusicMode } from "@/lib/background-music";
 import { playCollisionSound } from "@/lib/collision-sound";
 import {
   FIRST_FLIGHT_STORAGE_KEY,
@@ -150,6 +151,13 @@ export function GameCanvas({
       window.removeEventListener("keydown", unlock, true);
     };
   }, []);
+
+  // Mission music while a mission is in progress; the calm track otherwise
+  // (home screen, game over, or when leaving the game).
+  useEffect(() => {
+    setMusicMode(gameState.isPlaying ? "mission" : "calm");
+  }, [gameState.isPlaying]);
+  useEffect(() => () => setMusicMode("calm"), []);
 
   const selectedShip = ships[shipRef.current];
 
