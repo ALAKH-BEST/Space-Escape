@@ -1,0 +1,27 @@
+{
+  "capturedAt": "2026-10-28T03:54:32.477Z",
+  "node": "v22.23.4",
+  "v8": "12.4.254.21-node.57",
+  "platform": "linux x64",
+  "kernel": "6.18.44-fc-v180",
+  "cpuModel": "Intel(R) Xeon(R) Processor @ 2.30GHz",
+  "logicalCpus": 2,
+  "cpuMHz": 0,
+  "totalMemoryMB": 8028,
+  "loadAverageAtStart": [
+    1.01,
+    0.46,
+    0.2
+  ],
+  "hypervisor": "unknown",
+  "wsVersion": "8.18.0",
+  "git": {
+    "commit": "82c341d6317d7532a24f4c81bff4902d6567199a",
+    "dirty": true
+  },
+  "pinning": {
+    "serverCpu": 0,
+    "loadGeneratorCpu": 1
+  },
+  "note": "Server and load generator are pinned to separate CPU cores and talk over the loopback interface."
+}

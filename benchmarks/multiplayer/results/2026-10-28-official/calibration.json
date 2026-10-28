@@ -1,0 +1,38 @@
+{
+  "meta": {
+    "scenario": "calibrate",
+    "startedAt": "2026-10-28T03:56:06.884Z",
+    "playersPerRoom": 4,
+    "positionHz": 15,
+    "warmupSeconds": 8,
+    "measureSeconds": 20,
+    "sloP95Ms": 100,
+    "server": "harness"
+  },
+  "results": [
+    {
+      "injectedRoundTripMs": 0,
+      "measuredP50": 2.59,
+      "measuredP95": 3.05,
+      "errorMs": 2.59
+    },
+    {
+      "injectedRoundTripMs": 20,
+      "measuredP50": 20.36,
+      "measuredP95": 21.79,
+      "errorMs": 0.36
+    },
+    {
+      "injectedRoundTripMs": 50,
+      "measuredP50": 50.51,
+      "measuredP95": 51.41,
+      "errorMs": 0.51
+    },
+    {
+      "injectedRoundTripMs": 100,
+      "measuredP50": 100.43,
+      "measuredP95": 101.59,
+      "errorMs": 0.43
+    }
+  ]
+}

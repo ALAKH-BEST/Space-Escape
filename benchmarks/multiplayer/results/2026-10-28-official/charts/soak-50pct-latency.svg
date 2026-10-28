@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 400" width="760" height="400" font-family="system-ui, -apple-system, Segoe UI, sans-serif">
+<rect width="760" height="400" fill="#ffffff"/>
+<text x="64" y="26" font-size="15" font-weight="600" fill="#111827">Soak (188 rooms): p50 / p95 / p99 latency per minute (log scale)</text>
+<line x1="64" x2="736" y1="344" y2="344" stroke="#e5e7eb"/>
+<text x="56" y="348" font-size="11" text-anchor="end" fill="#374151">0.1</text>
+<line x1="64" x2="736" y1="244.00000000000003" y2="244.00000000000003" stroke="#e5e7eb"/>
+<text x="56" y="248.00000000000003" font-size="11" text-anchor="end" fill="#374151">1</text>
+<line x1="64" x2="736" y1="144" y2="144" stroke="#e5e7eb"/>
+<text x="56" y="148" font-size="11" text-anchor="end" fill="#374151">10</text>
+<line x1="64" x2="736" y1="44" y2="44" stroke="#e5e7eb"/>
+<text x="56" y="48" font-size="11" text-anchor="end" fill="#374151">100</text>
+<line x1="64" x2="64" y1="344" y2="348" stroke="#9ca3af"/>
+<text x="64" y="362" font-size="11" text-anchor="middle" fill="#374151">0</text>
+<line x1="288" x2="288" y1="344" y2="348" stroke="#9ca3af"/>
+<text x="288" y="362" font-size="11" text-anchor="middle" fill="#374151">200</text>
+<line x1="512" x2="512" y1="344" y2="348" stroke="#9ca3af"/>
+<text x="512" y="362" font-size="11" text-anchor="middle" fill="#374151">400</text>
+<line x1="736" x2="736" y1="344" y2="348" stroke="#9ca3af"/>
+<text x="736" y="362" font-size="11" text-anchor="middle" fill="#374151">600</text>
+<line x1="64" x2="64" y1="44" y2="344" stroke="#9ca3af"/>
+<line x1="64" x2="736" y1="344" y2="344" stroke="#9ca3af"/>
+<text x="400" y="388" font-size="12" text-anchor="middle" fill="#111827">Seconds into the test</text>
+<text transform="translate(16 194) rotate(-90)" font-size="12" text-anchor="middle" fill="#111827">Latency (ms)</text>
+<path d="M131.2 272.0 L198.5 267.2 L265.8 263.8 L333.1 265.7 L400.4 267.7 L467.7 268.3 L535.0 269.2 L602.3 268.7 L669.6 269.3 L736.9 267.9" fill="none" stroke="#15803d" stroke-width="2.2"/>
+<circle cx="131.2" cy="272.0" r="3" fill="#15803d"/>
+<circle cx="198.5" cy="267.2" r="3" fill="#15803d"/>
+<circle cx="265.8" cy="263.8" r="3" fill="#15803d"/>
+<circle cx="333.1" cy="265.7" r="3" fill="#15803d"/>
+<circle cx="400.4" cy="267.7" r="3" fill="#15803d"/>
+<circle cx="467.7" cy="268.3" r="3" fill="#15803d"/>
+<circle cx="535.0" cy="269.2" r="3" fill="#15803d"/>
+<circle cx="602.3" cy="268.7" r="3" fill="#15803d"/>
+<circle cx="669.6" cy="269.3" r="3" fill="#15803d"/>
+<circle cx="736.9" cy="267.9" r="3" fill="#15803d"/>
+<path d="M131.2 216.1 L198.5 197.8 L265.8 193.3 L333.1 191.2 L400.4 202.1 L467.7 206.6 L535.0 216.3 L602.3 210.2 L669.6 212.8 L736.9 205.0" fill="none" stroke="#2563eb" stroke-width="2.2"/>
+<circle cx="131.2" cy="216.1" r="3" fill="#2563eb"/>
+<circle cx="198.5" cy="197.8" r="3" fill="#2563eb"/>
+<circle cx="265.8" cy="193.3" r="3" fill="#2563eb"/>
+<circle cx="333.1" cy="191.2" r="3" fill="#2563eb"/>
+<circle cx="400.4" cy="202.1" r="3" fill="#2563eb"/>
+<circle cx="467.7" cy="206.6" r="3" fill="#2563eb"/>
+<circle cx="535.0" cy="216.3" r="3" fill="#2563eb"/>
+<circle cx="602.3" cy="210.2" r="3" fill="#2563eb"/>
+<circle cx="669.6" cy="212.8" r="3" fill="#2563eb"/>
+<circle cx="736.9" cy="205.0" r="3" fill="#2563eb"/>
+<path d="M131.2 171.6 L198.5 137.6 L265.8 135.1 L333.1 119.3 L400.4 121.6 L467.7 164.8 L535.0 177.4 L602.3 177.8 L669.6 169.1 L736.9 154.8" fill="none" stroke="#dc2626" stroke-width="2.2"/>
+<circle cx="131.2" cy="171.6" r="3" fill="#dc2626"/>
+<circle cx="198.5" cy="137.6" r="3" fill="#dc2626"/>
+<circle cx="265.8" cy="135.1" r="3" fill="#dc2626"/>
+<circle cx="333.1" cy="119.3" r="3" fill="#dc2626"/>
+<circle cx="400.4" cy="121.6" r="3" fill="#dc2626"/>
+<circle cx="467.7" cy="164.8" r="3" fill="#dc2626"/>
+<circle cx="535.0" cy="177.4" r="3" fill="#dc2626"/>
+<circle cx="602.3" cy="177.8" r="3" fill="#dc2626"/>
+<circle cx="669.6" cy="169.1" r="3" fill="#dc2626"/>
+<circle cx="736.9" cy="154.8" r="3" fill="#dc2626"/>
+<rect x="64" y="364" width="12" height="4" fill="#15803d"/>
+<text x="81" y="369" font-size="11" fill="#374151">p50</text>
+<rect x="112.6" y="364" width="12" height="4" fill="#2563eb"/>
+<text x="129.6" y="369" font-size="11" fill="#374151">p95</text>
+<rect x="161.2" y="364" width="12" height="4" fill="#dc2626"/>
+<text x="178.2" y="369" font-size="11" fill="#374151">p99</text>
+</svg>

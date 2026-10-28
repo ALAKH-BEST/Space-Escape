@@ -1,0 +1,134 @@
+{
+  "meta": {
+    "scenario": "connections",
+    "startedAt": "2026-10-28T04:31:16.888Z",
+    "playersPerRoom": 4,
+    "positionHz": 15,
+    "warmupSeconds": 8,
+    "measureSeconds": 20,
+    "sloP95Ms": 100,
+    "server": "harness"
+  },
+  "results": [
+    {
+      "connections": 100,
+      "connected": 100,
+      "failures": 0,
+      "connectSeconds": 0.156703379,
+      "server": {
+        "rssMBBefore": 50.16796875,
+        "rssMBAfter": 56.20703125,
+        "kbPerConnection": 61.84,
+        "idleCpuPercent": 0.3,
+        "openFiles": 122
+      },
+      "generatorRssMB": 90.25390625,
+      "verdict": "pass"
+    },
+    {
+      "connections": 500,
+      "connected": 500,
+      "failures": 0,
+      "connectSeconds": 0.6804148590000004,
+      "server": {
+        "rssMBBefore": 50.0703125,
+        "rssMBAfter": 61.01953125,
+        "kbPerConnection": 22.424,
+        "idleCpuPercent": 0.3,
+        "openFiles": 522
+      },
+      "generatorRssMB": 97.50390625,
+      "verdict": "pass"
+    },
+    {
+      "connections": 1000,
+      "connected": 1000,
+      "failures": 0,
+      "connectSeconds": 1.3275502009999982,
+      "server": {
+        "rssMBBefore": 50.16796875,
+        "rssMBAfter": 63.02734375,
+        "kbPerConnection": 13.168,
+        "idleCpuPercent": 0.3999999999999998,
+        "openFiles": 1022
+      },
+      "generatorRssMB": 103.12890625,
+      "verdict": "pass"
+    },
+    {
+      "connections": 2500,
+      "connected": 2500,
+      "failures": 0,
+      "connectSeconds": 3.2809020200000014,
+      "server": {
+        "rssMBBefore": 50.16796875,
+        "rssMBAfter": 80.5390625,
+        "kbPerConnection": 12.44,
+        "idleCpuPercent": 0.10000000000000009,
+        "openFiles": 2522
+      },
+      "generatorRssMB": 128.37890625,
+      "verdict": "pass"
+    },
+    {
+      "connections": 5000,
+      "connected": 5000,
+      "failures": 0,
+      "connectSeconds": 6.530947575999999,
+      "server": {
+        "rssMBBefore": 50.16015625,
+        "rssMBAfter": 103.77734375,
+        "kbPerConnection": 10.9808,
+        "idleCpuPercent": 0,
+        "openFiles": 5022
+      },
+      "generatorRssMB": 150.75390625,
+      "verdict": "pass"
+    },
+    {
+      "connections": 8000,
+      "connected": 8000,
+      "failures": 0,
+      "connectSeconds": 10.449509166000004,
+      "server": {
+        "rssMBBefore": 50.046875,
+        "rssMBAfter": 116.453125,
+        "kbPerConnection": 8.5,
+        "idleCpuPercent": 0.10000000000000009,
+        "openFiles": 8022
+      },
+      "generatorRssMB": 167.1328125,
+      "verdict": "pass"
+    },
+    {
+      "connections": 12000,
+      "connected": 12000,
+      "failures": 0,
+      "connectSeconds": 15.69553486,
+      "server": {
+        "rssMBBefore": 50.15234375,
+        "rssMBAfter": 130.99609375,
+        "kbPerConnection": 6.898666666666666,
+        "idleCpuPercent": 0.20000000000000018,
+        "openFiles": 12022
+      },
+      "generatorRssMB": 187.6328125,
+      "verdict": "pass"
+    },
+    {
+      "connections": 16000,
+      "connected": 16000,
+      "failures": 0,
+      "connectSeconds": 20.805234372000005,
+      "server": {
+        "rssMBBefore": 50.16796875,
+        "rssMBAfter": 143.8828125,
+        "kbPerConnection": 5.99775,
+        "idleCpuPercent": 0.10000000000000231,
+        "openFiles": 16022
+      },
+      "generatorRssMB": 214.26953125,
+      "verdict": "pass"
+    }
+  ]
+}
