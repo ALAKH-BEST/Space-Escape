@@ -47,7 +47,9 @@ export const themes = [
 
 export type ThemeId = (typeof themes)[number]["id"];
 
-const defaultTheme: ThemeId = "deep-space";
+// Keep the default and the storage key in sync with the inline script in client/index.html,
+// which applies the theme before the first paint.
+const defaultTheme: ThemeId = "nebula-green";
 const storageKey = "astrododge-theme";
 
 type ThemeContextValue = {
@@ -64,19 +66,31 @@ function isThemeId(value: string | null): value is ThemeId {
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [theme, setThemeState] = useState<ThemeId>(() => {
     if (typeof window === "undefined") return defaultTheme;
-    const savedTheme = window.localStorage.getItem(storageKey);
-    return isThemeId(savedTheme) ? savedTheme : defaultTheme;
+    try {
+      const savedTheme = window.localStorage.getItem(storageKey);
+      return isThemeId(savedTheme) ? savedTheme : defaultTheme;
+    } catch {
+      return defaultTheme;
+    }
   });
 
   useEffect(() => {
     document.documentElement.dataset.theme = theme;
-    window.localStorage.setItem(storageKey, theme);
   }, [theme]);
 
+  // Only an explicit choice is saved, so a visitor who never picks a theme keeps
+  // following the default instead of having it frozen into their browser.
   const value = useMemo(
     () => ({
       theme,
-      setTheme: (nextTheme: ThemeId) => setThemeState(nextTheme),
+      setTheme: (nextTheme: ThemeId) => {
+        try {
+          window.localStorage.setItem(storageKey, nextTheme);
+        } catch {
+          // Storage can be blocked (private mode); the choice still applies for this session.
+        }
+        setThemeState(nextTheme);
+      },
     }),
     [theme],
   );
