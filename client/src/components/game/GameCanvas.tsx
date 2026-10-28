@@ -9,7 +9,9 @@ import { MobileControls } from "@/components/game/MobileControls";
 import { MusicToggle } from "@/components/game/MusicToggle";
 import { unlockAchievementAudio } from "@/lib/achievement-audio";
 import { playAbilitySound } from "@/lib/ability-sounds";
-import { setMusicMode } from "@/lib/background-music";
+import { setMusicMode, startMusic, stopMusic } from "@/lib/background-music";
+import { isPortal } from "@/lib/portal";
+import { gameplayStart, gameplayStop, showBreakAd } from "@/lib/portal-sdk";
 import { playCollisionSound } from "@/lib/collision-sound";
 import {
   FIRST_FLIGHT_STORAGE_KEY,
@@ -159,6 +161,8 @@ export function GameCanvas({
     setMusicMode(gameState.isPlaying ? "mission" : "calm");
   }, [gameState.isPlaying]);
   useEffect(() => () => setMusicMode("calm"), []);
+  // Tell the portal the player is no longer playing if they leave mid-run.
+  useEffect(() => () => gameplayStop(), []);
 
   const selectedShip = ships[shipRef.current];
 
@@ -334,6 +338,7 @@ export function GameCanvas({
         rngSeed: multiplayerRef.current?.room.seed ?? Math.floor(Math.random() * 2_147_483_647),
         lastPositionBroadcast: 0,
       };
+      gameplayStart();
       if (!firstFlightSeenRef.current) {
         firstFlightSeenRef.current = true;
         try {
@@ -391,9 +396,23 @@ export function GameCanvas({
       survivalTime,
       sector: startingSectorNumber + Math.floor(finalScore / 100),
     });
+    gameplayStop();
+    if (isPortal) {
+      // Portals pay for ads shown at natural pauses: the moment a run ends is one.
+      let paused = false;
+      showBreakAd(
+        () => {
+          paused = true;
+          stopMusic(0.2);
+        },
+        () => {
+          if (paused) startMusic();
+        },
+      );
+    }
     if (state.runId && state.runToken) {
       scoreMutation.mutate(
-        { runId: state.runId, runToken: state.runToken },
+        { runId: state.runId, runToken: state.runToken, score: finalScore },
         {
           onSuccess: (result) => {
             setGameState((previous) => ({
@@ -647,7 +666,7 @@ export function GameCanvas({
           <div className="flex flex-wrap justify-center gap-3">
             <Button onClick={startGame} size="lg" className="font-mono"><RotateCcw className="mr-2 h-5 w-5" /> PLAY AGAIN</Button>
             <Button asChild variant="outline" size="lg" className="font-mono"><Link href="/hangar">HANGAR</Link></Button>
-            <Button asChild variant="outline" size="lg" className="font-mono"><Link href="/leaderboard"><Trophy className="mr-2 h-5 w-5" /> LEADERBOARD</Link></Button>
+            {!isPortal && <Button asChild variant="outline" size="lg" className="font-mono"><Link href="/leaderboard"><Trophy className="mr-2 h-5 w-5" /> LEADERBOARD</Link></Button>}
           </div>
         </div>
       )}

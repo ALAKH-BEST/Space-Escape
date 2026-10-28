@@ -3,11 +3,16 @@ import { api } from "@shared/routes";
 import type { InsertUser } from "@shared/schema";
 import { useToast } from "@/hooks/use-toast";
 import { apiUrl } from "@/lib/apiBase";
+import { isPortal } from "@/lib/portal";
+
+// Portal builds have no accounts: everyone plays as a local guest pilot.
+const PORTAL_GUEST = { id: 0, username: "Pilot", gems: 0 };
 
 export function useUser() {
   return useQuery({
     queryKey: ["/api/user"],
     queryFn: async () => {
+      if (isPortal) return PORTAL_GUEST;
       const res = await fetch(apiUrl(api.auth.me.path), {
         credentials: "include",
       });

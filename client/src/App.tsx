@@ -1,5 +1,6 @@
 import { useEffect } from "react";
-import { Switch, Route, Redirect, useLocation } from "wouter";
+import { Switch, Route, Redirect, Router as WouterRouter, useLocation } from "wouter";
+import { usePortalLocation, usePortalSearch } from "@/lib/portal-location";
 import { startMusic, stopMusic } from "@/lib/background-music";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
@@ -19,6 +20,8 @@ import NotFound from "@/pages/not-found";
 import GoogleAnalytics from "@/components/GoogleAnalytics";
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
 import MultiplayerPage from "@/pages/MultiplayerPage";
+import { isPortal } from "@/lib/portal";
+import { initPortalSdk } from "@/lib/portal-sdk";
 
 function ProtectedRoute({ component: Component }: { component: React.ComponentType }) {
   const { data: user, isLoading } = useUser();
@@ -39,6 +42,20 @@ function ProtectedRoute({ component: Component }: { component: React.ComponentTy
 }
 
 function Router() {
+  if (isPortal) {
+    // Portal builds are solo and account-free: straight into the game and hangar.
+    return (
+      <Switch>
+        <Route path="/game" component={GamePage} />
+        <Route path="/hangar" component={HangarPage} />
+        <Route path="/about" component={AboutPage} />
+        <Route path="/privacy" component={PrivacyPage} />
+        <Route path="/terms" component={TermsPage} />
+        <Route><Redirect to="/game" /></Route>
+      </Switch>
+    );
+  }
+
   return (
     <Switch>
       <Route path="/" component={AuthPage} />
@@ -81,14 +98,30 @@ function AppMusic() {
 }
 
 function App() {
+  useEffect(() => {
+    void initPortalSdk();
+  }, []);
+
+  const content = (
+    <>
+      <GoogleAnalytics />
+      <AppMusic />
+      <Router />
+      <Toaster />
+    </>
+  );
+
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
         <TooltipProvider>
-          <GoogleAnalytics />
-          <AppMusic />
-          <Router />
-          <Toaster />
+          {isPortal ? (
+            <WouterRouter hook={usePortalLocation} searchHook={usePortalSearch}>
+              {content}
+            </WouterRouter>
+          ) : (
+            content
+          )}
         </TooltipProvider>
       </ThemeProvider>
     </QueryClientProvider>

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useSearch } from "wouter";
 import { GameLayout } from "@/components/layout/GameLayout";
 import { GameCanvas } from "@/components/game/GameCanvas";
 import { MusicToggle } from "@/components/game/MusicToggle";
@@ -11,8 +12,9 @@ import { getSectorEnvironmentById } from "@/lib/sector-environments";
 import { ships } from "@shared/ships";
 
 export default function GamePage() {
+  const search = useSearch();
   const [launchRequest] = useState(() => {
-    const query = new URLSearchParams(window.location.search);
+    const query = new URLSearchParams(search);
     return {
       direct: query.get("launch") === "1",
       sector: getSectorEnvironmentById(query.get("sector")),
