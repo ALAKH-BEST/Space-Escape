@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 400" width="760" height="400" font-family="system-ui, -apple-system, Segoe UI, sans-serif">
+<rect width="760" height="400" fill="#ffffff"/>
+<text x="64" y="26" font-size="15" font-weight="600" fill="#111827">Event-loop delay (p99) vs load, server and load generator (log scale)</text>
+<line x1="64" x2="736" y1="344" y2="344" stroke="#e5e7eb"/>
+<text x="56" y="348" font-size="11" text-anchor="end" fill="#374151">1</text>
+<line x1="64" x2="736" y1="269" y2="269" stroke="#e5e7eb"/>
+<text x="56" y="273" font-size="11" text-anchor="end" fill="#374151">10</text>
+<line x1="64" x2="736" y1="194" y2="194" stroke="#e5e7eb"/>
+<text x="56" y="198" font-size="11" text-anchor="end" fill="#374151">100</text>
+<line x1="64" x2="736" y1="119" y2="119" stroke="#e5e7eb"/>
+<text x="56" y="123" font-size="11" text-anchor="end" fill="#374151">1k</text>
+<line x1="64" x2="736" y1="44" y2="44" stroke="#e5e7eb"/>
+<text x="56" y="48" font-size="11" text-anchor="end" fill="#374151">10k</text>
+<line x1="64" x2="64" y1="344" y2="348" stroke="#9ca3af"/>
+<text x="64" y="362" font-size="11" text-anchor="middle" fill="#374151">0</text>
+<line x1="288" x2="288" y1="344" y2="348" stroke="#9ca3af"/>
+<text x="288" y="362" font-size="11" text-anchor="middle" fill="#374151">500</text>
+<line x1="512" x2="512" y1="344" y2="348" stroke="#9ca3af"/>
+<text x="512" y="362" font-size="11" text-anchor="middle" fill="#374151">1000</text>
+<line x1="736" x2="736" y1="344" y2="348" stroke="#9ca3af"/>
+<text x="736" y="362" font-size="11" text-anchor="middle" fill="#374151">1500</text>
+<line x1="64" x2="64" y1="44" y2="344" stroke="#9ca3af"/>
+<line x1="64" x2="736" y1="344" y2="344" stroke="#9ca3af"/>
+<text x="400" y="388" font-size="12" text-anchor="middle" fill="#111827">Concurrent clients</text>
+<text transform="translate(16 194) rotate(-90)" font-size="12" text-anchor="middle" fill="#111827">Delay (ms)</text>
+<path d="M65.8 331.8 L73.0 330.2 L81.9 329.7 L108.8 326.9 L153.6 322.5 L243.2 319.4 L332.8 318.4 L422.4 313.5 L512.0 300.6 L601.6 290.0 L691.2 257.1 L714.5 227.6 L736.0 215.9 L759.3 178.5 L780.8 195.5 L870.4 74.0" fill="none" stroke="#2563eb" stroke-width="2.2"/>
+<circle cx="65.8" cy="331.8" r="3" fill="#2563eb"/>
+<circle cx="73.0" cy="330.2" r="3" fill="#2563eb"/>
+<circle cx="81.9" cy="329.7" r="3" fill="#2563eb"/>
+<circle cx="108.8" cy="326.9" r="3" fill="#2563eb"/>
+<circle cx="153.6" cy="322.5" r="3" fill="#2563eb"/>
+<circle cx="243.2" cy="319.4" r="3" fill="#2563eb"/>
+<circle cx="332.8" cy="318.4" r="3" fill="#2563eb"/>
+<circle cx="422.4" cy="313.5" r="3" fill="#2563eb"/>
+<circle cx="512.0" cy="300.6" r="3" fill="#2563eb"/>
+<circle cx="601.6" cy="290.0" r="3" fill="#2563eb"/>
+<circle cx="691.2" cy="257.1" r="3" fill="#2563eb"/>
+<circle cx="714.5" cy="227.6" r="3" fill="#2563eb"/>
+<circle cx="736.0" cy="215.9" r="3" fill="#2563eb"/>
+<circle cx="759.3" cy="178.5" r="3" fill="#2563eb"/>
+<circle cx="780.8" cy="195.5" r="3" fill="#2563eb"/>
+<circle cx="870.4" cy="74.0" r="3" fill="#2563eb"/>
+<path d="M65.8 333.7 L73.0 331.5 L81.9 330.8 L108.8 327.7 L153.6 324.2 L243.2 320.5 L332.8 319.2 L422.4 317.7 L512.0 315.5 L601.6 308.8 L691.2 303.7 L714.5 296.5 L736.0 294.4 L759.3 296.3 L780.8 290.1 L870.4 281.8" fill="none" stroke="#ea580c" stroke-width="2.2" stroke-dasharray="5 3"/>
+<circle cx="65.8" cy="333.7" r="3" fill="#ea580c"/>
+<circle cx="73.0" cy="331.5" r="3" fill="#ea580c"/>
+<circle cx="81.9" cy="330.8" r="3" fill="#ea580c"/>
+<circle cx="108.8" cy="327.7" r="3" fill="#ea580c"/>
+<circle cx="153.6" cy="324.2" r="3" fill="#ea580c"/>
+<circle cx="243.2" cy="320.5" r="3" fill="#ea580c"/>
+<circle cx="332.8" cy="319.2" r="3" fill="#ea580c"/>
+<circle cx="422.4" cy="317.7" r="3" fill="#ea580c"/>
+<circle cx="512.0" cy="315.5" r="3" fill="#ea580c"/>
+<circle cx="601.6" cy="308.8" r="3" fill="#ea580c"/>
+<circle cx="691.2" cy="303.7" r="3" fill="#ea580c"/>
+<circle cx="714.5" cy="296.5" r="3" fill="#ea580c"/>
+<circle cx="736.0" cy="294.4" r="3" fill="#ea580c"/>
+<circle cx="759.3" cy="296.3" r="3" fill="#ea580c"/>
+<circle cx="780.8" cy="290.1" r="3" fill="#ea580c"/>
+<circle cx="870.4" cy="281.8" r="3" fill="#ea580c"/>
+<rect x="64" y="364" width="12" height="4" fill="#2563eb"/>
+<text x="81" y="369" font-size="11" fill="#374151">Server</text>
+<rect x="131.2" y="364" width="12" height="4" fill="#ea580c"/>
+<text x="148.2" y="369" font-size="11" fill="#374151">Load generator</text>
+</svg>

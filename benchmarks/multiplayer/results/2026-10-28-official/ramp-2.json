@@ -1,0 +1,3546 @@
+{
+  "meta": {
+    "scenario": "ramp",
+    "startedAt": "2026-10-28T04:19:19.344Z",
+    "playersPerRoom": 4,
+    "positionHz": 15,
+    "warmupSeconds": 8,
+    "measureSeconds": 20,
+    "sloP95Ms": 100,
+    "server": "harness"
+  },
+  "steps": [
+    {
+      "config": {
+        "url": "ws://127.0.0.1:36069/ws",
+        "rooms": 1,
+        "playersPerRoom": 4,
+        "positionHz": 15,
+        "rampRoomsPerSecond": 25,
+        "warmupMs": 8000,
+        "measureMs": 20000,
+        "clients": 4
+      },
+      "setup": {
+        "roomsReady": 1,
+        "setupFailures": 0,
+        "setupSeconds": 0.04040477699995972
+      },
+      "latencyMs": {
+        "count": 1200,
+        "min": 0.08909299992956221,
+        "mean": 0.2586545966667472,
+        "p50": 0.22525699995458126,
+        "p90": 0.3448410000419244,
+        "p95": 0.3838980000000447,
+        "p99": 1.0311570001067594,
+        "p999": 5.291577000054531,
+        "max": 6.051387000014074
+      },
+      "throughput": {
+        "positionsSentPerSecond": 59.976222783335984,
+        "expectedPositionsPerSecond": 60,
+        "messagesReceivedPerSecond": 432.0287247826302,
+        "sampleCoverage": 1
+      },
+      "integrity": {
+        "eliminations": 0,
+        "unexpectedCloses": 0,
+        "socketErrors": 0,
+        "sampleOverflow": 0
+      },
+      "generator": {
+        "cpuPercent": 3.01195592799348,
+        "eventLoopP99Ms": 1.361919,
+        "eventLoopMaxMs": 5.922815
+      },
+      "server": {
+        "cpuPercent": 3.098771510472359,
+        "rssMBStart": 63.46484375,
+        "rssMBEnd": 64.28515625,
+        "rssMBMax": 64.28515625,
+        "heapUsedMB": 5.936798095703125,
+        "eventLoopDelayMs": {
+          "mean": 1.0855405416666668,
+          "p50": 1.081343,
+          "p95": 1.166335,
+          "p99": 1.445887,
+          "max": 7.192575
+        },
+        "gc": {
+          "minorCount": 20,
+          "minorMs": 5.022604999830946,
+          "majorCount": 2,
+          "majorMs": 5.948199999984354,
+          "otherCount": 2,
+          "otherMs": 6.977109000086784
+        }
+      },
+      "machine": {
+        "stealPercent": 0.10129146619397315
+      },
+      "timeline": [
+        {
+          "tSeconds": 1.0004543180000036,
+          "serverCpuPercent": 4.997729441555553,
+          "serverRssMB": 60.62109375,
+          "generatorCpuPercent": 2.3932127203832922,
+          "positionsPerSecond": 59.97275329866664,
+          "messagesReceivedPerSecond": 431.80382375039983
+        },
+        {
+          "tSeconds": 2.000455866000033,
+          "serverCpuPercent": 4.999992260011834,
+          "serverRssMB": 62.68359375,
+          "generatorCpuPercent": 2.499896130160717,
+          "positionsPerSecond": 59.99990712014202,
+          "messagesReceivedPerSecond": 431.99933126502253
+        },
+        {
+          "tSeconds": 3.000425636,
+          "serverCpuPercent": 3.000090692741738,
+          "serverRssMB": 63.03515625,
+          "generatorCpuPercent": 3.343101061945213,
+          "positionsPerSecond": 60.001813854834815,
+          "messagesReceivedPerSecond": 416.01257606018805
+        },
+        {
+          "tSeconds": 3.9998931250000607,
+          "serverCpuPercent": 4.002131178875955,
+          "serverRssMB": 63.296875,
+          "generatorCpuPercent": 3.6978691560019077,
+          "positionsPerSecond": 60.03196768313928,
+          "messagesReceivedPerSecond": 448.23869203410663
+        },
+        {
+          "tSeconds": 5.0005163140000075,
+          "serverCpuPercent": 2.9981315973681237,
+          "serverRssMB": 63.85546875,
+          "generatorCpuPercent": 3.7843416399179617,
+          "positionsPerSecond": 59.96263194736253,
+          "messagesReceivedPerSecond": 431.7309500210102
+        },
+        {
+          "tSeconds": 6.001481012000004,
+          "serverCpuPercent": 3.9961449269812497,
+          "serverRssMB": 63.859375,
+          "generatorCpuPercent": 3.4741484958943207,
+          "positionsPerSecond": 59.94217390471869,
+          "messagesReceivedPerSecond": 431.5836521139746
+        },
+        {
+          "tSeconds": 7.0015859190000915,
+          "serverCpuPercent": 2.999685312012711,
+          "serverRssMB": 64.046875,
+          "generatorCpuPercent": 2.5686305326764827,
+          "positionsPerSecond": 59.99370624025417,
+          "messagesReceivedPerSecond": 431.95468492983
+        },
+        {
+          "tSeconds": 8.00186558600003,
+          "serverCpuPercent": 1.999440822383643,
+          "serverRssMB": 64.2109375,
+          "generatorCpuPercent": 2.6782509815829023,
+          "positionsPerSecond": 59.983224671509575,
+          "messagesReceivedPerSecond": 431.87921763486895
+        },
+        {
+          "tSeconds": 9.002735963999992,
+          "serverCpuPercent": 3.9965215155964486,
+          "serverRssMB": 64.21484375,
+          "generatorCpuPercent": 3.8155790039778164,
+          "positionsPerSecond": 59.94782273394667,
+          "messagesReceivedPerSecond": 431.6243236844161
+        },
+        {
+          "tSeconds": 10.003354304000037,
+          "serverCpuPercent": 1.9987640842160785,
+          "serverRssMB": 64.21484375,
+          "generatorCpuPercent": 2.5459257522702274,
+          "positionsPerSecond": 59.9629225264823,
+          "messagesReceivedPerSecond": 431.73304219067256
+        },
+        {
+          "tSeconds": 11.0027262240001,
+          "serverCpuPercent": 4.00251389892939,
+          "serverRssMB": 64.21484375,
+          "generatorCpuPercent": 2.761134213176437,
+          "positionsPerSecond": 60.0377084839408,
+          "messagesReceivedPerSecond": 432.2715010843737
+        },
+        {
+          "tSeconds": 12.003349938000087,
+          "serverCpuPercent": 1.9987533495533538,
+          "serverRssMB": 64.21875,
+          "generatorCpuPercent": 3.2941453953988975,
+          "positionsPerSecond": 59.9626004866009,
+          "messagesReceivedPerSecond": 431.73072350352646
+        },
+        {
+          "tSeconds": 13.003766211000038,
+          "serverCpuPercent": 2.9987517006334703,
+          "serverRssMB": 64.21875,
+          "generatorCpuPercent": 3.269039187250564,
+          "positionsPerSecond": 59.975034012669354,
+          "messagesReceivedPerSecond": 431.8202448912193
+        },
+        {
+          "tSeconds": 14.004713665000047,
+          "serverCpuPercent": 2.997160328458139,
+          "serverRssMB": 64.22265625,
+          "generatorCpuPercent": 3.5031808972461516,
+          "positionsPerSecond": 59.943206569162726,
+          "messagesReceivedPerSecond": 431.5910872979716
+        },
+        {
+          "tSeconds": 15.00578097600001,
+          "serverCpuPercent": 2.996801480814825,
+          "serverRssMB": 64.22265625,
+          "generatorCpuPercent": 2.6519695237557297,
+          "positionsPerSecond": 59.936029616296445,
+          "messagesReceivedPerSecond": 431.5394132373344
+        },
+        {
+          "tSeconds": 16.006726967000052,
+          "serverCpuPercent": 1.9981098061063252,
+          "serverRssMB": 64.2265625,
+          "generatorCpuPercent": 3.408875234707693,
+          "positionsPerSecond": 59.9432941831897,
+          "messagesReceivedPerSecond": 431.59171811896584
+        },
+        {
+          "tSeconds": 17.007696823000092,
+          "serverCpuPercent": 2.9970932511277066,
+          "serverRssMB": 64.2265625,
+          "generatorCpuPercent": 2.6204585325693324,
+          "positionsPerSecond": 59.9418650225543,
+          "messagesReceivedPerSecond": 431.581428162391
+        },
+        {
+          "tSeconds": 18.008010324000033,
+          "serverCpuPercent": 2.999059791756411,
+          "serverRssMB": 64.28125,
+          "generatorCpuPercent": 2.4702255818100287,
+          "positionsPerSecond": 59.98119583512817,
+          "messagesReceivedPerSecond": 431.8646100129228
+        },
+        {
+          "tSeconds": 19.008508167000024,
+          "serverCpuPercent": 1.9990048094486714,
+          "serverRssMB": 64.28515625,
+          "generatorCpuPercent": 2.598506351802326,
+          "positionsPerSecond": 59.97014428346009,
+          "messagesReceivedPerSecond": 431.78503884091265
+        },
+        {
+          "tSeconds": 20.007743367000018,
+          "serverCpuPercent": 2.0015307707334675,
+          "serverRssMB": 64.28515625,
+          "generatorCpuPercent": 2.8571851752220225,
+          "positionsPerSecond": 60.04592312200398,
+          "messagesReceivedPerSecond": 432.3306464784286
+        }
+      ],
+      "subWindows": [],
+      "verdict": "pass",
+      "reason": ""
+    },
+    {
+      "config": {
+        "url": "ws://127.0.0.1:34895/ws",
+        "rooms": 5,
+        "playersPerRoom": 4,
+        "positionHz": 15,
+        "rampRoomsPerSecond": 25,
+        "warmupMs": 8000,
+        "measureMs": 20000,
+        "clients": 20
+      },
+      "setup": {
+        "roomsReady": 5,
+        "setupFailures": 0,
+        "setupSeconds": 0.20089710800000465
+      },
+      "latencyMs": {
+        "count": 6001,
+        "min": 0.04035200004000217,
+        "mean": 0.19622947475360403,
+        "p50": 0.14982299995608628,
+        "p90": 0.2667669999646023,
+        "p95": 0.32123100000899285,
+        "p99": 0.6213449999922886,
+        "p999": 6.845818000030704,
+        "max": 16.33394899999257
+      },
+      "throughput": {
+        "positionsSentPerSecond": 299.93467627172294,
+        "expectedPositionsPerSecond": 300,
+        "messagesReceivedPerSecond": 2160.1694231734486,
+        "sampleCoverage": 1
+      },
+      "integrity": {
+        "eliminations": 0,
+        "unexpectedCloses": 0,
+        "socketErrors": 0,
+        "sampleOverflow": 0
+      },
+      "generator": {
+        "cpuPercent": 5.064387762403263,
+        "eventLoopP99Ms": 1.440767,
+        "eventLoopMaxMs": 11.714559
+      },
+      "server": {
+        "cpuPercent": 5.347943736223021,
+        "rssMBStart": 63.72265625,
+        "rssMBEnd": 66.58984375,
+        "rssMBMax": 66.58984375,
+        "heapUsedMB": 7.578605651855469,
+        "eventLoopDelayMs": {
+          "mean": 1.0871167617495245,
+          "p50": 1.083391,
+          "p95": 1.320959,
+          "p99": 1.509375,
+          "max": 17.039359
+        },
+        "gc": {
+          "minorCount": 46,
+          "minorMs": 14.383296000305563,
+          "majorCount": 0,
+          "majorMs": 0,
+          "otherCount": 0,
+          "otherMs": 0
+        }
+      },
+      "machine": {
+        "stealPercent": 0.10178117048346055
+      },
+      "timeline": [
+        {
+          "tSeconds": 1.0000139679999556,
+          "serverCpuPercent": 6.9999022253660215,
+          "serverRssMB": 65.03125,
+          "generatorCpuPercent": 6.535408713411381,
+          "positionsPerSecond": 299.99580965854403,
+          "messagesReceivedPerSecond": 2159.969829541517
+        },
+        {
+          "tSeconds": 2.000379106999957,
+          "serverCpuPercent": 8.996714948500403,
+          "serverRssMB": 65.69140625,
+          "generatorCpuPercent": 5.487996118585248,
+          "positionsPerSecond": 299.89049828334686,
+          "messagesReceivedPerSecond": 2159.2115876400976
+        },
+        {
+          "tSeconds": 3.000977317999932,
+          "serverCpuPercent": 5.996412879854885,
+          "serverRssMB": 65.71484375,
+          "generatorCpuPercent": 4.981819820583434,
+          "positionsPerSecond": 299.82064399274395,
+          "messagesReceivedPerSecond": 2158.708636747757
+        },
+        {
+          "tSeconds": 4.001657076000003,
+          "serverCpuPercent": 8.993886333812856,
+          "serverRssMB": 66.28125,
+          "generatorCpuPercent": 4.11989946537892,
+          "positionsPerSecond": 299.7962111270953,
+          "messagesReceivedPerSecond": 2158.5327201150862
+        },
+        {
+          "tSeconds": 5.001100362999947,
+          "serverCpuPercent": 7.003899161714405,
+          "serverRssMB": 66.3046875,
+          "generatorCpuPercent": 4.404852238504502,
+          "positionsPerSecond": 300.1671069306176,
+          "messagesReceivedPerSecond": 2161.2031699004465
+        },
+        {
+          "tSeconds": 6.0014894289999505,
+          "serverCpuPercent": 6.997277597194352,
+          "serverRssMB": 66.328125,
+          "generatorCpuPercent": 4.308723622135215,
+          "positionsPerSecond": 299.8833255940434,
+          "messagesReceivedPerSecond": 2159.1599442771126
+        },
+        {
+          "tSeconds": 7.001892513999948,
+          "serverCpuPercent": 3.9983883096482167,
+          "serverRssMB": 66.3984375,
+          "generatorCpuPercent": 4.576655218931086,
+          "positionsPerSecond": 299.879123223616,
+          "messagesReceivedPerSecond": 2159.129687210035
+        },
+        {
+          "tSeconds": 8.002701617999934,
+          "serverCpuPercent": 5.995149300720283,
+          "serverRssMB": 66.41796875,
+          "generatorCpuPercent": 4.368765214589879,
+          "positionsPerSecond": 299.7574650360139,
+          "messagesReceivedPerSecond": 2158.2537482593
+        },
+        {
+          "tSeconds": 9.002392147999956,
+          "serverCpuPercent": 3.000928697403901,
+          "serverRssMB": 66.4296875,
+          "generatorCpuPercent": 4.432871840848491,
+          "positionsPerSecond": 300.092869740392,
+          "messagesReceivedPerSecond": 2160.6686621308227
+        },
+        {
+          "tSeconds": 10.002054233999923,
+          "serverCpuPercent": 4.001352112898012,
+          "serverRssMB": 66.44140625,
+          "generatorCpuPercent": 7.5654564736590855,
+          "positionsPerSecond": 300.10140846735055,
+          "messagesReceivedPerSecond": 2160.730140964924
+        },
+        {
+          "tSeconds": 11.002538369999966,
+          "serverCpuPercent": 4.9975804913710205,
+          "serverRssMB": 66.4609375,
+          "generatorCpuPercent": 8.320471760083604,
+          "positionsPerSecond": 299.854829482261,
+          "messagesReceivedPerSecond": 2158.954772272279
+        },
+        {
+          "tSeconds": 12.002677003999938,
+          "serverCpuPercent": 3.9994455408669967,
+          "serverRssMB": 66.47265625,
+          "generatorCpuPercent": 4.20581693077573,
+          "positionsPerSecond": 299.9584155650245,
+          "messagesReceivedPerSecond": 2159.7005920681763
+        },
+        {
+          "tSeconds": 13.002972545000025,
+          "serverCpuPercent": 4.998522731592953,
+          "serverRssMB": 66.484375,
+          "generatorCpuPercent": 4.743698042736339,
+          "positionsPerSecond": 299.91136389557687,
+          "messagesReceivedPerSecond": 2159.3618200481537
+        },
+        {
+          "tSeconds": 14.003544682999957,
+          "serverCpuPercent": 3.9977127566191353,
+          "serverRssMB": 66.50390625,
+          "generatorCpuPercent": 5.685946853739391,
+          "positionsPerSecond": 299.8284567464349,
+          "messagesReceivedPerSecond": 2158.764888574331
+        },
+        {
+          "tSeconds": 15.003803272999939,
+          "serverCpuPercent": 4.998707384257571,
+          "serverRssMB": 66.5234375,
+          "generatorCpuPercent": 4.7650678011173895,
+          "positionsPerSecond": 299.92244305545535,
+          "messagesReceivedPerSecond": 2159.441589999278
+        },
+        {
+          "tSeconds": 16.004488733000006,
+          "serverCpuPercent": 3.997260038134,
+          "serverRssMB": 66.53515625,
+          "generatorCpuPercent": 4.717766160007649,
+          "positionsPerSecond": 299.79450286004976,
+          "messagesReceivedPerSecond": 2158.5204205923583
+        },
+        {
+          "tSeconds": 17.004793807999928,
+          "serverCpuPercent": 4.998475090212239,
+          "serverRssMB": 66.546875,
+          "generatorCpuPercent": 4.528318523226871,
+          "positionsPerSecond": 299.90850541273403,
+          "messagesReceivedPerSecond": 2159.341238971685
+        },
+        {
+          "tSeconds": 18.00592556200002,
+          "serverCpuPercent": 3.9954781016761634,
+          "serverRssMB": 66.56640625,
+          "generatorCpuPercent": 4.13871599162125,
+          "positionsPerSecond": 299.66085762571197,
+          "messagesReceivedPerSecond": 2157.558174905126
+        },
+        {
+          "tSeconds": 19.006887334999977,
+          "serverCpuPercent": 4.995195755592765,
+          "serverRssMB": 66.578125,
+          "generatorCpuPercent": 4.21914214300387,
+          "positionsPerSecond": 299.71174533556564,
+          "messagesReceivedPerSecond": 2157.9245664160726
+        },
+        {
+          "tSeconds": 20.00755480199994,
+          "serverCpuPercent": 3.9973319128602487,
+          "serverRssMB": 66.58984375,
+          "generatorCpuPercent": 5.181141758853835,
+          "positionsPerSecond": 300.7992264427351,
+          "messagesReceivedPerSecond": 2178.5458925088456
+        }
+      ],
+      "subWindows": [],
+      "verdict": "pass",
+      "reason": ""
+    },
+    {
+      "config": {
+        "url": "ws://127.0.0.1:46235/ws",
+        "rooms": 10,
+        "playersPerRoom": 4,
+        "positionHz": 15,
+        "rampRoomsPerSecond": 25,
+        "warmupMs": 8000,
+        "measureMs": 20000,
+        "clients": 40
+      },
+      "setup": {
+        "roomsReady": 10,
+        "setupFailures": 0,
+        "setupSeconds": 0.4047259619999677
+      },
+      "latencyMs": {
+        "count": 12004,
+        "min": 0.027620999957434833,
+        "mean": 0.18046874625142859,
+        "p50": 0.14584200002718717,
+        "p90": 0.27708499995060265,
+        "p95": 0.34561900002881885,
+        "p99": 0.6602829999756068,
+        "p999": 2.956988999969326,
+        "max": 5.283972000004724
+      },
+      "throughput": {
+        "positionsSentPerSecond": 599.9874710880181,
+        "expectedPositionsPerSecond": 600,
+        "messagesReceivedPerSecond": 4321.869097803961,
+        "sampleCoverage": 1
+      },
+      "integrity": {
+        "eliminations": 0,
+        "unexpectedCloses": 0,
+        "socketErrors": 0,
+        "sampleOverflow": 0
+      },
+      "generator": {
+        "cpuPercent": 7.466130330515515,
+        "eventLoopP99Ms": 1.501183,
+        "eventLoopMaxMs": 3.633151
+      },
+      "server": {
+        "cpuPercent": 7.1474682077296405,
+        "rssMBStart": 65.2109375,
+        "rssMBEnd": 70.42578125,
+        "rssMBMax": 70.42578125,
+        "heapUsedMB": 8.005149841308594,
+        "eventLoopDelayMs": {
+          "mean": 1.0831794798050893,
+          "p50": 1.085439,
+          "p95": 1.377279,
+          "p99": 1.553407,
+          "max": 7.766015
+        },
+        "gc": {
+          "minorCount": 68,
+          "minorMs": 19.988275000359863,
+          "majorCount": 0,
+          "majorMs": 0,
+          "otherCount": 0,
+          "otherMs": 0
+        }
+      },
+      "machine": {
+        "stealPercent": 0.1525165226232842
+      },
+      "timeline": [
+        {
+          "tSeconds": 0.9995794260000112,
+          "serverCpuPercent": 12.005049011482832,
+          "serverRssMB": 66.13671875,
+          "generatorCpuPercent": 7.9063251948123945,
+          "positionsPerSecond": 600.2524505741411,
+          "messagesReceivedPerSecond": 4321.8176441338155
+        },
+        {
+          "tSeconds": 1.9992874640000518,
+          "serverCpuPercent": 6.001752283599974,
+          "serverRssMB": 66.1640625,
+          "generatorCpuPercent": 6.235620564250926,
+          "positionsPerSecond": 600.175228359998,
+          "messagesReceivedPerSecond": 4321.261644191985
+        },
+        {
+          "tSeconds": 2.999857889999985,
+          "serverCpuPercent": 8.99486909280347,
+          "serverRssMB": 66.2265625,
+          "generatorCpuPercent": 7.711201330270497,
+          "positionsPerSecond": 599.6579395202315,
+          "messagesReceivedPerSecond": 4317.537164545667
+        },
+        {
+          "tSeconds": 4.0000778700000374,
+          "serverCpuPercent": 8.998020615424553,
+          "serverRssMB": 66.82421875,
+          "generatorCpuPercent": 8.158105379978084,
+          "positionsPerSecond": 599.868041028303,
+          "messagesReceivedPerSecond": 4319.049895403782
+        },
+        {
+          "tSeconds": 5.000335403000005,
+          "serverCpuPercent": 5.998455199837222,
+          "serverRssMB": 66.859375,
+          "generatorCpuPercent": 7.698417403471084,
+          "positionsPerSecond": 599.8455199837217,
+          "messagesReceivedPerSecond": 4318.887743882796
+        },
+        {
+          "tSeconds": 6.000980098000029,
+          "serverCpuPercent": 6.995490042546833,
+          "serverRssMB": 66.89453125,
+          "generatorCpuPercent": 9.240242861628095,
+          "positionsPerSecond": 599.6134322183013,
+          "messagesReceivedPerSecond": 4317.21671197177
+        },
+        {
+          "tSeconds": 7.001201031000004,
+          "serverCpuPercent": 6.998453810604444,
+          "serverRssMB": 66.921875,
+          "generatorCpuPercent": 10.282928161832679,
+          "positionsPerSecond": 599.8674694803804,
+          "messagesReceivedPerSecond": 4319.045780258738
+        },
+        {
+          "tSeconds": 8.001462886000052,
+          "serverCpuPercent": 5.998429281300263,
+          "serverRssMB": 66.9453125,
+          "generatorCpuPercent": 7.023960740759892,
+          "positionsPerSecond": 599.8429281300257,
+          "messagesReceivedPerSecond": 4318.8690825361855
+        },
+        {
+          "tSeconds": 9.001620787999942,
+          "serverCpuPercent": 6.998894860504492,
+          "serverRssMB": 66.9765625,
+          "generatorCpuPercent": 6.058843296526459,
+          "positionsPerSecond": 599.9052737575292,
+          "messagesReceivedPerSecond": 4319.31797105421
+        },
+        {
+          "tSeconds": 10.001283703000052,
+          "serverCpuPercent": 5.001685993322513,
+          "serverRssMB": 68.0234375,
+          "generatorCpuPercent": 6.78348661158372,
+          "positionsPerSecond": 600.202319198701,
+          "messagesReceivedPerSecond": 4321.456698230648
+        },
+        {
+          "tSeconds": 11.002056668999954,
+          "serverCpuPercent": 5.99536578609038,
+          "serverRssMB": 70.2109375,
+          "generatorCpuPercent": 6.981403612376038,
+          "positionsPerSecond": 599.5365786090375,
+          "messagesReceivedPerSecond": 4316.6633659850695
+        },
+        {
+          "tSeconds": 12.00217972200003,
+          "serverCpuPercent": 8.998892659260925,
+          "serverRssMB": 70.24609375,
+          "generatorCpuPercent": 8.691430493402837,
+          "positionsPerSecond": 600.9260542462014,
+          "messagesReceivedPerSecond": 4339.466015688043
+        },
+        {
+          "tSeconds": 13.002930784999975,
+          "serverCpuPercent": 6.994746504706303,
+          "serverRssMB": 70.3125,
+          "generatorCpuPercent": 8.058147823321814,
+          "positionsPerSecond": 598.5504509027264,
+          "messagesReceivedPerSecond": 4296.772852891025
+        },
+        {
+          "tSeconds": 14.003237569999998,
+          "serverCpuPercent": 5.9981598545288985,
+          "serverRssMB": 70.32421875,
+          "generatorCpuPercent": 7.3831349649396145,
+          "positionsPerSecond": 601.8153720710657,
+          "messagesReceivedPerSecond": 4358.662827624329
+        },
+        {
+          "tSeconds": 15.003268065999961,
+          "serverCpuPercent": 6.9997865345101085,
+          "serverRssMB": 70.34375,
+          "generatorCpuPercent": 6.634997659111633,
+          "positionsPerSecond": 599.9817029580088,
+          "messagesReceivedPerSecond": 4299.868871199063
+        },
+        {
+          "tSeconds": 16.004059906000037,
+          "serverCpuPercent": 4.9960439325720465,
+          "serverRssMB": 70.35546875,
+          "generatorCpuPercent": 5.807901071614999,
+          "positionsPerSecond": 599.525271908645,
+          "messagesReceivedPerSecond": 4336.566133472532
+        },
+        {
+          "tSeconds": 17.00510675699997,
+          "serverCpuPercent": 6.992679706257272,
+          "serverRssMB": 70.38671875,
+          "generatorCpuPercent": 6.606084413925636,
+          "positionsPerSecond": 600.3715004943757,
+          "messagesReceivedPerSecond": 4319.478149979502
+        },
+        {
+          "tSeconds": 18.00572566700005,
+          "serverCpuPercent": 5.99628883687551,
+          "serverRssMB": 70.3984375,
+          "generatorCpuPercent": 5.793714212336393,
+          "positionsPerSecond": 600.6282651603631,
+          "messagesReceivedPerSecond": 4337.315592006615
+        },
+        {
+          "tSeconds": 19.00620541699999,
+          "serverCpuPercent": 6.996643360348274,
+          "serverRssMB": 70.4140625,
+          "generatorCpuPercent": 9.394393039939647,
+          "positionsPerSecond": 598.7127675498036,
+          "messagesReceivedPerSecond": 4297.9380642139495
+        },
+        {
+          "tSeconds": 20.00694736999995,
+          "serverCpuPercent": 8.99332737377543,
+          "serverRssMB": 70.42578125,
+          "generatorCpuPercent": 6.87130181700324,
+          "positionsPerSecond": 600.5544168487795,
+          "messagesReceivedPerSecond": 4336.782311353915
+        }
+      ],
+      "subWindows": [],
+      "verdict": "pass",
+      "reason": ""
+    },
+    {
+      "config": {
+        "url": "ws://127.0.0.1:33823/ws",
+        "rooms": 25,
+        "playersPerRoom": 4,
+        "positionHz": 15,
+        "rampRoomsPerSecond": 25,
+        "warmupMs": 8000,
+        "measureMs": 20000,
+        "clients": 100
+      },
+      "setup": {
+        "roomsReady": 25,
+        "setupFailures": 0,
+        "setupSeconds": 1.0079965100000845
+      },
+      "latencyMs": {
+        "count": 30021,
+        "min": 0.03113300004042685,
+        "mean": 0.19647405669407234,
+        "p50": 0.1512640001019463,
+        "p90": 0.3190650000469759,
+        "p95": 0.420769999967888,
+        "p99": 0.8572740000672638,
+        "p999": 3.206339000025764,
+        "max": 6.508110000053421
+      },
+      "throughput": {
+        "positionsSentPerSecond": 1500.34570358547,
+        "expectedPositionsPerSecond": 1500,
+        "messagesReceivedPerSecond": 10805.0480351356,
+        "sampleCoverage": 1.0000666244711682
+      },
+      "integrity": {
+        "eliminations": 0,
+        "unexpectedCloses": 0,
+        "socketErrors": 0,
+        "sampleOverflow": 0
+      },
+      "generator": {
+        "cpuPercent": 12.637320048280076,
+        "eventLoopP99Ms": 1.674239,
+        "eventLoopMaxMs": 23.920639
+      },
+      "server": {
+        "cpuPercent": 12.694886862011039,
+        "rssMBStart": 68.890625,
+        "rssMBEnd": 77.27734375,
+        "rssMBMax": 77.27734375,
+        "heapUsedMB": 13.110275268554688,
+        "eventLoopDelayMs": {
+          "mean": 1.08486158130456,
+          "p50": 1.184767,
+          "p95": 1.471487,
+          "p99": 1.734655,
+          "max": 14.409727
+        },
+        "gc": {
+          "minorCount": 108,
+          "minorMs": 37.65821099933237,
+          "majorCount": 0,
+          "majorMs": 0,
+          "otherCount": 0,
+          "otherMs": 0
+        }
+      },
+      "machine": {
+        "stealPercent": 0.1800411522633745
+      },
+      "timeline": [
+        {
+          "tSeconds": 1.0008457979999947,
+          "serverCpuPercent": 17.984788501854794,
+          "serverRssMB": 69.7109375,
+          "generatorCpuPercent": 13.239502055640413,
+          "positionsPerSecond": 1500.7306849881063,
+          "messagesReceivedPerSecond": 10838.832537117827
+        },
+        {
+          "tSeconds": 2.000126719999942,
+          "serverCpuPercent": 12.008635145343689,
+          "serverRssMB": 69.80859375,
+          "generatorCpuPercent": 10.565797632630636,
+          "positionsPerSecond": 1501.0793931679598,
+          "messagesReceivedPerSecond": 10786.75651930496
+        },
+        {
+          "tSeconds": 3.00094073199993,
+          "serverCpuPercent": 8.992679850689475,
+          "serverRssMB": 69.8515625,
+          "generatorCpuPercent": 12.318472615469485,
+          "positionsPerSecond": 1499.7791617649914,
+          "messagesReceivedPerSecond": 10816.195487079302
+        },
+        {
+          "tSeconds": 4.0001204829999475,
+          "serverCpuPercent": 12.009851068328741,
+          "serverRssMB": 70.3125,
+          "generatorCpuPercent": 14.33705995909413,
+          "positionsPerSecond": 1500.2305626187306,
+          "messagesReceivedPerSecond": 10803.861856884054
+        },
+        {
+          "tSeconds": 5.000218837999972,
+          "serverCpuPercent": 20.997934748127324,
+          "serverRssMB": 70.3515625,
+          "generatorCpuPercent": 13.368985093470814,
+          "positionsPerSecond": 1499.8524820090963,
+          "messagesReceivedPerSecond": 10775.94013240802
+        },
+        {
+          "tSeconds": 6.000171818999923,
+          "serverCpuPercent": 15.000705318164123,
+          "serverRssMB": 70.39453125,
+          "generatorCpuPercent": 13.98895774680498,
+          "positionsPerSecond": 1502.0706258588305,
+          "messagesReceivedPerSecond": 10816.508581417518
+        },
+        {
+          "tSeconds": 7.001053053999902,
+          "serverCpuPercent": 11.989434490696809,
+          "serverRssMB": 70.43359375,
+          "generatorCpuPercent": 11.795005828039377,
+          "positionsPerSecond": 1496.6810722553225,
+          "messagesReceivedPerSecond": 10814.469910608552
+        },
+        {
+          "tSeconds": 8.001870141999913,
+          "serverCpuPercent": 10.991019369964949,
+          "serverRssMB": 70.46484375,
+          "generatorCpuPercent": 12.204527826766952,
+          "positionsPerSecond": 1501.7729193688426,
+          "messagesReceivedPerSecond": 10803.172857096426
+        },
+        {
+          "tSeconds": 9.002145056999987,
+          "serverCpuPercent": 12.996427087246332,
+          "serverRssMB": 70.5,
+          "generatorCpuPercent": 12.772188733733316,
+          "positionsPerSecond": 1497.5882905150015,
+          "messagesReceivedPerSecond": 10805.029535304497
+        },
+        {
+          "tSeconds": 10.003116527999984,
+          "serverCpuPercent": 12.987383133919536,
+          "serverRssMB": 70.53125,
+          "generatorCpuPercent": 12.749414313727266,
+          "positionsPerSecond": 1501.5412961754676,
+          "messagesReceivedPerSecond": 10785.522177984263
+        },
+        {
+          "tSeconds": 11.003997875000001,
+          "serverCpuPercent": 11.989433149062181,
+          "serverRssMB": 70.5625,
+          "generatorCpuPercent": 14.50531578344996,
+          "positionsPerSecond": 1501.676501920037,
+          "messagesReceivedPerSecond": 10802.479267305016
+        },
+        {
+          "tSeconds": 12.004864744999912,
+          "serverCpuPercent": 10.990472688941106,
+          "serverRssMB": 70.6015625,
+          "generatorCpuPercent": 12.97884902514673,
+          "positionsPerSecond": 1502.6973567424945,
+          "messagesReceivedPerSecond": 10822.618196964562
+        },
+        {
+          "tSeconds": 13.005555553999962,
+          "serverCpuPercent": 13.990335350426212,
+          "serverRssMB": 70.63671875,
+          "generatorCpuPercent": 12.946256609417249,
+          "positionsPerSecond": 1500.9631211671538,
+          "messagesReceivedPerSecond": 10800.538890529026
+        },
+        {
+          "tSeconds": 14.005975303999962,
+          "serverCpuPercent": 9.995804261161377,
+          "serverRssMB": 70.66796875,
+          "generatorCpuPercent": 11.081448561966104,
+          "positionsPerSecond": 1499.3706391742053,
+          "messagesReceivedPerSecond": 10811.461888872136
+        },
+        {
+          "tSeconds": 15.005140321999905,
+          "serverCpuPercent": 10.008356797776315,
+          "serverRssMB": 70.69921875,
+          "generatorCpuPercent": 11.268709169320276,
+          "positionsPerSecond": 1502.2543553462235,
+          "messagesReceivedPerSecond": 10822.03620543552
+        },
+        {
+          "tSeconds": 16.00569218299992,
+          "serverCpuPercent": 14.991726650738572,
+          "serverRssMB": 70.734375,
+          "generatorCpuPercent": 13.515841134395538,
+          "positionsPerSecond": 1498.1732166304755,
+          "messagesReceivedPerSecond": 10765.059183673684
+        },
+        {
+          "tSeconds": 17.006103189999937,
+          "serverCpuPercent": 10.995480780430679,
+          "serverRssMB": 70.76171875,
+          "generatorCpuPercent": 12.189789911017836,
+          "positionsPerSecond": 1501.382921109718,
+          "messagesReceivedPerSecond": 10835.546514533518
+        },
+        {
+          "tSeconds": 18.006167925999964,
+          "serverCpuPercent": 9.999352681904499,
+          "serverRssMB": 70.796875,
+          "generatorCpuPercent": 12.35290032264435,
+          "positionsPerSecond": 1500.902837553864,
+          "messagesReceivedPerSecond": 10787.301673238564
+        },
+        {
+          "tSeconds": 19.007001531999908,
+          "serverCpuPercent": 10.990837971522538,
+          "serverRssMB": 74.15625,
+          "generatorCpuPercent": 12.317232281267659,
+          "positionsPerSecond": 1497.7514653920275,
+          "messagesReceivedPerSecond": 10787.007885505223
+        },
+        {
+          "tSeconds": 20.00795069299999,
+          "serverCpuPercent": 13.986724346731167,
+          "serverRssMB": 77.27734375,
+          "generatorCpuPercent": 12.247674984562945,
+          "positionsPerSecond": 1500.5757120564424,
+          "messagesReceivedPerSecond": 10813.736023501286
+        }
+      ],
+      "subWindows": [],
+      "verdict": "pass",
+      "reason": ""
+    },
+    {
+      "config": {
+        "url": "ws://127.0.0.1:36751/ws",
+        "rooms": 50,
+        "playersPerRoom": 4,
+        "positionHz": 15,
+        "rampRoomsPerSecond": 25,
+        "warmupMs": 8000,
+        "measureMs": 20000,
+        "clients": 200
+      },
+      "setup": {
+        "roomsReady": 50,
+        "setupFailures": 0,
+        "setupSeconds": 2.0172913780000528
+      },
+      "latencyMs": {
+        "count": 60020,
+        "min": 0.036742999916896224,
+        "mean": 0.23434422022665152,
+        "p50": 0.1847080000443384,
+        "p90": 0.3898210000479594,
+        "p95": 0.5054229999659583,
+        "p99": 1.0220089999493212,
+        "p999": 2.8048049999633804,
+        "max": 9.33910800004378
+      },
+      "throughput": {
+        "positionsSentPerSecond": 2999.9415094892856,
+        "expectedPositionsPerSecond": 3000,
+        "messagesReceivedPerSecond": 21606.897749755153,
+        "sampleCoverage": 1.0001999733368885
+      },
+      "integrity": {
+        "eliminations": 0,
+        "unexpectedCloses": 0,
+        "socketErrors": 0,
+        "sampleOverflow": 0
+      },
+      "generator": {
+        "cpuPercent": 21.659849656948378,
+        "eventLoopP99Ms": 1.836031,
+        "eventLoopMaxMs": 9.052159
+      },
+      "server": {
+        "cpuPercent": 20.096928523108467,
+        "rssMBStart": 76.1015625,
+        "rssMBEnd": 78.18359375,
+        "rssMBMax": 78.18359375,
+        "heapUsedMB": 9.174919128417969,
+        "eventLoopDelayMs": {
+          "mean": 1.0754129777968926,
+          "p50": 1.227775,
+          "p95": 1.582079,
+          "p99": 1.933311,
+          "max": 7.827455
+        },
+        "gc": {
+          "minorCount": 112,
+          "minorMs": 54.694951000856236,
+          "majorCount": 1,
+          "majorMs": 2.9430460000876337,
+          "otherCount": 1,
+          "otherMs": 3.7480979999527335
+        }
+      },
+      "machine": {
+        "stealPercent": 0.15669887699138157
+      },
+      "timeline": [
+        {
+          "tSeconds": 1.0007085590000497,
+          "serverCpuPercent": 23.98300662480776,
+          "serverRssMB": 77.08203125,
+          "generatorCpuPercent": 21.606690385066372,
+          "positionsPerSecond": 2998.8751200436677,
+          "messagesReceivedPerSecond": 21668.646485513793
+        },
+        {
+          "tSeconds": 2.0001600249999902,
+          "serverCpuPercent": 18.00987903098547,
+          "serverRssMB": 77.12109375,
+          "generatorCpuPercent": 19.4434654018519,
+          "positionsPerSecond": 3002.6470539992974,
+          "messagesReceivedPerSecond": 21614.856483687712
+        },
+        {
+          "tSeconds": 3.0013487560000502,
+          "serverCpuPercent": 29.964380412106514,
+          "serverRssMB": 77.15234375,
+          "generatorCpuPercent": 23.318180955433263,
+          "positionsPerSecond": 2995.4392285302497,
+          "messagesReceivedPerSecond": 21571.35745867549
+        },
+        {
+          "tSeconds": 4.001940704000066,
+          "serverCpuPercent": 21.9869848482927,
+          "serverRssMB": 77.8359375,
+          "generatorCpuPercent": 20.74541979024568,
+          "positionsPerSecond": 3000.2240233897555,
+          "messagesReceivedPerSecond": 21611.207289067315
+        },
+        {
+          "tSeconds": 5.001359132000013,
+          "serverCpuPercent": 18.01047438761149,
+          "serverRssMB": 77.890625,
+          "generatorCpuPercent": 20.036952930790942,
+          "positionsPerSecond": 3002.7463131790096,
+          "messagesReceivedPerSecond": 21616.571592775515
+        },
+        {
+          "tSeconds": 6.002108496000059,
+          "serverCpuPercent": 18.98577274539153,
+          "serverRssMB": 78.1796875,
+          "generatorCpuPercent": 19.688745962569584,
+          "positionsPerSecond": 2999.7520937718627,
+          "messagesReceivedPerSecond": 21591.819867495808
+        },
+        {
+          "tSeconds": 7.002213459999999,
+          "serverCpuPercent": 20.997795987343242,
+          "serverRssMB": 78.1796875,
+          "generatorCpuPercent": 22.070183425268276,
+          "positionsPerSecond": 2999.685141049035,
+          "messagesReceivedPerSecond": 21591.733645270953
+        },
+        {
+          "tSeconds": 8.00242608200002,
+          "serverCpuPercent": 19.995748463969694,
+          "serverRssMB": 78.1796875,
+          "generatorCpuPercent": 20.313780843289113,
+          "positionsPerSecond": 3000.36205701865,
+          "messagesReceivedPerSecond": 21605.406215319235
+        },
+        {
+          "tSeconds": 9.002547972000087,
+          "serverCpuPercent": 17.9978062473953,
+          "serverRssMB": 78.1796875,
+          "generatorCpuPercent": 20.825661560111026,
+          "positionsPerSecond": 3001.6341308155916,
+          "messagesReceivedPerSecond": 21621.364571870872
+        },
+        {
+          "tSeconds": 10.002548093000078,
+          "serverCpuPercent": 16.999997943000412,
+          "serverRssMB": 78.1796875,
+          "generatorCpuPercent": 19.295697665220775,
+          "positionsPerSecond": 2999.999637000074,
+          "messagesReceivedPerSecond": 21599.997386400533
+        },
+        {
+          "tSeconds": 11.002219901000034,
+          "serverCpuPercent": 20.00656599490791,
+          "serverRssMB": 78.1796875,
+          "generatorCpuPercent": 21.54577114972613,
+          "positionsPerSecond": 3000.9848992361835,
+          "messagesReceivedPerSecond": 21579.082082107652
+        },
+        {
+          "tSeconds": 12.00269223799999,
+          "serverCpuPercent": 17.991501947945185,
+          "serverRssMB": 78.1796875,
+          "generatorCpuPercent": 21.74902712977357,
+          "positionsPerSecond": 2997.5841301048717,
+          "messagesReceivedPerSecond": 21597.798560622232
+        },
+        {
+          "tSeconds": 13.002635939000058,
+          "serverCpuPercent": 25.001407554242164,
+          "serverRssMB": 78.18359375,
+          "generatorCpuPercent": 24.475577950561345,
+          "positionsPerSecond": 2999.16885020689,
+          "messagesReceivedPerSecond": 21597.215901656553
+        },
+        {
+          "tSeconds": 14.002768584000064,
+          "serverCpuPercent": 22.99694956962426,
+          "serverRssMB": 78.18359375,
+          "generatorCpuPercent": 24.87000111870148,
+          "positionsPerSecond": 2998.6022504044795,
+          "messagesReceivedPerSecond": 21593.135778504547
+        },
+        {
+          "tSeconds": 15.002299778000102,
+          "serverCpuPercent": 18.008442465877923,
+          "serverRssMB": 78.18359375,
+          "generatorCpuPercent": 23.88159583541628,
+          "positionsPerSecond": 3006.409422775736,
+          "messagesReceivedPerSecond": 21630.140339571186
+        },
+        {
+          "tSeconds": 16.002685141000082,
+          "serverCpuPercent": 19.99229570894914,
+          "serverRssMB": 78.18359375,
+          "generatorCpuPercent": 23.26123598031939,
+          "positionsPerSecond": 2993.846282415131,
+          "messagesReceivedPerSecond": 21619.66857965758
+        },
+        {
+          "tSeconds": 17.002700165000046,
+          "serverCpuPercent": 16.9997445958378,
+          "serverRssMB": 78.18359375,
+          "generatorCpuPercent": 21.54417632029574,
+          "positionsPerSecond": 3002.954883605937,
+          "messagesReceivedPerSecond": 21611.67530619098
+        },
+        {
+          "tSeconds": 18.002819022000068,
+          "serverCpuPercent": 17.99786082825509,
+          "serverRssMB": 78.18359375,
+          "generatorCpuPercent": 24.45019392330029,
+          "positionsPerSecond": 2999.643471375853,
+          "messagesReceivedPerSecond": 21597.432993906143
+        },
+        {
+          "tSeconds": 19.00258710900007,
+          "serverCpuPercent": 19.00440736912616,
+          "serverRssMB": 78.18359375,
+          "generatorCpuPercent": 21.166808858142634,
+          "positionsPerSecond": 3000.695900388335,
+          "messagesReceivedPerSecond": 21605.01048279601
+        },
+        {
+          "tSeconds": 20.002925404000095,
+          "serverCpuPercent": 16.994250929881275,
+          "serverRssMB": 78.18359375,
+          "generatorCpuPercent": 18.907203787494268,
+          "positionsPerSecond": 2997.985796394939,
+          "messagesReceivedPerSecond": 21588.696651865655
+        }
+      ],
+      "subWindows": [],
+      "verdict": "pass",
+      "reason": ""
+    },
+    {
+      "config": {
+        "url": "ws://127.0.0.1:44285/ws",
+        "rooms": 100,
+        "playersPerRoom": 4,
+        "positionHz": 15,
+        "rampRoomsPerSecond": 25,
+        "warmupMs": 8000,
+        "measureMs": 20000,
+        "clients": 400
+      },
+      "setup": {
+        "roomsReady": 100,
+        "setupFailures": 0,
+        "setupSeconds": 4.024498710999964
+      },
+      "latencyMs": {
+        "count": 120080,
+        "min": 0.037960999994538724,
+        "mean": 0.3581825038808041,
+        "p50": 0.2726399999810383,
+        "p90": 0.6171930000418797,
+        "p95": 0.8603410000214353,
+        "p99": 1.9568499999586493,
+        "p999": 3.5114110000431538,
+        "max": 6.046625999966636
+      },
+      "throughput": {
+        "positionsSentPerSecond": 6000.733516083702,
+        "expectedPositionsPerSecond": 6000,
+        "messagesReceivedPerSecond": 43209.639161486164,
+        "sampleCoverage": 1.0000499691856688
+      },
+      "integrity": {
+        "eliminations": 0,
+        "unexpectedCloses": 0,
+        "socketErrors": 0,
+        "sampleOverflow": 0
+      },
+      "generator": {
+        "cpuPercent": 35.90028256786646,
+        "eventLoopP99Ms": 2.059263,
+        "eventLoopMaxMs": 5.869567
+      },
+      "server": {
+        "cpuPercent": 31.634361441119502,
+        "rssMBStart": 91,
+        "rssMBEnd": 92.77734375,
+        "rssMBMax": 92.77734375,
+        "heapUsedMB": 11.660125732421875,
+        "eventLoopDelayMs": {
+          "mean": 1.0746887424274973,
+          "p50": 1.242111,
+          "p95": 1.722367,
+          "p99": 2.129919,
+          "max": 5.705727
+        },
+        "gc": {
+          "minorCount": 112,
+          "minorMs": 76.21976400027052,
+          "majorCount": 0,
+          "majorMs": 0,
+          "otherCount": 0,
+          "otherMs": 0
+        }
+      },
+      "machine": {
+        "stealPercent": 0.3897116134060795
+      },
+      "timeline": [
+        {
+          "tSeconds": 1.000619231000077,
+          "serverCpuPercent": 33.97895917512844,
+          "serverRssMB": 91.60546875,
+          "generatorCpuPercent": 35.70439073441839,
+          "positionsPerSecond": 6001.283819019003,
+          "messagesReceivedPerSecond": 43309.18161215779
+        },
+        {
+          "tSeconds": 2.0016004710000708,
+          "serverCpuPercent": 28.971571934754923,
+          "serverRssMB": 91.60546875,
+          "generatorCpuPercent": 38.96546552660692,
+          "positionsPerSecond": 5998.114410216157,
+          "messagesReceivedPerSecond": 43157.65198556595
+        },
+        {
+          "tSeconds": 3.002485187000013,
+          "serverCpuPercent": 31.971714112978606,
+          "serverRssMB": 91.61328125,
+          "generatorCpuPercent": 39.10790061460211,
+          "positionsPerSecond": 6001.690208645714,
+          "messagesReceivedPerSecond": 43172.804329247534
+        },
+        {
+          "tSeconds": 4.002573821000056,
+          "serverCpuPercent": 32.99707533722314,
+          "serverRssMB": 92.4453125,
+          "generatorCpuPercent": 34.77521773334991,
+          "positionsPerSecond": 5999.468243131478,
+          "messagesReceivedPerSecond": 43261.16558984723
+        },
+        {
+          "tSeconds": 5.002340977000072,
+          "serverCpuPercent": 30.00698694686815,
+          "serverRssMB": 92.4453125,
+          "generatorCpuPercent": 32.82834388290254,
+          "positionsPerSecond": 6001.397389373634,
+          "messagesReceivedPerSecond": 43210.061203490164
+        },
+        {
+          "tSeconds": 6.0026051089999966,
+          "serverCpuPercent": 26.992870319178955,
+          "serverRssMB": 92.4453125,
+          "generatorCpuPercent": 37.99606402362021,
+          "positionsPerSecond": 6000.4150983596965,
+          "messagesReceivedPerSecond": 43180.594623184275
+        },
+        {
+          "tSeconds": 7.003701908000046,
+          "serverCpuPercent": 27.96932327420081,
+          "serverRssMB": 92.4453125,
+          "generatorCpuPercent": 35.80043411965621,
+          "positionsPerSecond": 6002.416555524019,
+          "messagesReceivedPerSecond": 43236.57816430381
+        },
+        {
+          "tSeconds": 8.005303619000014,
+          "serverCpuPercent": 28.953624660891748,
+          "serverRssMB": 92.4453125,
+          "generatorCpuPercent": 34.22328418925908,
+          "positionsPerSecond": 5995.397106505342,
+          "messagesReceivedPerSecond": 43134.91033962645
+        },
+        {
+          "tSeconds": 9.004799086000071,
+          "serverCpuPercent": 37.01867714423344,
+          "serverRssMB": 92.4453125,
+          "generatorCpuPercent": 37.00817184396277,
+          "positionsPerSecond": 6007.030745242636,
+          "messagesReceivedPerSecond": 43262.827524156695
+        },
+        {
+          "tSeconds": 10.005679732999997,
+          "serverCpuPercent": 31.97184409141875,
+          "serverRssMB": 92.453125,
+          "generatorCpuPercent": 34.38272095993736,
+          "positionsPerSecond": 5994.720767141027,
+          "messagesReceivedPerSecond": 43184.9692863561
+        },
+        {
+          "tSeconds": 11.006523115999997,
+          "serverCpuPercent": 36.968821124733395,
+          "serverRssMB": 92.48828125,
+          "generatorCpuPercent": 36.14971194748861,
+          "positionsPerSecond": 6007.933011433022,
+          "messagesReceivedPerSecond": 43263.51228921501
+        },
+        {
+          "tSeconds": 12.00577546600008,
+          "serverCpuPercent": 39.02918016654827,
+          "serverRssMB": 92.515625,
+          "generatorCpuPercent": 40.34856660581951,
+          "positionsPerSecond": 6001.48701176385,
+          "messagesReceivedPerSecond": 43155.265033899035
+        },
+        {
+          "tSeconds": 13.005877971000038,
+          "serverCpuPercent": 27.99713015417472,
+          "serverRssMB": 92.55078125,
+          "generatorCpuPercent": 36.780229842541495,
+          "positionsPerSecond": 6006.384315575978,
+          "messagesReceivedPerSecond": 43192.57254535301
+        },
+        {
+          "tSeconds": 14.005816035000025,
+          "serverCpuPercent": 30.001858195089625,
+          "serverRssMB": 92.578125,
+          "generatorCpuPercent": 31.732965412946225,
+          "positionsPerSecond": 5993.371205439057,
+          "messagesReceivedPerSecond": 43218.67679196634
+        },
+        {
+          "tSeconds": 15.005763804000104,
+          "serverCpuPercent": 34.00177594675679,
+          "serverRssMB": 92.61328125,
+          "generatorCpuPercent": 35.09143286062699,
+          "positionsPerSecond": 6003.313559070032,
+          "messagesReceivedPerSecond": 43230.257959600094
+        },
+        {
+          "tSeconds": 16.00723132000002,
+          "serverCpuPercent": 29.956039033424208,
+          "serverRssMB": 92.640625,
+          "generatorCpuPercent": 34.84236826709305,
+          "positionsPerSecond": 5990.209272050415,
+          "messagesReceivedPerSecond": 43168.64931643333
+        },
+        {
+          "tSeconds": 17.007757646000012,
+          "serverCpuPercent": 29.984218526200294,
+          "serverRssMB": 92.67578125,
+          "generatorCpuPercent": 33.66787971953901,
+          "positionsPerSecond": 6001.841074994411,
+          "messagesReceivedPerSecond": 43197.26415674578
+        },
+        {
+          "tSeconds": 18.008647656999994,
+          "serverCpuPercent": 31.971544973287408,
+          "serverRssMB": 92.71484375,
+          "generatorCpuPercent": 35.924426864922204,
+          "positionsPerSecond": 5999.66023639346,
+          "messagesReceivedPerSecond": 43181.56792954627
+        },
+        {
+          "tSeconds": 19.009653955000104,
+          "serverCpuPercent": 29.9698414085269,
+          "serverRssMB": 92.7421875,
+          "generatorCpuPercent": 37.66609668223674,
+          "positionsPerSecond": 6002.9592341279595,
+          "messagesReceivedPerSecond": 43224.50326880488
+        },
+        {
+          "tSeconds": 20.009759691000102,
+          "serverCpuPercent": 31.996616805725534,
+          "serverRssMB": 92.77734375,
+          "generatorCpuPercent": 35.0137977810779,
+          "positionsPerSecond": 6006.364910999785,
+          "messagesReceivedPerSecond": 43187.433533528
+        }
+      ],
+      "subWindows": [],
+      "verdict": "pass",
+      "reason": ""
+    },
+    {
+      "config": {
+        "url": "ws://127.0.0.1:38765/ws",
+        "rooms": 150,
+        "playersPerRoom": 4,
+        "positionHz": 15,
+        "rampRoomsPerSecond": 25,
+        "warmupMs": 8000,
+        "measureMs": 20000,
+        "clients": 600
+      },
+      "setup": {
+        "roomsReady": 150,
+        "setupFailures": 0,
+        "setupSeconds": 6.037934819999966
+      },
+      "latencyMs": {
+        "count": 180067,
+        "min": 0.04127599997445941,
+        "mean": 0.48582005284698593,
+        "p50": 0.3696739999577403,
+        "p90": 0.8551069999812171,
+        "p95": 1.1710449999663979,
+        "p99": 2.38069500005804,
+        "p999": 6.9563230000203475,
+        "max": 11.535962000023574
+      },
+      "throughput": {
+        "positionsSentPerSecond": 8999.952241185165,
+        "expectedPositionsPerSecond": 9000,
+        "messagesReceivedPerSecond": 64811.49272000516,
+        "sampleCoverage": 1.0000888637108374
+      },
+      "integrity": {
+        "eliminations": 0,
+        "unexpectedCloses": 0,
+        "socketErrors": 0,
+        "sampleOverflow": 0
+      },
+      "generator": {
+        "cpuPercent": 47.16506121070102,
+        "eventLoopP99Ms": 2.123775,
+        "eventLoopMaxMs": 6.303743
+      },
+      "server": {
+        "cpuPercent": 43.487447722206994,
+        "rssMBStart": 92.19921875,
+        "rssMBEnd": 94.90234375,
+        "rssMBMax": 94.90234375,
+        "heapUsedMB": 12.236427307128906,
+        "eventLoopDelayMs": {
+          "mean": 1.0794724540843854,
+          "p50": 1.216511,
+          "p95": 1.835007,
+          "p99": 2.179071,
+          "max": 10.731519
+        },
+        "gc": {
+          "minorCount": 168,
+          "minorMs": 133.99515000078827,
+          "majorCount": 0,
+          "majorMs": 0,
+          "otherCount": 0,
+          "otherMs": 0
+        }
+      },
+      "machine": {
+        "stealPercent": 0.1813001813001813
+      },
+      "timeline": [
+        {
+          "tSeconds": 1.0012420850000345,
+          "serverCpuPercent": 45.94293496961668,
+          "serverRssMB": 93.08984375,
+          "generatorCpuPercent": 49.003333694266665,
+          "positionsPerSecond": 9001.818975677284,
+          "messagesReceivedPerSecond": 64899.38944186286
+        },
+        {
+          "tSeconds": 2.001478328999947,
+          "serverCpuPercent": 40.99031628372347,
+          "serverRssMB": 93.140625,
+          "generatorCpuPercent": 47.74881962786002,
+          "positionsPerSecond": 9006.872180489381,
+          "messagesReceivedPerSecond": 64868.67516471007
+        },
+        {
+          "tSeconds": 3.002118203000049,
+          "serverCpuPercent": 40.9737819422493,
+          "serverRssMB": 93.20703125,
+          "generatorCpuPercent": 45.598322818779984,
+          "positionsPerSecond": 8992.246095520954,
+          "messagesReceivedPerSecond": 64674.61639450256
+        },
+        {
+          "tSeconds": 4.002445350000053,
+          "serverCpuPercent": 44.98528319955696,
+          "serverRssMB": 93.81640625,
+          "generatorCpuPercent": 46.405418606518964,
+          "positionsPerSecond": 9013.051407271232,
+          "messagesReceivedPerSecond": 64982.7410912
+        },
+        {
+          "tSeconds": 5.003007069000043,
+          "serverCpuPercent": 46.973614028501956,
+          "serverRssMB": 93.859375,
+          "generatorCpuPercent": 48.207520919557055,
+          "positionsPerSecond": 8990.94961277455,
+          "messagesReceivedPerSecond": 64723.643499697624
+        },
+        {
+          "tSeconds": 6.0034294579999985,
+          "serverCpuPercent": 40.98268936282455,
+          "serverRssMB": 93.90625,
+          "generatorCpuPercent": 45.6445202567353,
+          "positionsPerSecond": 9001.19799298134,
+          "messagesReceivedPerSecond": 64832.615416409746
+        },
+        {
+          "tSeconds": 7.003623476000037,
+          "serverCpuPercent": 41.99185282469704,
+          "serverRssMB": 93.9609375,
+          "generatorCpuPercent": 45.6116505187879,
+          "positionsPerSecond": 9006.252624877881,
+          "messagesReceivedPerSecond": 64739.43938344722
+        },
+        {
+          "tSeconds": 8.003634574000024,
+          "serverCpuPercent": 40.999544987050236,
+          "serverRssMB": 94.24609375,
+          "generatorCpuPercent": 45.87139091930412,
+          "positionsPerSecond": 8996.900152402215,
+          "messagesReceivedPerSecond": 64811.28072440729
+        },
+        {
+          "tSeconds": 9.003334477000054,
+          "serverCpuPercent": 42.01260785757898,
+          "serverRssMB": 94.29296875,
+          "generatorCpuPercent": 45.976697468978976,
+          "positionsPerSecond": 8998.700483018585,
+          "messagesReceivedPerSecond": 64859.46413060527
+        },
+        {
+          "tSeconds": 10.003147582000006,
+          "serverCpuPercent": 42.007851057325446,
+          "serverRssMB": 94.34375,
+          "generatorCpuPercent": 46.49238919508093,
+          "positionsPerSecond": 9000.682182496947,
+          "messagesReceivedPerSecond": 64792.10932127483
+        },
+        {
+          "tSeconds": 11.002769738000003,
+          "serverCpuPercent": 42.01587544644228,
+          "serverRssMB": 94.390625,
+          "generatorCpuPercent": 49.083745998923334,
+          "positionsPerSecond": 9003.40188138049,
+          "messagesReceivedPerSecond": 64817.490900031786
+        },
+        {
+          "tSeconds": 12.00430461500003,
+          "serverCpuPercent": 44.93103638566418,
+          "serverRssMB": 94.4453125,
+          "generatorCpuPercent": 46.35764671428285,
+          "positionsPerSecond": 8988.204212083323,
+          "messagesReceivedPerSecond": 64763.59584629645
+        },
+        {
+          "tSeconds": 13.003799288999987,
+          "serverCpuPercent": 45.022751166758106,
+          "serverRssMB": 94.55859375,
+          "generatorCpuPercent": 47.29389883672557,
+          "positionsPerSecond": 9014.555289166434,
+          "messagesReceivedPerSecond": 64876.78392571679
+        },
+        {
+          "tSeconds": 14.003832734000055,
+          "serverCpuPercent": 45.998461581449256,
+          "serverRssMB": 94.60546875,
+          "generatorCpuPercent": 48.50767766071741,
+          "positionsPerSecond": 9000.698971622296,
+          "messagesReceivedPerSecond": 64733.83497688489
+        },
+        {
+          "tSeconds": 15.004810706999967,
+          "serverCpuPercent": 41.95896526486664,
+          "serverRssMB": 94.65625,
+          "generatorCpuPercent": 45.911599695115335,
+          "positionsPerSecond": 8986.21172755894,
+          "messagesReceivedPerSecond": 64780.64627702412
+        },
+        {
+          "tSeconds": 16.004777303999987,
+          "serverCpuPercent": 42.001402972862635,
+          "serverRssMB": 94.703125,
+          "generatorCpuPercent": 47.52398744375161,
+          "positionsPerSecond": 9014.301104699614,
+          "messagesReceivedPerSecond": 64850.16619009992
+        },
+        {
+          "tSeconds": 17.00477394600003,
+          "serverCpuPercent": 40.000134320449405,
+          "serverRssMB": 94.75,
+          "generatorCpuPercent": 49.825767314924555,
+          "positionsPerSecond": 8999.030218743097,
+          "messagesReceivedPerSecond": 64779.21752860975
+        },
+        {
+          "tSeconds": 18.005363574999965,
+          "serverCpuPercent": 49.97053592287751,
+          "serverRssMB": 94.8046875,
+          "generatorCpuPercent": 48.9384444739264,
+          "positionsPerSecond": 8988.700001807207,
+          "messagesReceivedPerSecond": 64794.79510975836
+        },
+        {
+          "tSeconds": 19.00538850400003,
+          "serverCpuPercent": 48.99877850944739,
+          "serverRssMB": 94.84765625,
+          "generatorCpuPercent": 49.43316768055969,
+          "positionsPerSecond": 8998.775669520752,
+          "messagesReceivedPerSecond": 64778.385139632665
+        },
+        {
+          "tSeconds": 20.005652199000004,
+          "serverCpuPercent": 40.98919135518674,
+          "serverRssMB": 94.90234375,
+          "generatorCpuPercent": 43.87033161290655,
+          "positionsPerSecond": 8997.627370650745,
+          "messagesReceivedPerSecond": 64766.9212866931
+        }
+      ],
+      "subWindows": [],
+      "verdict": "pass",
+      "reason": ""
+    },
+    {
+      "config": {
+        "url": "ws://127.0.0.1:41083/ws",
+        "rooms": 200,
+        "playersPerRoom": 4,
+        "positionHz": 15,
+        "rampRoomsPerSecond": 25,
+        "warmupMs": 8000,
+        "measureMs": 20000,
+        "clients": 800
+      },
+      "setup": {
+        "roomsReady": 200,
+        "setupFailures": 0,
+        "setupSeconds": 8.043247174000019
+      },
+      "latencyMs": {
+        "count": 240083,
+        "min": 0.04354900005273521,
+        "mean": 0.7652468008480953,
+        "p50": 0.537184999906458,
+        "p90": 1.330405000015162,
+        "p95": 1.9423439999809489,
+        "p99": 3.900437999982387,
+        "p999": 16.397990999976173,
+        "max": 20.46881900005974
+      },
+      "throughput": {
+        "positionsSentPerSecond": 12000.243586004352,
+        "expectedPositionsPerSecond": 12000,
+        "messagesReceivedPerSecond": 86415.07059395843,
+        "sampleCoverage": 1.000083311464074
+      },
+      "integrity": {
+        "eliminations": 0,
+        "unexpectedCloses": 0,
+        "socketErrors": 0,
+        "sampleOverflow": 0
+      },
+      "generator": {
+        "cpuPercent": 61.731933757138606,
+        "eventLoopP99Ms": 2.240511,
+        "eventLoopMaxMs": 9.920511
+      },
+      "server": {
+        "cpuPercent": 57.3861013014625,
+        "rssMBStart": 93.578125,
+        "rssMBEnd": 97.92578125,
+        "rssMBMax": 97.92578125,
+        "heapUsedMB": 14.430839538574219,
+        "eventLoopDelayMs": {
+          "mean": 1.1001115521583722,
+          "p50": 1.120255,
+          "p95": 1.879039,
+          "p99": 2.531327,
+          "max": 17.793023
+        },
+        "gc": {
+          "minorCount": 224,
+          "minorMs": 208.18312699790113,
+          "majorCount": 0,
+          "majorMs": 0,
+          "otherCount": 0,
+          "otherMs": 0
+        }
+      },
+      "machine": {
+        "stealPercent": 0.21356113187399894
+      },
+      "timeline": [
+        {
+          "tSeconds": 1.0001428490000543,
+          "serverCpuPercent": 56.991858769963414,
+          "serverRssMB": 95.97265625,
+          "generatorCpuPercent": 59.563591400528786,
+          "positionsPerSecond": 12016.283485919666,
+          "messagesReceivedPerSecond": 86573.63304308872
+        },
+        {
+          "tSeconds": 1.999792301999987,
+          "serverCpuPercent": 53.018585506097004,
+          "serverRssMB": 96.0390625,
+          "generatorCpuPercent": 60.93926207550689,
+          "positionsPerSecond": 12003.20768844637,
+          "messagesReceivedPerSecond": 86489.31857116299
+        },
+        {
+          "tSeconds": 3.000203153999988,
+          "serverCpuPercent": 53.97782310342218,
+          "serverRssMB": 96.10546875,
+          "generatorCpuPercent": 59.2078743264172,
+          "positionsPerSecond": 11996.071390077235,
+          "messagesReceivedPerSecond": 86242.56706883457
+        },
+        {
+          "tSeconds": 4.000845521999989,
+          "serverCpuPercent": 58.96212461793355,
+          "serverRssMB": 96.87890625,
+          "generatorCpuPercent": 61.04178870827101,
+          "positionsPerSecond": 11991.297174416655,
+          "messagesReceivedPerSecond": 86541.40856846063
+        },
+        {
+          "tSeconds": 5.000783083999995,
+          "serverCpuPercent": 56.00349674632936,
+          "serverRssMB": 96.94140625,
+          "generatorCpuPercent": 63.64217369004045,
+          "positionsPerSecond": 12006.749677436283,
+          "messagesReceivedPerSecond": 86375.39310679425
+        },
+        {
+          "tSeconds": 6.0015460159999785,
+          "serverCpuPercent": 55.957308378804925,
+          "serverRssMB": 97.01171875,
+          "generatorCpuPercent": 60.64463226941444,
+          "positionsPerSecond": 11990.851795458188,
+          "messagesReceivedPerSecond": 86404.07956277246
+        },
+        {
+          "tSeconds": 7.001788239000016,
+          "serverCpuPercent": 59.98547013946413,
+          "serverRssMB": 97.078125,
+          "generatorCpuPercent": 64.13476508479447,
+          "positionsPerSecond": 11998.093785728492,
+          "messagesReceivedPerSecond": 86399.07215754155
+        },
+        {
+          "tSeconds": 8.001800881000003,
+          "serverCpuPercent": 55.9992920569506,
+          "serverRssMB": 97.140625,
+          "generatorCpuPercent": 61.18692647487631,
+          "positionsPerSecond": 12009.848171499574,
+          "messagesReceivedPerSecond": 86397.90775765126
+        },
+        {
+          "tSeconds": 9.002038939999998,
+          "serverCpuPercent": 57.98619586419902,
+          "serverRssMB": 97.203125,
+          "generatorCpuPercent": 60.977083856394486,
+          "positionsPerSecond": 12002.142781891536,
+          "messagesReceivedPerSecond": 86408.42969563545
+        },
+        {
+          "tSeconds": 10.001780819999986,
+          "serverCpuPercent": 59.0152330119458,
+          "serverRssMB": 97.2734375,
+          "generatorCpuPercent": 64.52665562034957,
+          "positionsPerSecond": 12003.098239717794,
+          "messagesReceivedPerSecond": 86457.31636250063
+        },
+        {
+          "tSeconds": 11.001772185000009,
+          "serverCpuPercent": 58.00050083432335,
+          "serverRssMB": 97.3359375,
+          "generatorCpuPercent": 62.25073753511715,
+          "positionsPerSecond": 11993.103560448963,
+          "messagesReceivedPerSecond": 86418.74622587163
+        },
+        {
+          "tSeconds": 12.001770840000011,
+          "serverCpuPercent": 59.000079355106536,
+          "serverRssMB": 97.3984375,
+          "generatorCpuPercent": 63.445485334177576,
+          "positionsPerSecond": 12000.016140021671,
+          "messagesReceivedPerSecond": 86415.11622833106
+        },
+        {
+          "tSeconds": 13.001983814000036,
+          "serverCpuPercent": 59.98722428089455,
+          "serverRssMB": 97.46875,
+          "generatorCpuPercent": 61.66146771057435,
+          "positionsPerSecond": 12007.4427268924,
+          "messagesReceivedPerSecond": 86309.61829535113
+        },
+        {
+          "tSeconds": 14.001768016000046,
+          "serverCpuPercent": 58.01251898557148,
+          "serverRssMB": 97.53515625,
+          "generatorCpuPercent": 61.812639043879784,
+          "positionsPerSecond": 11992.587976500035,
+          "messagesReceivedPerSecond": 86494.66537579792
+        },
+        {
+          "tSeconds": 15.003746770999976,
+          "serverCpuPercent": 60.879534317076555,
+          "serverRssMB": 97.59765625,
+          "generatorCpuPercent": 63.31421667718331,
+          "positionsPerSecond": 11978.297883173007,
+          "messagesReceivedPerSecond": 86233.36529725717
+        },
+        {
+          "tSeconds": 16.003768087000005,
+          "serverCpuPercent": 52.99887027607985,
+          "serverRssMB": 97.66015625,
+          "generatorCpuPercent": 58.43815433230064,
+          "positionsPerSecond": 12022.743723194466,
+          "messagesReceivedPerSecond": 86519.15575767349
+        },
+        {
+          "tSeconds": 17.00415861699998,
+          "serverCpuPercent": 59.97657734725021,
+          "serverRssMB": 97.73046875,
+          "generatorCpuPercent": 62.34875094229606,
+          "positionsPerSecond": 11991.317030960197,
+          "messagesReceivedPerSecond": 86369.27020890746
+        },
+        {
+          "tSeconds": 18.00377756700001,
+          "serverCpuPercent": 59.022490520010706,
+          "serverRssMB": 97.79296875,
+          "generatorCpuPercent": 62.6921888585625,
+          "positionsPerSecond": 12012.577392615063,
+          "messagesReceivedPerSecond": 86480.95356735401
+        },
+        {
+          "tSeconds": 19.004480770000022,
+          "serverCpuPercent": 55.96064830422973,
+          "serverRssMB": 97.859375,
+          "generatorCpuPercent": 62.96482294760803,
+          "positionsPerSecond": 11984.572412725513,
+          "messagesReceivedPerSecond": 86343.28314426208
+        },
+        {
+          "tSeconds": 20.004729819,
+          "serverCpuPercent": 55.986056728559,
+          "serverRssMB": 97.92578125,
+          "generatorCpuPercent": 59.84999441874142,
+          "positionsPerSecond": 12006.009915236902,
+          "messagesReceivedPerSecond": 86322.50146733409
+        }
+      ],
+      "subWindows": [],
+      "verdict": "pass",
+      "reason": ""
+    },
+    {
+      "config": {
+        "url": "ws://127.0.0.1:39693/ws",
+        "rooms": 250,
+        "playersPerRoom": 4,
+        "positionHz": 15,
+        "rampRoomsPerSecond": 25,
+        "warmupMs": 8000,
+        "measureMs": 20000,
+        "clients": 1000
+      },
+      "setup": {
+        "roomsReady": 250,
+        "setupFailures": 0,
+        "setupSeconds": 10.056091613000026
+      },
+      "latencyMs": {
+        "count": 300134,
+        "min": 0.05270200001541525,
+        "mean": 1.6282318164919378,
+        "p50": 0.7081239999970421,
+        "p90": 2.2994540000800043,
+        "p95": 4.512351000099443,
+        "p99": 30.336798999924213,
+        "p999": 37.08406899997499,
+        "max": 42.493434000061825
+      },
+      "throughput": {
+        "positionsSentPerSecond": 15001.13983905218,
+        "expectedPositionsPerSecond": 15000,
+        "messagesReceivedPerSecond": 108027.12115450135,
+        "sampleCoverage": 1.000069973643261
+      },
+      "integrity": {
+        "eliminations": 0,
+        "unexpectedCloses": 0,
+        "socketErrors": 0,
+        "sampleOverflow": 0
+      },
+      "generator": {
+        "cpuPercent": 69.6617458791404,
+        "eventLoopP99Ms": 2.402303,
+        "eventLoopMaxMs": 17.809407
+      },
+      "server": {
+        "cpuPercent": 67.3797419739976,
+        "rssMBStart": 99.76953125,
+        "rssMBEnd": 102.65234375,
+        "rssMBMax": 102.65234375,
+        "heapUsedMB": 23.607284545898438,
+        "eventLoopDelayMs": {
+          "mean": 1.1672391401563775,
+          "p50": 1.103871,
+          "p95": 1.933311,
+          "p99": 3.790847,
+          "max": 44.662783
+        },
+        "gc": {
+          "minorCount": 277,
+          "minorMs": 254.41224300256,
+          "majorCount": 0,
+          "majorMs": 0,
+          "otherCount": 0,
+          "otherMs": 0
+        }
+      },
+      "machine": {
+        "stealPercent": 0.40106951871657753
+      },
+      "timeline": [
+        {
+          "tSeconds": 1.0019791869999608,
+          "serverCpuPercent": 73.85382946083382,
+          "serverRssMB": 100.80859375,
+          "generatorCpuPercent": 71.60108805733388,
+          "positionsPerSecond": 14991.329355826816,
+          "messagesReceivedPerSecond": 108257.73769291303
+        },
+        {
+          "tSeconds": 2.0029663619999774,
+          "serverCpuPercent": 63.93688310741744,
+          "serverRssMB": 100.88671875,
+          "generatorCpuPercent": 67.3602036909203,
+          "positionsPerSecond": 14999.193171480696,
+          "messagesReceivedPerSecond": 107997.38767881638
+        },
+        {
+          "tSeconds": 3.002900231000036,
+          "serverCpuPercent": 67.00443107002717,
+          "serverRssMB": 100.98828125,
+          "generatorCpuPercent": 69.29918282425528,
+          "positionsPerSecond": 15019.993287175193,
+          "messagesReceivedPerSecond": 108091.14817571366
+        },
+        {
+          "tSeconds": 4.002905842000036,
+          "serverCpuPercent": 67.9996184541408,
+          "serverRssMB": 101.34375,
+          "generatorCpuPercent": 68.95721308107737,
+          "positionsPerSecond": 14998.91584108321,
+          "messagesReceivedPerSecond": 108044.39376290655
+        },
+        {
+          "tSeconds": 5.003010286999983,
+          "serverCpuPercent": 62.99342065218344,
+          "serverRssMB": 101.42578125,
+          "generatorCpuPercent": 69.55233560631133,
+          "positionsPerSecond": 15002.433070878717,
+          "messagesReceivedPerSecond": 108005.71934264906
+        },
+        {
+          "tSeconds": 6.002995041999966,
+          "serverCpuPercent": 65.00099094010801,
+          "serverRssMB": 101.51171875,
+          "generatorCpuPercent": 69.8881654450834,
+          "positionsPerSecond": 15008.228800448316,
+          "messagesReceivedPerSecond": 107871.64450322228
+        },
+        {
+          "tSeconds": 7.002930952999973,
+          "serverCpuPercent": 69.00442242442817,
+          "serverRssMB": 101.58984375,
+          "generatorCpuPercent": 71.23406532001174,
+          "positionsPerSecond": 14993.960947963078,
+          "messagesReceivedPerSecond": 107955.91878687829
+        },
+        {
+          "tSeconds": 8.00411426599999,
+          "serverCpuPercent": 71.91490216137763,
+          "serverRssMB": 101.6640625,
+          "generatorCpuPercent": 72.31472904103312,
+          "positionsPerSecond": 14980.27364744918,
+          "messagesReceivedPerSecond": 107903.31660271918
+        },
+        {
+          "tSeconds": 9.004875281000045,
+          "serverCpuPercent": 71.9452485866428,
+          "serverRssMB": 101.75,
+          "generatorCpuPercent": 75.4830562619347,
+          "positionsPerSecond": 14999.585090751343,
+          "messagesReceivedPerSecond": 108161.68733350799
+        },
+        {
+          "tSeconds": 10.00510229499999,
+          "serverCpuPercent": 70.98388566418379,
+          "serverRssMB": 101.828125,
+          "generatorCpuPercent": 72.69239780800798,
+          "positionsPerSecond": 15032.587392206566,
+          "messagesReceivedPerSecond": 108011.47988191199
+        },
+        {
+          "tSeconds": 11.004896070000017,
+          "serverCpuPercent": 65.01340738993707,
+          "serverRssMB": 101.91015625,
+          "generatorCpuPercent": 68.98512645770185,
+          "positionsPerSecond": 14994.092156654595,
+          "messagesReceivedPerSecond": 108094.2917453122
+        },
+        {
+          "tSeconds": 12.004926928000058,
+          "serverCpuPercent": 63.99802514893733,
+          "serverRssMB": 101.98828125,
+          "generatorCpuPercent": 66.85273705823705,
+          "positionsPerSecond": 15002.53705171103,
+          "messagesReceivedPerSecond": 105863.73325691473
+        },
+        {
+          "tSeconds": 13.004897638999973,
+          "serverCpuPercent": 67.00196242048324,
+          "serverRssMB": 102.07421875,
+          "generatorCpuPercent": 69.21792732387932,
+          "positionsPerSecond": 14991.439084260623,
+          "messagesReceivedPerSecond": 110057.22346602751
+        },
+        {
+          "tSeconds": 14.006722876999993,
+          "serverCpuPercent": 67.87610994483516,
+          "serverRssMB": 102.15625,
+          "generatorCpuPercent": 69.36319565947954,
+          "positionsPerSecond": 14974.667667535552,
+          "messagesReceivedPerSecond": 107882.08951070356
+        },
+        {
+          "tSeconds": 15.005895220000063,
+          "serverCpuPercent": 65.05384226792518,
+          "serverRssMB": 102.23828125,
+          "generatorCpuPercent": 67.01366432837227,
+          "positionsPerSecond": 15034.443362288834,
+          "messagesReceivedPerSecond": 108008.39390326513
+        },
+        {
+          "tSeconds": 16.00644628200005,
+          "serverCpuPercent": 69.9614469051466,
+          "serverRssMB": 102.32421875,
+          "generatorCpuPercent": 70.34583508342838,
+          "positionsPerSecond": 14983.743028599414,
+          "messagesReceivedPerSecond": 108125.41619190418
+        },
+        {
+          "tSeconds": 17.005894955000024,
+          "serverCpuPercent": 65.03585602339551,
+          "serverRssMB": 102.40625,
+          "generatorCpuPercent": 66.86736578417722,
+          "positionsPerSecond": 15006.273363675118,
+          "messagesReceivedPerSecond": 107962.52265372958
+        },
+        {
+          "tSeconds": 18.00589409800002,
+          "serverCpuPercent": 65.00005570504801,
+          "serverRssMB": 102.48828125,
+          "generatorCpuPercent": 67.00235742102075,
+          "positionsPerSecond": 14998.012853297112,
+          "messagesReceivedPerSecond": 108053.09260150105
+        },
+        {
+          "tSeconds": 19.005889684000053,
+          "serverCpuPercent": 64.00028249724484,
+          "serverRssMB": 102.5703125,
+          "generatorCpuPercent": 68.206901065259,
+          "positionsPerSecond": 15007.066241189883,
+          "messagesReceivedPerSecond": 107948.47648457157
+        },
+        {
+          "tSeconds": 20.00589289400005,
+          "serverCpuPercent": 69.99977530072154,
+          "serverRssMB": 102.65234375,
+          "generatorCpuPercent": 70.99007212186882,
+          "positionsPerSecond": 15005.951830894692,
+          "messagesReceivedPerSecond": 107970.65341420304
+        }
+      ],
+      "subWindows": [],
+      "verdict": "pass",
+      "reason": ""
+    },
+    {
+      "config": {
+        "url": "ws://127.0.0.1:46051/ws",
+        "rooms": 300,
+        "playersPerRoom": 4,
+        "positionHz": 15,
+        "rampRoomsPerSecond": 25,
+        "warmupMs": 8000,
+        "measureMs": 20000,
+        "clients": 1200
+      },
+      "setup": {
+        "roomsReady": 300,
+        "setupFailures": 0,
+        "setupSeconds": 12.07916141900001
+      },
+      "latencyMs": {
+        "count": 360203,
+        "min": 0.06488499999977648,
+        "mean": 3.580587333389782,
+        "p50": 1.208407000056468,
+        "p90": 6.454035999951884,
+        "p95": 19.467401000089012,
+        "p99": 45.098380999988876,
+        "p999": 93.94138899992686,
+        "max": 101.79409700003453
+      },
+      "throughput": {
+        "positionsSentPerSecond": 18001.176179473743,
+        "expectedPositionsPerSecond": 18000,
+        "messagesReceivedPerSecond": 129614.34639464856,
+        "sampleCoverage": 1.0001416068770963
+      },
+      "integrity": {
+        "eliminations": 0,
+        "unexpectedCloses": 0,
+        "socketErrors": 0,
+        "sampleOverflow": 0
+      },
+      "generator": {
+        "cpuPercent": 83.21446945057542,
+        "eventLoopP99Ms": 2.951167,
+        "eventLoopMaxMs": 14.548991
+      },
+      "server": {
+        "cpuPercent": 80.72119418981455,
+        "rssMBStart": 111.48828125,
+        "rssMBEnd": 112.6953125,
+        "rssMBMax": 112.6953125,
+        "heapUsedMB": 23.033187866210938,
+        "eventLoopDelayMs": {
+          "mean": 1.3230320560772384,
+          "p50": 1.113087,
+          "p95": 2.269183,
+          "p99": 5.251071,
+          "max": 91.291647
+        },
+        "gc": {
+          "minorCount": 329,
+          "minorMs": 387.89999500405975,
+          "majorCount": 3,
+          "majorMs": 23.43495799973607,
+          "otherCount": 3,
+          "otherMs": 16.43411700008437
+        }
+      },
+      "machine": {
+        "stealPercent": 0.3156233561283535
+      },
+      "timeline": [
+        {
+          "tSeconds": 1.0009171450000722,
+          "serverCpuPercent": 81.92486302149825,
+          "serverRssMB": 111.97265625,
+          "generatorCpuPercent": 81.20552276082167,
+          "positionsPerSecond": 17996.494604954238,
+          "messagesReceivedPerSecond": 129816.93904343163
+        },
+        {
+          "tSeconds": 2.0034185400001006,
+          "serverCpuPercent": 76.80787317008948,
+          "serverRssMB": 111.97265625,
+          "generatorCpuPercent": 79.69604870225416,
+          "positionsPerSecond": 17975.03733149368,
+          "messagesReceivedPerSecond": 129326.5033311962
+        },
+        {
+          "tSeconds": 3.003177674000035,
+          "serverCpuPercent": 76.01831022631593,
+          "serverRssMB": 111.97265625,
+          "generatorCpuPercent": 77.75242791630758,
+          "positionsPerSecond": 18042.345787661674,
+          "messagesReceivedPerSecond": 127800.78286337355
+        },
+        {
+          "tSeconds": 4.004441540000029,
+          "serverCpuPercent": 81.89649380595996,
+          "serverRssMB": 112.6953125,
+          "generatorCpuPercent": 82.34672477434684,
+          "positionsPerSecond": 17971.2867017615,
+          "messagesReceivedPerSecond": 131198.1830771478
+        },
+        {
+          "tSeconds": 5.004018148000003,
+          "serverCpuPercent": 86.03642713495971,
+          "serverRssMB": 112.6953125,
+          "generatorCpuPercent": 89.0722124621811,
+          "positionsPerSecond": 18024.631484774072,
+          "messagesReceivedPerSecond": 130123.0930766273
+        },
+        {
+          "tSeconds": 6.004154309000005,
+          "serverCpuPercent": 77.98938088790887,
+          "serverRssMB": 112.6953125,
+          "generatorCpuPercent": 81.26243522555708,
+          "positionsPerSecond": 17998.54929952879,
+          "messagesReceivedPerSecond": 129442.37499677778
+        },
+        {
+          "tSeconds": 7.004052590000094,
+          "serverCpuPercent": 80.00813834781756,
+          "serverRssMB": 112.6953125,
+          "generatorCpuPercent": 82.42808450232016,
+          "positionsPerSecond": 18000.831026529588,
+          "messagesReceivedPerSecond": 129669.1898203078
+        },
+        {
+          "tSeconds": 8.004290337000041,
+          "serverCpuPercent": 77.98146014179945,
+          "serverRssMB": 112.6953125,
+          "generatorCpuPercent": 82.66504663316238,
+          "positionsPerSecond": 18015.71681737475,
+          "messagesReceivedPerSecond": 129549.20006633851
+        },
+        {
+          "tSeconds": 9.00572044100007,
+          "serverCpuPercent": 77.88861118558697,
+          "serverRssMB": 112.6953125,
+          "generatorCpuPercent": 82.4877339617081,
+          "positionsPerSecond": 17954.323450216045,
+          "messagesReceivedPerSecond": 129502.79753123574
+        },
+        {
+          "tSeconds": 10.006243427000008,
+          "serverCpuPercent": 80.95766027708721,
+          "serverRssMB": 112.6953125,
+          "generatorCpuPercent": 85.47349855688901,
+          "positionsPerSecond": 18035.56765061779,
+          "messagesReceivedPerSecond": 129552.24598908718
+        },
+        {
+          "tSeconds": 11.006035093000042,
+          "serverCpuPercent": 82.01708694778944,
+          "serverRssMB": 112.6953125,
+          "generatorCpuPercent": 85.35098151137932,
+          "positionsPerSecond": 18004.7510017946,
+          "messagesReceivedPerSecond": 129857.05363940852
+        },
+        {
+          "tSeconds": 12.006883042000002,
+          "serverCpuPercent": 81.93052709148668,
+          "serverRssMB": 112.6953125,
+          "generatorCpuPercent": 84.616849227318,
+          "positionsPerSecond": 17987.747307658952,
+          "messagesReceivedPerSecond": 129268.38700051658
+        },
+        {
+          "tSeconds": 13.007669215000002,
+          "serverCpuPercent": 80.93637001117939,
+          "serverRssMB": 112.6953125,
+          "generatorCpuPercent": 83.79612175157415,
+          "positionsPerSecond": 17995.852146930083,
+          "messagesReceivedPerSecond": 129881.89036460633
+        },
+        {
+          "tSeconds": 14.007855281000026,
+          "serverCpuPercent": 75.9858616146708,
+          "serverRssMB": 112.6953125,
+          "generatorCpuPercent": 79.70097035924724,
+          "positionsPerSecond": 17996.651435053656,
+          "messagesReceivedPerSecond": 129607.88437938197
+        },
+        {
+          "tSeconds": 15.00700893100002,
+          "serverCpuPercent": 78.06607121937719,
+          "serverRssMB": 112.6953125,
+          "generatorCpuPercent": 85.6213656428124,
+          "positionsPerSecond": 18022.253133940038,
+          "messagesReceivedPerSecond": 129706.77733099501
+        },
+        {
+          "tSeconds": 16.007682926000097,
+          "serverCpuPercent": 82.94409609394657,
+          "serverRssMB": 112.6953125,
+          "generatorCpuPercent": 82.94949245682514,
+          "positionsPerSecond": 17980.880976125107,
+          "messagesReceivedPerSecond": 129451.75016763575
+        },
+        {
+          "tSeconds": 17.00712837300007,
+          "serverCpuPercent": 80.04438885597521,
+          "serverRssMB": 112.6953125,
+          "generatorCpuPercent": 81.45126904560496,
+          "positionsPerSecond": 18009.987492594406,
+          "messagesReceivedPerSecond": 129659.90328835133
+        },
+        {
+          "tSeconds": 18.007019561000053,
+          "serverCpuPercent": 85.00925002651576,
+          "serverRssMB": 112.6953125,
+          "generatorCpuPercent": 84.81852927380906,
+          "positionsPerSecond": 18007.95948208753,
+          "messagesReceivedPerSecond": 129329.07255504551
+        },
+        {
+          "tSeconds": 19.007062986000093,
+          "serverCpuPercent": 87.99617876593348,
+          "serverRssMB": 112.6953125,
+          "generatorCpuPercent": 85.97716644154386,
+          "positionsPerSecond": 17994.21860105653,
+          "messagesReceivedPerSecond": 129679.3686734102
+        },
+        {
+          "tSeconds": 20.007003419000075,
+          "serverCpuPercent": 82.00488478497353,
+          "serverRssMB": 112.6953125,
+          "generatorCpuPercent": 85.63940128221775,
+          "positionsPerSecond": 18011.072865577717,
+          "messagesReceivedPerSecond": 129767.72987436781
+        }
+      ],
+      "subWindows": [],
+      "verdict": "pass",
+      "reason": ""
+    },
+    {
+      "config": {
+        "url": "ws://127.0.0.1:35559/ws",
+        "rooms": 350,
+        "playersPerRoom": 4,
+        "positionHz": 15,
+        "rampRoomsPerSecond": 25,
+        "warmupMs": 8000,
+        "measureMs": 20000,
+        "clients": 1400
+      },
+      "setup": {
+        "roomsReady": 350,
+        "setupFailures": 0,
+        "setupSeconds": 14.10352741400001
+      },
+      "latencyMs": {
+        "count": 420119,
+        "min": 0.07567900000140071,
+        "mean": 12.152389536210046,
+        "p50": 3.6177320000715554,
+        "p90": 32.57815600000322,
+        "p95": 46.07118600001559,
+        "p99": 84.31263000005856,
+        "p999": 130.8077419999754,
+        "max": 146.41475700004958
+      },
+      "throughput": {
+        "positionsSentPerSecond": 21001.421546047724,
+        "expectedPositionsPerSecond": 21000,
+        "messagesReceivedPerSecond": 151332.71151859013,
+        "sampleCoverage": 0.9998595833194504
+      },
+      "integrity": {
+        "eliminations": 0,
+        "unexpectedCloses": 0,
+        "socketErrors": 0,
+        "sampleOverflow": 0
+      },
+      "generator": {
+        "cpuPercent": 93.86166154282148,
+        "eventLoopP99Ms": 3.444735,
+        "eventLoopMaxMs": 17.596415
+      },
+      "server": {
+        "cpuPercent": 94.21645020515105,
+        "rssMBStart": 112.71875,
+        "rssMBEnd": 115.703125,
+        "rssMBMax": 115.703125,
+        "heapUsedMB": 23.747482299804688,
+        "eventLoopDelayMs": {
+          "mean": 2.37423420113852,
+          "p50": 1.325055,
+          "p95": 5.525503,
+          "p99": 25.591807,
+          "max": 240.779263
+        },
+        "gc": {
+          "minorCount": 363,
+          "minorMs": 500.11600299947895,
+          "majorCount": 8,
+          "majorMs": 62.17682699998841,
+          "otherCount": 8,
+          "otherMs": 47.46181899984367
+        }
+      },
+      "machine": {
+        "stealPercent": 0.33307712016397645
+      },
+      "timeline": [
+        {
+          "tSeconds": 0.999964370999951,
+          "serverCpuPercent": 98.00349176641299,
+          "serverRssMB": 113.6484375,
+          "generatorCpuPercent": 92.82450724437317,
+          "positionsPerSecond": 21018.74887700477,
+          "messagesReceivedPerSecond": 149554.32847117644
+        },
+        {
+          "tSeconds": 1.9999662829999578,
+          "serverCpuPercent": 96.99981453635381,
+          "serverRssMB": 113.6484375,
+          "generatorCpuPercent": 92.37702337513066,
+          "positionsPerSecond": 20999.959848076625,
+          "messagesReceivedPerSecond": 151713.70992338556
+        },
+        {
+          "tSeconds": 3.0001999310000103,
+          "serverCpuPercent": 93.97804221838697,
+          "serverRssMB": 113.6484375,
+          "generatorCpuPercent": 92.38041550067427,
+          "positionsPerSecond": 20996.09430455683,
+          "messagesReceivedPerSecond": 152753.3094947352
+        },
+        {
+          "tSeconds": 3.9999720570000354,
+          "serverCpuPercent": 98.0223367419603,
+          "serverRssMB": 114.484375,
+          "generatorCpuPercent": 93.36267492618376,
+          "positionsPerSecond": 21004.78644470577,
+          "messagesReceivedPerSecond": 151236.46285773342
+        },
+        {
+          "tSeconds": 5.004761585999979,
+          "serverCpuPercent": 95.54239691923134,
+          "serverRssMB": 114.484375,
+          "generatorCpuPercent": 93.39747010839451,
+          "positionsPerSecond": 20965.584723963806,
+          "messagesReceivedPerSecond": 148028.0155268302
+        },
+        {
+          "tSeconds": 6.003961868999991,
+          "serverCpuPercent": 91.07283249238115,
+          "serverRssMB": 114.484375,
+          "generatorCpuPercent": 91.92761607734535,
+          "positionsPerSecond": 21039.82590645416,
+          "messagesReceivedPerSecond": 154520.57272885903
+        },
+        {
+          "tSeconds": 7.004567322000046,
+          "serverCpuPercent": 94.94251676838975,
+          "serverRssMB": 114.484375,
+          "generatorCpuPercent": 91.27463749689859,
+          "positionsPerSecond": 21010.279263387994,
+          "messagesReceivedPerSecond": 149346.5776665039
+        },
+        {
+          "tSeconds": 8.00466702699999,
+          "serverCpuPercent": 94.99052896931452,
+          "serverRssMB": 114.484375,
+          "generatorCpuPercent": 92.92683472994861,
+          "positionsPerSecond": 21000.906104658046,
+          "messagesReceivedPerSecond": 152595.78543722178
+        },
+        {
+          "tSeconds": 9.003986733000026,
+          "serverCpuPercent": 92.06262965457451,
+          "serverRssMB": 114.53515625,
+          "generatorCpuPercent": 94.3583914475478,
+          "positionsPerSecond": 20989.278880485916,
+          "messagesReceivedPerSecond": 151611.14014897068
+        },
+        {
+          "tSeconds": 10.003962964999955,
+          "serverCpuPercent": 95.00225801367559,
+          "serverRssMB": 115.04296875,
+          "generatorCpuPercent": 93.23561602412836,
+          "positionsPerSecond": 21000.499139865067,
+          "messagesReceivedPerSecond": 150838.58513150224
+        },
+        {
+          "tSeconds": 11.003967265999993,
+          "serverCpuPercent": 92.99960000871687,
+          "serverRssMB": 115.05078125,
+          "generatorCpuPercent": 94.1534950458143,
+          "positionsPerSecond": 20995.909696591614,
+          "messagesReceivedPerSecond": 151230.34955826093
+        },
+        {
+          "tSeconds": 12.004112515000044,
+          "serverCpuPercent": 96.98591289313303,
+          "serverRssMB": 115.234375,
+          "generatorCpuPercent": 92.46446962824616,
+          "positionsPerSecond": 21015.947454647066,
+          "messagesReceivedPerSecond": 151220.03544106436
+        },
+        {
+          "tSeconds": 13.006294427999993,
+          "serverCpuPercent": 92.79752387629118,
+          "serverRssMB": 115.234375,
+          "generatorCpuPercent": 97.13795343660819,
+          "positionsPerSecond": 20939.31224240829,
+          "messagesReceivedPerSecond": 149435.943771625
+        },
+        {
+          "tSeconds": 14.006994696000008,
+          "serverCpuPercent": 91.93562042695365,
+          "serverRssMB": 115.234375,
+          "generatorCpuPercent": 92.56557928692251,
+          "positionsPerSecond": 21032.27177310967,
+          "messagesReceivedPerSecond": 150232.7967798623
+        },
+        {
+          "tSeconds": 15.00698844300001,
+          "serverCpuPercent": 87.00054401440143,
+          "serverRssMB": 115.234375,
+          "generatorCpuPercent": 95.57689764234092,
+          "positionsPerSecond": 21021.131445134917,
+          "messagesReceivedPerSecond": 154259.9645875585
+        },
+        {
+          "tSeconds": 16.00701027800003,
+          "serverCpuPercent": 92.99796938933636,
+          "serverRssMB": 115.234375,
+          "generatorCpuPercent": 92.64607707290513,
+          "positionsPerSecond": 20996.541540515012,
+          "messagesReceivedPerSecond": 146184.808054713
+        },
+        {
+          "tSeconds": 17.007000077000004,
+          "serverCpuPercent": 97.00098950709678,
+          "serverRssMB": 115.234375,
+          "generatorCpuPercent": 95.32757243656894,
+          "positionsPerSecond": 21000.214223185845,
+          "messagesReceivedPerSecond": 155909.59043373613
+        },
+        {
+          "tSeconds": 18.007069326000057,
+          "serverCpuPercent": 91.99362953314358,
+          "serverRssMB": 115.234375,
+          "generatorCpuPercent": 95.62407812820882,
+          "positionsPerSecond": 20998.545871695856,
+          "messagesReceivedPerSecond": 150504.57770849057
+        },
+        {
+          "tSeconds": 19.007002183999983,
+          "serverCpuPercent": 95.00637891830051,
+          "serverRssMB": 115.671875,
+          "generatorCpuPercent": 96.40847305770504,
+          "positionsPerSecond": 21012.410815288487,
+          "messagesReceivedPerSecond": 149192.01705041964
+        },
+        {
+          "tSeconds": 20.00699794000003,
+          "serverCpuPercent": 95.00040318170616,
+          "serverRssMB": 115.703125,
+          "generatorCpuPercent": 97.26961281223215,
+          "positionsPerSecond": 20993.08909466912,
+          "messagesReceivedPerSecond": 153270.65048063337
+        }
+      ],
+      "subWindows": [],
+      "verdict": "pass",
+      "reason": ""
+    },
+    {
+      "config": {
+        "url": "ws://127.0.0.1:35361/ws",
+        "rooms": 375,
+        "playersPerRoom": 4,
+        "positionHz": 15,
+        "rampRoomsPerSecond": 25,
+        "warmupMs": 8000,
+        "measureMs": 20000,
+        "clients": 1500
+      },
+      "setup": {
+        "roomsReady": 375,
+        "setupFailures": 0,
+        "setupSeconds": 15.302850783000002
+      },
+      "latencyMs": {
+        "count": 451017,
+        "min": 0.10054600005969405,
+        "mean": 23.48068749475263,
+        "p50": 12.00759799988009,
+        "p90": 61.28415299998596,
+        "p95": 90.24889899999835,
+        "p99": 127.33895100001246,
+        "p999": 176.77272700006142,
+        "max": 239.33287100004964
+      },
+      "throughput": {
+        "positionsSentPerSecond": 22499.734831528338,
+        "expectedPositionsPerSecond": 22500,
+        "messagesReceivedPerSecond": 162001.6869486287,
+        "sampleCoverage": 1.0012031744269938
+      },
+      "integrity": {
+        "eliminations": 0,
+        "unexpectedCloses": 0,
+        "socketErrors": 0,
+        "sampleOverflow": 0
+      },
+      "generator": {
+        "cpuPercent": 96.87101938809408,
+        "eventLoopP99Ms": 4.587519,
+        "eventLoopMaxMs": 43.155455
+      },
+      "server": {
+        "cpuPercent": 95.79774994588233,
+        "rssMBStart": 115.59765625,
+        "rssMBEnd": 117.4765625,
+        "rssMBMax": 117.4765625,
+        "heapUsedMB": 17.416259765625,
+        "eventLoopDelayMs": {
+          "mean": 4.151557997926601,
+          "p50": 1.605631,
+          "p95": 13.787135,
+          "p99": 41.222143,
+          "max": 438.829055
+        },
+        "gc": {
+          "minorCount": 373,
+          "minorMs": 547.4506730001885,
+          "majorCount": 11,
+          "majorMs": 84.59419499966316,
+          "otherCount": 11,
+          "otherMs": 65.74606499983929
+        }
+      },
+      "machine": {
+        "stealPercent": 0.2785515320334262
+      },
+      "timeline": [
+        {
+          "tSeconds": 1.0000103629999795,
+          "serverCpuPercent": 95.99900516231156,
+          "serverRssMB": 115.83203125,
+          "generatorCpuPercent": 95.89240626699582,
+          "positionsPerSecond": 22499.76683491675,
+          "messagesReceivedPerSecond": 156654.3765906986
+        },
+        {
+          "tSeconds": 2.0000409240000883,
+          "serverCpuPercent": 97.99700511351611,
+          "serverRssMB": 115.83203125,
+          "generatorCpuPercent": 98.13750081982677,
+          "positionsPerSecond": 22496.31249019154,
+          "messagesReceivedPerSecond": 161568.0623184299
+        },
+        {
+          "tSeconds": 3.0011325780001936,
+          "serverCpuPercent": 96.89422503165697,
+          "serverRssMB": 115.45703125,
+          "generatorCpuPercent": 97.0035057349402,
+          "positionsPerSecond": 22496.441669463395,
+          "messagesReceivedPerSecond": 161974.18023822916
+        },
+        {
+          "tSeconds": 4.0015011240001765,
+          "serverCpuPercent": 97.96389579806088,
+          "serverRssMB": 116.15234375,
+          "generatorCpuPercent": 94.72978771565812,
+          "positionsPerSecond": 22491.71076996295,
+          "messagesReceivedPerSecond": 161373.52643233017
+        },
+        {
+          "tSeconds": 5.001419566000113,
+          "serverCpuPercent": 99.00807490057888,
+          "serverRssMB": 116.15234375,
+          "generatorCpuPercent": 94.6179168480683,
+          "positionsPerSecond": 22502.835286241705,
+          "messagesReceivedPerSecond": 166248.55889997733
+        },
+        {
+          "tSeconds": 6.002127459000097,
+          "serverCpuPercent": 95.93209034477115,
+          "serverRssMB": 116.22265625,
+          "generatorCpuPercent": 100.26922012096247,
+          "positionsPerSecond": 22485.082967163475,
+          "messagesReceivedPerSecond": 162265.13364774923
+        },
+        {
+          "tSeconds": 7.002248926999979,
+          "serverCpuPercent": 95.98834048826907,
+          "serverRssMB": 117.4609375,
+          "generatorCpuPercent": 98.74210599388087,
+          "positionsPerSecond": 22516.264994326346,
+          "messagesReceivedPerSecond": 162920.21040790156
+        },
+        {
+          "tSeconds": 8.002019172,
+          "serverCpuPercent": 95.02183174094952,
+          "serverRssMB": 117.47265625,
+          "generatorCpuPercent": 98.40880991612016,
+          "positionsPerSecond": 22505.17067548806,
+          "messagesReceivedPerSecond": 162745.39156743608
+        },
+        {
+          "tSeconds": 9.002027584000025,
+          "serverCpuPercent": 93.99920927864935,
+          "serverRssMB": 117.47265625,
+          "generatorCpuPercent": 95.09280007936337,
+          "positionsPerSecond": 22499.81073159157,
+          "messagesReceivedPerSecond": 162092.63647673794
+        },
+        {
+          "tSeconds": 10.007582686000038,
+          "serverCpuPercent": 92.48622956119092,
+          "serverRssMB": 117.47265625,
+          "generatorCpuPercent": 97.64457442929738,
+          "positionsPerSecond": 22489.070917169596,
+          "messagesReceivedPerSecond": 159062.39218703494
+        },
+        {
+          "tSeconds": 11.00701522499998,
+          "serverCpuPercent": 95.0539394035132,
+          "serverRssMB": 117.47265625,
+          "generatorCpuPercent": 92.53340910086706,
+          "positionsPerSecond": 22512.77512188472,
+          "messagesReceivedPerSecond": 164945.60019524177
+        },
+        {
+          "tSeconds": 12.007413554999978,
+          "serverCpuPercent": 96.96137737455064,
+          "serverRssMB": 117.47265625,
+          "generatorCpuPercent": 98.15050370985762,
+          "positionsPerSecond": 22522.02880026807,
+          "messagesReceivedPerSecond": 161659.6061290912
+        },
+        {
+          "tSeconds": 13.007358078000136,
+          "serverCpuPercent": 97.00538156753775,
+          "serverRssMB": 117.47265625,
+          "generatorCpuPercent": 95.2763856480315,
+          "positionsPerSecond": 22478.247025706685,
+          "messagesReceivedPerSecond": 160193.88707624795
+        },
+        {
+          "tSeconds": 14.007886136000044,
+          "serverCpuPercent": 96.94880540772307,
+          "serverRssMB": 117.47265625,
+          "generatorCpuPercent": 96.91332414388805,
+          "positionsPerSecond": 22479.12971572262,
+          "messagesReceivedPerSecond": 159174.94639617042
+        },
+        {
+          "tSeconds": 15.009998019000049,
+          "serverCpuPercent": 96.79557906210299,
+          "serverRssMB": 117.47265625,
+          "generatorCpuPercent": 98.10421537532002,
+          "positionsPerSecond": 22485.513226869785,
+          "messagesReceivedPerSecond": 164237.15035419769
+        },
+        {
+          "tSeconds": 16.011467513000127,
+          "serverCpuPercent": 94.86060291317531,
+          "serverRssMB": 117.47265625,
+          "generatorCpuPercent": 98.72702123465018,
+          "positionsPerSecond": 22497.93941301847,
+          "messagesReceivedPerSecond": 163166.2282066351
+        },
+        {
+          "tSeconds": 17.011542680000186,
+          "serverCpuPercent": 94.9928596717112,
+          "serverRssMB": 117.47265625,
+          "generatorCpuPercent": 97.46037419604686,
+          "positionsPerSecond": 22516.30751671152,
+          "messagesReceivedPerSecond": 163221.73111212754
+        },
+        {
+          "tSeconds": 18.014418013000164,
+          "serverCpuPercent": 90.73909488608659,
+          "serverRssMB": 117.47265625,
+          "generatorCpuPercent": 96.63753490684617,
+          "positionsPerSecond": 22509.2783292144,
+          "messagesReceivedPerSecond": 161385.96161882477
+        },
+        {
+          "tSeconds": 19.021118122000015,
+          "serverCpuPercent": 94.36772595006595,
+          "serverRssMB": 117.4765625,
+          "generatorCpuPercent": 95.70893967193774,
+          "positionsPerSecond": 22353.230916361514,
+          "messagesReceivedPerSecond": 161441.3255219225
+        },
+        {
+          "tSeconds": 20.021220611999976,
+          "serverCpuPercent": 96.99005948880665,
+          "serverRssMB": 117.4765625,
+          "generatorCpuPercent": 97.37382015717587,
+          "positionsPerSecond": 22661.677404683676,
+          "messagesReceivedPerSecond": 163230.27052957978
+        }
+      ],
+      "subWindows": [],
+      "verdict": "pass",
+      "reason": ""
+    },
+    {
+      "config": {
+        "url": "ws://127.0.0.1:46361/ws",
+        "rooms": 388,
+        "playersPerRoom": 4,
+        "positionHz": 15,
+        "rampRoomsPerSecond": 25,
+        "warmupMs": 8000,
+        "measureMs": 20000,
+        "clients": 1552
+      },
+      "setup": {
+        "roomsReady": 388,
+        "setupFailures": 0,
+        "setupSeconds": 20.62035249099997
+      },
+      "latencyMs": {
+        "count": 465337,
+        "min": 0.13208799995481968,
+        "mean": 44.315550536607894,
+        "p50": 31.818651999812573,
+        "p90": 91.75111799989827,
+        "p95": 109.6186020001769,
+        "p99": 169.74771400005557,
+        "p999": 245.63947599986568,
+        "max": 329.9421759999823
+      },
+      "throughput": {
+        "positionsSentPerSecond": 23278.967557505584,
+        "expectedPositionsPerSecond": 23280,
+        "messagesReceivedPerSecond": 169041.97896909068,
+        "sampleCoverage": 0.9985129712679441
+      },
+      "integrity": {
+        "eliminations": 0,
+        "unexpectedCloses": 0,
+        "socketErrors": 0,
+        "sampleOverflow": 0
+      },
+      "generator": {
+        "cpuPercent": 96.4275747274174,
+        "eventLoopP99Ms": 3.803135,
+        "eventLoopMaxMs": 31.735807
+      },
+      "server": {
+        "cpuPercent": 98.20494435563373,
+        "rssMBStart": 119.15625,
+        "rssMBEnd": 119.8515625,
+        "rssMBMax": 120.23046875,
+        "heapUsedMB": 23.221107482910156,
+        "eventLoopDelayMs": {
+          "mean": 28.14535887955182,
+          "p50": 11.870207,
+          "p95": 105.578495,
+          "p99": 279.707647,
+          "max": 919.076863
+        },
+        "gc": {
+          "minorCount": 358,
+          "minorMs": 536.6628739940934,
+          "majorCount": 12,
+          "majorMs": 103.17804799973965,
+          "otherCount": 12,
+          "otherMs": 59.66022300068289
+        }
+      },
+      "machine": {
+        "stealPercent": 0.22767518340500886
+      },
+      "timeline": [
+        {
+          "tSeconds": 0.999514419999905,
+          "serverCpuPercent": 98.04760995845298,
+          "serverRssMB": 119.97265625,
+          "generatorCpuPercent": 92.05299909530946,
+          "positionsPerSecond": 23293.310765843893,
+          "messagesReceivedPerSecond": 164662.9570386945
+        },
+        {
+          "tSeconds": 1.9995137000000105,
+          "serverCpuPercent": 100.00007200004129,
+          "serverRssMB": 120.05859375,
+          "generatorCpuPercent": 95.00216840155122,
+          "positionsPerSecond": 23266.016751529605,
+          "messagesReceivedPerSecond": 165983.11950782852
+        },
+        {
+          "tSeconds": 2.9997530489999336,
+          "serverCpuPercent": 99.97607082743122,
+          "serverRssMB": 120.05859375,
+          "generatorCpuPercent": 96.6845586475797,
+          "positionsPerSecond": 23282.427374292183,
+          "messagesReceivedPerSecond": 166224.21440052023
+        },
+        {
+          "tSeconds": 3.9995514370000453,
+          "serverCpuPercent": 97.01956030758211,
+          "serverRssMB": 120.2265625,
+          "generatorCpuPercent": 93.77160548091372,
+          "positionsPerSecond": 23290.69568373558,
+          "messagesReceivedPerSecond": 161202.50035848422
+        },
+        {
+          "tSeconds": 4.999759709999896,
+          "serverCpuPercent": 96.9798017257695,
+          "serverRssMB": 120.23046875,
+          "generatorCpuPercent": 95.6308826691881,
+          "positionsPerSecond": 23286.150123658765,
+          "messagesReceivedPerSecond": 171558.26904465683
+        },
+        {
+          "tSeconds": 5.99950916799996,
+          "serverCpuPercent": 99.02480987390895,
+          "serverRssMB": 120.23046875,
+          "generatorCpuPercent": 95.74868906805037,
+          "positionsPerSecond": 23278.832325206935,
+          "messagesReceivedPerSecond": 167489.96327036698
+        },
+        {
+          "tSeconds": 6.999535424999893,
+          "serverCpuPercent": 97.99742688156904,
+          "serverRssMB": 120.23046875,
+          "generatorCpuPercent": 98.3230183325143,
+          "positionsPerSecond": 23276.38883186002,
+          "messagesReceivedPerSecond": 166983.6155112188
+        },
+        {
+          "tSeconds": 7.999490975999972,
+          "serverCpuPercent": 96.00426729366943,
+          "serverRssMB": 120.23046875,
+          "generatorCpuPercent": 98.62188364409829,
+          "positionsPerSecond": 23266.034151950178,
+          "messagesReceivedPerSecond": 167065.4258911022
+        },
+        {
+          "tSeconds": 8.999577820000006,
+          "serverCpuPercent": 97.99149002703679,
+          "serverRssMB": 120.23046875,
+          "generatorCpuPercent": 95.96896567114199,
+          "positionsPerSecond": 23287.977578874346,
+          "messagesReceivedPerSecond": 166873.50803706233
+        },
+        {
+          "tSeconds": 9.999467729999918,
+          "serverCpuPercent": 98.01079000788076,
+          "serverRssMB": 120.23046875,
+          "generatorCpuPercent": 98.27821944918793,
+          "positionsPerSecond": 23287.56372789288,
+          "messagesReceivedPerSecond": 167818.4751359427
+        },
+        {
+          "tSeconds": 10.999478887999896,
+          "serverCpuPercent": 98.9988953703277,
+          "serverRssMB": 119.8515625,
+          "generatorCpuPercent": 95.2452372536447,
+          "positionsPerSecond": 23265.74040086909,
+          "messagesReceivedPerSecond": 167124.13522890257
+        },
+        {
+          "tSeconds": 12.001430736999959,
+          "serverCpuPercent": 98.80714337600199,
+          "serverRssMB": 119.8515625,
+          "generatorCpuPercent": 94.63937822424644,
+          "positionsPerSecond": 23255.608563679132,
+          "messagesReceivedPerSecond": 165518.93203801016
+        },
+        {
+          "tSeconds": 13.001529505999992,
+          "serverCpuPercent": 98.99022283467778,
+          "serverRssMB": 119.8515625,
+          "generatorCpuPercent": 97.39468042480593,
+          "positionsPerSecond": 23310.69762570544,
+          "messagesReceivedPerSecond": 170951.11532928442
+        },
+        {
+          "tSeconds": 14.001591818999964,
+          "serverCpuPercent": 99.9937690882695,
+          "serverRssMB": 119.8515625,
+          "generatorCpuPercent": 95.55744552889934,
+          "positionsPerSecond": 23288.548820657965,
+          "messagesReceivedPerSecond": 166696.61263398142
+        },
+        {
+          "tSeconds": 15.001672731,
+          "serverCpuPercent": 99.9919094546188,
+          "serverRssMB": 119.8515625,
+          "generatorCpuPercent": 98.28114787575974,
+          "positionsPerSecond": 23276.116682846165,
+          "messagesReceivedPerSecond": 167395.4556988828
+        },
+        {
+          "tSeconds": 16.00330692699994,
+          "serverCpuPercent": 97.84011008346751,
+          "serverRssMB": 119.8515625,
+          "generatorCpuPercent": 99.45527059462124,
+          "positionsPerSecond": 23271.96904128199,
+          "messagesReceivedPerSecond": 165797.0551157279
+        },
+        {
+          "tSeconds": 17.003759967999997,
+          "serverCpuPercent": 97.9556220870087,
+          "serverRssMB": 119.8515625,
+          "generatorCpuPercent": 96.38953159021315,
+          "positionsPerSecond": 23269.457981485237,
+          "messagesReceivedPerSecond": 167734.00961653944
+        },
+        {
+          "tSeconds": 18.01846944399993,
+          "serverCpuPercent": 96.57936810280302,
+          "serverRssMB": 119.8515625,
+          "generatorCpuPercent": 96.77026018036979,
+          "positionsPerSecond": 23214.526479894237,
+          "messagesReceivedPerSecond": 162500.6998555035
+        },
+        {
+          "tSeconds": 19.01845347999991,
+          "serverCpuPercent": 96.00153256846794,
+          "serverRssMB": 119.8515625,
+          "generatorCpuPercent": 99.14768279361012,
+          "positionsPerSecond": 23356.372861136824,
+          "messagesReceivedPerSecond": 171532.73834863846
+        },
+        {
+          "tSeconds": 20.01921004899987,
+          "serverCpuPercent": 97.92591229046852,
+          "serverRssMB": 119.8515625,
+          "generatorCpuPercent": 95.59127860194313,
+          "positionsPerSecond": 23259.402656992108,
+          "messagesReceivedPerSecond": 164580.4835081791
+        }
+      ],
+      "subWindows": [],
+      "verdict": "slo-breach",
+      "reason": "p95 109.6 ms exceeds the 100 ms objective"
+    },
+    {
+      "config": {
+        "url": "ws://127.0.0.1:38777/ws",
+        "rooms": 400,
+        "playersPerRoom": 4,
+        "positionHz": 15,
+        "rampRoomsPerSecond": 25,
+        "warmupMs": 8000,
+        "measureMs": 20000,
+        "clients": 1600
+      },
+      "setup": {
+        "roomsReady": 400,
+        "setupFailures": 0,
+        "setupSeconds": 19.06106965999992
+      },
+      "latencyMs": {
+        "count": 480759,
+        "min": 0.08262000000104308,
+        "mean": 47.138418537113566,
+        "p50": 37.08176799991634,
+        "p90": 100.35378299991135,
+        "p95": 121.18995299993549,
+        "p99": 175.86445100000128,
+        "p999": 222.08844399999361,
+        "max": 240.36572400003206
+      },
+      "throughput": {
+        "positionsSentPerSecond": 24000.034332931507,
+        "expectedPositionsPerSecond": 24000,
+        "messagesReceivedPerSecond": 173508.50223535133,
+        "sampleCoverage": 1.0003016974120604
+      },
+      "integrity": {
+        "eliminations": 0,
+        "unexpectedCloses": 0,
+        "socketErrors": 0,
+        "sampleOverflow": 0
+      },
+      "generator": {
+        "cpuPercent": 97.50100961572883,
+        "eventLoopP99Ms": 4.587519,
+        "eventLoopMaxMs": 26.378239
+      },
+      "server": {
+        "cpuPercent": 96.8262817386805,
+        "rssMBStart": 118.65234375,
+        "rssMBEnd": 119.50390625,
+        "rssMBMax": 119.50390625,
+        "heapUsedMB": 14.972335815429688,
+        "eventLoopDelayMs": {
+          "mean": 20.17347193561368,
+          "p50": 2.553855,
+          "p95": 87.490559,
+          "p99": 264.503295,
+          "max": 1314.914303
+        },
+        "gc": {
+          "minorCount": 371,
+          "minorMs": 538.5004319972359,
+          "majorCount": 14,
+          "majorMs": 116.70178900030442,
+          "otherCount": 14,
+          "otherMs": 78.31882899976335
+        }
+      },
+      "machine": {
+        "stealPercent": 0.35344609946983085
+      },
+      "timeline": [
+        {
+          "tSeconds": 1.003504033000092,
+          "serverCpuPercent": 97.65780383265391,
+          "serverRssMB": 119.50390625,
+          "generatorCpuPercent": 94.57201653318249,
+          "positionsPerSecond": 24002.893070583,
+          "messagesReceivedPerSecond": 173029.69822741518
+        },
+        {
+          "tSeconds": 2.0118182390000436,
+          "serverCpuPercent": 96.2001719531506,
+          "serverRssMB": 119.50390625,
+          "generatorCpuPercent": 100.35661443413684,
+          "positionsPerSecond": 24036.15842738722,
+          "messagesReceivedPerSecond": 174633.0647254695
+        },
+        {
+          "tSeconds": 3.0126957770000447,
+          "serverCpuPercent": 96.91495344558345,
+          "serverRssMB": 119.12109375,
+          "generatorCpuPercent": 96.81963708930788,
+          "positionsPerSecond": 23983.953169703353,
+          "messagesReceivedPerSecond": 171552.45620069047
+        },
+        {
+          "tSeconds": 4.012856178000104,
+          "serverCpuPercent": 95.98460397353207,
+          "serverRssMB": 119.4453125,
+          "generatorCpuPercent": 96.61630264843316,
+          "positionsPerSecond": 24005.149550005604,
+          "messagesReceivedPerSecond": 166960.2194138359
+        },
+        {
+          "tSeconds": 5.014875641000108,
+          "serverCpuPercent": 97.80249148713357,
+          "serverRssMB": 119.4453125,
+          "generatorCpuPercent": 95.17090587690473,
+          "positionsPerSecond": 23962.608398954722,
+          "messagesReceivedPerSecond": 174127.35624677112
+        },
+        {
+          "tSeconds": 6.014824785000062,
+          "serverCpuPercent": 98.00498414147798,
+          "serverRssMB": 119.4453125,
+          "generatorCpuPercent": 97.8918783893718,
+          "positionsPerSecond": 24030.22208097524,
+          "messagesReceivedPerSecond": 167889.5381903618
+        },
+        {
+          "tSeconds": 7.015842199000065,
+          "serverCpuPercent": 94.90344390752004,
+          "serverRssMB": 119.50390625,
+          "generatorCpuPercent": 99.2458259072802,
+          "positionsPerSecond": 24000.5814724018,
+          "messagesReceivedPerSecond": 177080.83547885183
+        },
+        {
+          "tSeconds": 8.016230689000105,
+          "serverCpuPercent": 96.96233110398565,
+          "serverRssMB": 119.50390625,
+          "generatorCpuPercent": 96.12145777486508,
+          "positionsPerSecond": 24012.671317318946,
+          "messagesReceivedPerSecond": 177934.87408076102
+        },
+        {
+          "tSeconds": 9.016711245000014,
+          "serverCpuPercent": 97.95292813267736,
+          "serverRssMB": 119.50390625,
+          "generatorCpuPercent": 96.95800624835826,
+          "positionsPerSecond": 23994.46931380665,
+          "messagesReceivedPerSecond": 172605.0536058753
+        },
+        {
+          "tSeconds": 10.017650618000072,
+          "serverCpuPercent": 96.90896633356247,
+          "serverRssMB": 119.50390625,
+          "generatorCpuPercent": 94.90714678879395,
+          "positionsPerSecond": 23973.47996020792,
+          "messagesReceivedPerSecond": 169056.19317663705
+        },
+        {
+          "tSeconds": 11.01683872800006,
+          "serverCpuPercent": 99.08044242039772,
+          "serverRssMB": 119.50390625,
+          "generatorCpuPercent": 95.88574868049734,
+          "positionsPerSecond": 24028.508505771035,
+          "messagesReceivedPerSecond": 170140.13507426745
+        },
+        {
+          "tSeconds": 12.016846990999998,
+          "serverCpuPercent": 97.99919023269725,
+          "serverRssMB": 119.50390625,
+          "generatorCpuPercent": 97.14779726775721,
+          "positionsPerSecond": 23990.801764006515,
+          "messagesReceivedPerSecond": 175308.55142545048
+        },
+        {
+          "tSeconds": 13.016835215000086,
+          "serverCpuPercent": 95.00111873316614,
+          "serverRssMB": 119.50390625,
+          "generatorCpuPercent": 96.92554139516696,
+          "positionsPerSecond": 24008.28272153522,
+          "messagesReceivedPerSecond": 167592.9735748421
+        },
+        {
+          "tSeconds": 14.016882247000002,
+          "serverCpuPercent": 97.99539108077472,
+          "serverRssMB": 119.50390625,
+          "generatorCpuPercent": 98.1763825683834,
+          "positionsPerSecond": 24004.871002909036,
+          "messagesReceivedPerSecond": 175618.7402994212
+        },
+        {
+          "tSeconds": 15.017080192000023,
+          "serverCpuPercent": 95.98100104074699,
+          "serverRssMB": 119.50390625,
+          "generatorCpuPercent": 100.08838800403436,
+          "positionsPerSecond": 23998.249666469248,
+          "messagesReceivedPerSecond": 173824.59229107515
+        },
+        {
+          "tSeconds": 16.018907716000104,
+          "serverCpuPercent": 95.82487773613255,
+          "serverRssMB": 119.50390625,
+          "generatorCpuPercent": 98.03014755261619,
+          "positionsPerSecond": 23942.244972696597,
+          "messagesReceivedPerSecond": 166483.74695681315
+        },
+        {
+          "tSeconds": 17.021433771000012,
+          "serverCpuPercent": 96.75559005796497,
+          "serverRssMB": 119.50390625,
+          "generatorCpuPercent": 99.29547417100216,
+          "positionsPerSecond": 24036.28302708025,
+          "messagesReceivedPerSecond": 165685.46939163125
+        },
+        {
+          "tSeconds": 18.020853681000066,
+          "serverCpuPercent": 94.05456010976866,
+          "serverRssMB": 119.50390625,
+          "generatorCpuPercent": 99.1402102445553,
+          "positionsPerSecond": 24005.92559737846,
+          "messagesReceivedPerSecond": 176578.4313822508
+        },
+        {
+          "tSeconds": 19.022809800000047,
+          "serverCpuPercent": 97.80867459326561,
+          "serverRssMB": 119.50390625,
+          "generatorCpuPercent": 96.74715105961832,
+          "positionsPerSecond": 23953.144798350666,
+          "messagesReceivedPerSecond": 171674.18486517906
+        },
+        {
+          "tSeconds": 20.025354393000015,
+          "serverCpuPercent": 96.75380095536839,
+          "serverRssMB": 119.50390625,
+          "generatorCpuPercent": 99.92173984025769,
+          "positionsPerSecond": 24034.84111155216,
+          "messagesReceivedPerSecond": 174404.2122623121
+        }
+      ],
+      "subWindows": [],
+      "verdict": "generator-limited",
+      "reason": "load generator saturated (CPU 98%, event-loop p99 4.6 ms); results are not valid for the server"
+    },
+    {
+      "config": {
+        "url": "ws://127.0.0.1:33371/ws",
+        "rooms": 450,
+        "playersPerRoom": 4,
+        "positionHz": 15,
+        "rampRoomsPerSecond": 25,
+        "warmupMs": 8000,
+        "measureMs": 20000,
+        "clients": 1800
+      },
+      "setup": {
+        "roomsReady": 450,
+        "setupFailures": 0,
+        "setupSeconds": 28.536613232999922
+      },
+      "latencyMs": {
+        "count": 540082,
+        "min": 0.13868600002024323,
+        "mean": 90.02614667435758,
+        "p50": 88.15921600000001,
+        "p90": 163.63275200000498,
+        "p95": 178.73035500000697,
+        "p99": 214.5441100000171,
+        "p999": 258.3383629999589,
+        "max": 318.6695019999752
+      },
+      "throughput": {
+        "positionsSentPerSecond": 27000.406591075036,
+        "expectedPositionsPerSecond": 27000,
+        "messagesReceivedPerSecond": 223045.83864649985,
+        "sampleCoverage": 0.9985467803604576
+      },
+      "integrity": {
+        "eliminations": 0,
+        "unexpectedCloses": 0,
+        "socketErrors": 0,
+        "sampleOverflow": 0
+      },
+      "generator": {
+        "cpuPercent": 98.0055733244588,
+        "eventLoopP99Ms": 6.778879,
+        "eventLoopMaxMs": 84.738047
+      },
+      "server": {
+        "cpuPercent": 96.29666446190892,
+        "rssMBStart": 120.39453125,
+        "rssMBEnd": 121.2109375,
+        "rssMBMax": 121.59375,
+        "heapUsedMB": 28.33954620361328,
+        "eventLoopDelayMs": {
+          "mean": 4676.386816,
+          "p50": 4739.563519,
+          "p95": 5188.354047,
+          "p99": 5188.354047,
+          "max": 5188.354047
+        },
+        "gc": {
+          "minorCount": 458,
+          "minorMs": 596.3778670006432,
+          "majorCount": 16,
+          "majorMs": 102.18142999988049,
+          "otherCount": 16,
+          "otherMs": 97.6880319993943
+        }
+      },
+      "machine": {
+        "stealPercent": 0.3306205493387589
+      },
+      "timeline": [
+        {
+          "tSeconds": 0.9996522549999645,
+          "serverCpuPercent": 94.03269940105669,
+          "serverRssMB": 121.18359375,
+          "generatorCpuPercent": 97.95236244428168,
+          "positionsPerSecond": 27011.39307688648,
+          "messagesReceivedPerSecond": 178677.134079997
+        },
+        {
+          "tSeconds": 1.999651985000004,
+          "serverCpuPercent": 98.00002646000296,
+          "serverRssMB": 121.18359375,
+          "generatorCpuPercent": 96.72592611599622,
+          "positionsPerSecond": 27000.0072900009,
+          "messagesReceivedPerSecond": 191650.05174550638
+        },
+        {
+          "tSeconds": 3.0000035170000046,
+          "serverCpuPercent": 92.96731901241286,
+          "serverRssMB": 121.18359375,
+          "generatorCpuPercent": 101.61058062937015,
+          "positionsPerSecond": 26998.509160077927,
+          "messagesReceivedPerSecond": 186539.42542270222
+        },
+        {
+          "tSeconds": 3.9996803569999755,
+          "serverCpuPercent": 95.0307101242868,
+          "serverRssMB": 121.1875,
+          "generatorCpuPercent": 99.73723108359987,
+          "positionsPerSecond": 26998.724907942033,
+          "messagesReceivedPerSecond": 182545.99156263866
+        },
+        {
+          "tSeconds": 5.001495698999963,
+          "serverCpuPercent": 93.82966706453271,
+          "serverRssMB": 121.59375,
+          "generatorCpuPercent": 100.0768263339306,
+          "positionsPerSecond": 27007.971295373063,
+          "messagesReceivedPerSecond": 186260.87281462536
+        },
+        {
+          "tSeconds": 6.01311390700005,
+          "serverCpuPercent": 94.89746155299709,
+          "serverRssMB": 121.59375,
+          "generatorCpuPercent": 97.96433003704047,
+          "positionsPerSecond": 26931.108776560937,
+          "messagesReceivedPerSecond": 184449.03277184183
+        },
+        {
+          "tSeconds": 7.012650337000029,
+          "serverCpuPercent": 97.04498714469266,
+          "serverRssMB": 121.59375,
+          "generatorCpuPercent": 97.36213416453677,
+          "positionsPerSecond": 27055.54213766935,
+          "messagesReceivedPerSecond": 188968.60017398675
+        },
+        {
+          "tSeconds": 8.012664530999958,
+          "serverCpuPercent": 96.99862320154892,
+          "serverRssMB": 121.59375,
+          "generatorCpuPercent": 97.30241888947306,
+          "positionsPerSecond": 27003.61671066629,
+          "messagesReceivedPerSecond": 191166.28658574153
+        },
+        {
+          "tSeconds": 9.012659707000013,
+          "serverCpuPercent": 97.00046793025186,
+          "serverRssMB": 121.59375,
+          "generatorCpuPercent": 96.74806671266852,
+          "positionsPerSecond": 26996.13022933074,
+          "messagesReceivedPerSecond": 184009.887663688
+        },
+        {
+          "tSeconds": 10.015905452999984,
+          "serverCpuPercent": 97.68294596885657,
+          "serverRssMB": 121.2109375,
+          "generatorCpuPercent": 96.12460395122648,
+          "positionsPerSecond": 26926.60308574164,
+          "messagesReceivedPerSecond": 187388.78360517402
+        },
+        {
+          "tSeconds": 11.01951471300004,
+          "serverCpuPercent": 98.64396827107265,
+          "serverRssMB": 121.2109375,
+          "generatorCpuPercent": 96.92118623934837,
+          "positionsPerSecond": 27050.36818811187,
+          "messagesReceivedPerSecond": 193342.177811302
+        },
+        {
+          "tSeconds": 12.019648750000052,
+          "serverCpuPercent": 93.98740221056867,
+          "serverRssMB": 121.2109375,
+          "generatorCpuPercent": 100.21166792866477,
+          "positionsPerSecond": 27038.375857214938,
+          "messagesReceivedPerSecond": 182010.60384469051
+        },
+        {
+          "tSeconds": 13.020966867999988,
+          "serverCpuPercent": 96.87231086335538,
+          "serverRssMB": 121.2109375,
+          "generatorCpuPercent": 100.08577513825259,
+          "positionsPerSecond": 26965.456346613006,
+          "messagesReceivedPerSecond": 190845.44318613035
+        },
+        {
+          "tSeconds": 14.020656931999955,
+          "serverCpuPercent": 97.03007311274348,
+          "serverRssMB": 121.2109375,
+          "generatorCpuPercent": 97.42899675354114,
+          "positionsPerSecond": 27033.378617236038,
+          "messagesReceivedPerSecond": 188231.33966849794
+        },
+        {
+          "tSeconds": 15.030191533999984,
+          "serverCpuPercent": 97.07443390830659,
+          "serverRssMB": 121.2109375,
+          "generatorCpuPercent": 96.59837295997627,
+          "positionsPerSecond": 26760.845984355103,
+          "messagesReceivedPerSecond": 185442.8759837542
+        },
+        {
+          "tSeconds": 16.03184367500001,
+          "serverCpuPercent": 96.84000665456291,
+          "serverRssMB": 121.2109375,
+          "generatorCpuPercent": 98.18608274706145,
+          "positionsPerSecond": 27195.06991000306,
+          "messagesReceivedPerSecond": 195273.38084129803
+        },
+        {
+          "tSeconds": 17.031651687999954,
+          "serverCpuPercent": 99.0190103627483,
+          "serverRssMB": 121.2109375,
+          "generatorCpuPercent": 98.14704295634161,
+          "positionsPerSecond": 27042.191749268895,
+          "messagesReceivedPerSecond": 193145.08134474306
+        },
+        {
+          "tSeconds": 18.031654484000057,
+          "serverCpuPercent": 93.99973717672499,
+          "serverRssMB": 121.2109375,
+          "generatorCpuPercent": 101.35901660017919,
+          "positionsPerSecond": 26999.924508208307,
+          "messagesReceivedPerSecond": 191210.4653755192
+        },
+        {
+          "tSeconds": 19.03167030800006,
+          "serverCpuPercent": 95.99848092003782,
+          "serverRssMB": 121.2109375,
+          "generatorCpuPercent": 94.95939736249595,
+          "positionsPerSecond": 26997.572790408114,
+          "messagesReceivedPerSecond": 178761.17128322527
+        },
+        {
+          "tSeconds": 20.031651422000024,
+          "serverCpuPercent": 99.00186974931569,
+          "serverRssMB": 121.2109375,
+          "generatorCpuPercent": 94.6409873896911,
+          "positionsPerSecond": 27003.509988290567,
+          "messagesReceivedPerSecond": 189661.5819486432
+        }
+      ],
+      "subWindows": [],
+      "verdict": "generator-limited",
+      "reason": "load generator saturated (CPU 98%, event-loop p99 6.8 ms); results are not valid for the server"
+    }
+  ],
+  "breakingPoint": {
+    "lastPassingRooms": 375,
+    "lastPassingClients": 1500,
+    "firstNonPassingRooms": 388,
+    "firstNonPassingVerdict": "slo-breach",
+    "firstNonPassingReason": "p95 109.6 ms exceeds the 100 ms objective"
+  }
+}

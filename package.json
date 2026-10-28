@@ -13,6 +13,7 @@
     "test:achievements": "tsx --test client/src/lib/game-achievements.test.ts",
     "start": "NODE_ENV=production node dist/index.cjs",
     "check": "tsc",
+    "bench:multiplayer": "tsx benchmarks/multiplayer/run.ts",
     "db:push": "drizzle-kit push"
   },
   "dependencies": {

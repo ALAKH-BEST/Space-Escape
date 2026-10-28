@@ -1,0 +1,42 @@
+{
+  "meta": {
+    "scenario": "overhead",
+    "startedAt": "2026-10-28T04:00:15.316Z",
+    "playersPerRoom": 4,
+    "positionHz": 15,
+    "warmupSeconds": 8,
+    "measureSeconds": 20,
+    "sloP95Ms": 100,
+    "server": "harness"
+  },
+  "secondsPerSample": 20,
+  "samples": [
+    {
+      "monitor": false,
+      "cpuPercent": 0.15
+    },
+    {
+      "monitor": true,
+      "cpuPercent": 1.85
+    },
+    {
+      "monitor": false,
+      "cpuPercent": 0.10000000000000002
+    },
+    {
+      "monitor": true,
+      "cpuPercent": 2.1500000000000004
+    },
+    {
+      "monitor": false,
+      "cpuPercent": 0.10000000000000002
+    },
+    {
+      "monitor": true,
+      "cpuPercent": 2.05
+    }
+  ],
+  "monitorOffCpuPercent": 0.1,
+  "monitorOnCpuPercent": 2.05,
+  "overheadPercentagePoints": 1.95
+}

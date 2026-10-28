@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 400" width="760" height="400" font-family="system-ui, -apple-system, Segoe UI, sans-serif">
+<rect width="760" height="400" fill="#ffffff"/>
+<text x="64" y="26" font-size="15" font-weight="600" fill="#111827">CPU use vs load (percent of one core)</text>
+<line x1="64" x2="736" y1="344" y2="344" stroke="#e5e7eb"/>
+<text x="56" y="348" font-size="11" text-anchor="end" fill="#374151">0</text>
+<line x1="64" x2="736" y1="284" y2="284" stroke="#e5e7eb"/>
+<text x="56" y="288" font-size="11" text-anchor="end" fill="#374151">20</text>
+<line x1="64" x2="736" y1="224" y2="224" stroke="#e5e7eb"/>
+<text x="56" y="228" font-size="11" text-anchor="end" fill="#374151">40</text>
+<line x1="64" x2="736" y1="164" y2="164" stroke="#e5e7eb"/>
+<text x="56" y="168" font-size="11" text-anchor="end" fill="#374151">60</text>
+<line x1="64" x2="736" y1="103.99999999999999" y2="103.99999999999999" stroke="#e5e7eb"/>
+<text x="56" y="107.99999999999999" font-size="11" text-anchor="end" fill="#374151">80</text>
+<line x1="64" x2="736" y1="44" y2="44" stroke="#e5e7eb"/>
+<text x="56" y="48" font-size="11" text-anchor="end" fill="#374151">100</text>
+<line x1="64" x2="64" y1="344" y2="348" stroke="#9ca3af"/>
+<text x="64" y="362" font-size="11" text-anchor="middle" fill="#374151">0</text>
+<line x1="288" x2="288" y1="344" y2="348" stroke="#9ca3af"/>
+<text x="288" y="362" font-size="11" text-anchor="middle" fill="#374151">500</text>
+<line x1="512" x2="512" y1="344" y2="348" stroke="#9ca3af"/>
+<text x="512" y="362" font-size="11" text-anchor="middle" fill="#374151">1000</text>
+<line x1="736" x2="736" y1="344" y2="348" stroke="#9ca3af"/>
+<text x="736" y="362" font-size="11" text-anchor="middle" fill="#374151">1500</text>
+<line x1="64" x2="64" y1="44" y2="344" stroke="#9ca3af"/>
+<line x1="64" x2="736" y1="344" y2="344" stroke="#9ca3af"/>
+<text x="400" y="388" font-size="12" text-anchor="middle" fill="#111827">Concurrent clients</text>
+<text transform="translate(16 194) rotate(-90)" font-size="12" text-anchor="middle" fill="#111827">CPU %</text>
+<line x1="64" x2="736" y1="44" y2="44" stroke="#6b7280" stroke-dasharray="6 4"/>
+<text x="732" y="39" font-size="11" text-anchor="end" fill="#6b7280">one core</text>
+<path d="M65.8 333.8 L73.0 327.5 L81.9 323.2 L108.8 308.9 L153.6 284.0 L243.2 249.1 L332.8 209.3 L422.4 171.8 L512.0 135.8 L601.6 101.8 L691.2 67.5 L714.5 61.3 L736.0 54.9 L759.3 53.0 L780.8 53.5 L870.4 55.1" fill="none" stroke="#2563eb" stroke-width="2.2"/>
+<circle cx="65.8" cy="333.8" r="3" fill="#2563eb"/>
+<circle cx="73.0" cy="327.5" r="3" fill="#2563eb"/>
+<circle cx="81.9" cy="323.2" r="3" fill="#2563eb"/>
+<circle cx="108.8" cy="308.9" r="3" fill="#2563eb"/>
+<circle cx="153.6" cy="284.0" r="3" fill="#2563eb"/>
+<circle cx="243.2" cy="249.1" r="3" fill="#2563eb"/>
+<circle cx="332.8" cy="209.3" r="3" fill="#2563eb"/>
+<circle cx="422.4" cy="171.8" r="3" fill="#2563eb"/>
+<circle cx="512.0" cy="135.8" r="3" fill="#2563eb"/>
+<circle cx="601.6" cy="101.8" r="3" fill="#2563eb"/>
+<circle cx="691.2" cy="67.5" r="3" fill="#2563eb"/>
+<circle cx="714.5" cy="61.3" r="3" fill="#2563eb"/>
+<circle cx="736.0" cy="54.9" r="3" fill="#2563eb"/>
+<circle cx="759.3" cy="53.0" r="3" fill="#2563eb"/>
+<circle cx="780.8" cy="53.5" r="3" fill="#2563eb"/>
+<circle cx="870.4" cy="55.1" r="3" fill="#2563eb"/>
+<path d="M65.8 334.9 L73.0 328.4 L81.9 321.0 L108.8 304.6 L153.6 281.4 L243.2 236.3 L332.8 200.8 L422.4 158.8 L512.0 126.2 L601.6 90.5 L691.2 63.9 L714.5 54.6 L736.0 54.8 L759.3 52.5 L780.8 50.2 L870.4 50.0" fill="none" stroke="#ea580c" stroke-width="2.2" stroke-dasharray="5 3"/>
+<circle cx="65.8" cy="334.9" r="3" fill="#ea580c"/>
+<circle cx="73.0" cy="328.4" r="3" fill="#ea580c"/>
+<circle cx="81.9" cy="321.0" r="3" fill="#ea580c"/>
+<circle cx="108.8" cy="304.6" r="3" fill="#ea580c"/>
+<circle cx="153.6" cy="281.4" r="3" fill="#ea580c"/>
+<circle cx="243.2" cy="236.3" r="3" fill="#ea580c"/>
+<circle cx="332.8" cy="200.8" r="3" fill="#ea580c"/>
+<circle cx="422.4" cy="158.8" r="3" fill="#ea580c"/>
+<circle cx="512.0" cy="126.2" r="3" fill="#ea580c"/>
+<circle cx="601.6" cy="90.5" r="3" fill="#ea580c"/>
+<circle cx="691.2" cy="63.9" r="3" fill="#ea580c"/>
+<circle cx="714.5" cy="54.6" r="3" fill="#ea580c"/>
+<circle cx="736.0" cy="54.8" r="3" fill="#ea580c"/>
+<circle cx="759.3" cy="52.5" r="3" fill="#ea580c"/>
+<circle cx="780.8" cy="50.2" r="3" fill="#ea580c"/>
+<circle cx="870.4" cy="50.0" r="3" fill="#ea580c"/>
+<rect x="64" y="364" width="12" height="4" fill="#2563eb"/>
+<text x="81" y="369" font-size="11" fill="#374151">Server</text>
+<rect x="131.2" y="364" width="12" height="4" fill="#ea580c"/>
+<text x="148.2" y="369" font-size="11" fill="#374151">Load generator</text>
+</svg>
