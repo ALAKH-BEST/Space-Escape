@@ -3,11 +3,14 @@ import { api } from "@shared/routes";
 import type { ShipId } from "@shared/ships";
 import { useToast } from "@/hooks/use-toast";
 import { apiUrl } from "@/lib/apiBase";
+import { isPortal } from "@/lib/portal";
+import { equipShip, purchaseShip, readProgression } from "@/lib/local-game-store";
 
 export function useProgression() {
   return useQuery({
     queryKey: [api.progression.get.path],
     queryFn: async () => {
+      if (isPortal) return readProgression();
       const res = await fetch(apiUrl(api.progression.get.path), {
         credentials: "include",
       });
@@ -27,6 +30,7 @@ function useProgressionMutation(
 
   return useMutation({
     mutationFn: async ({ shipId }: { shipId: ShipId }) => {
+      if (isPortal) return method === "purchase" ? purchaseShip(shipId) : equipShip(shipId);
       const contract = api.progression[method];
       const res = await fetch(apiUrl(path), {
         method: contract.method,

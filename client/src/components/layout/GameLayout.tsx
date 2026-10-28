@@ -7,6 +7,7 @@ import { Gem, Rocket, LogOut } from "lucide-react";
 import { PublicFooter } from "@/components/layout/PublicFooter";
 import { ThemeSelector } from "@/components/theme/ThemeSelector";
 import { MusicToggle } from "@/components/game/MusicToggle";
+import { isPortal } from "@/lib/portal";
 
 export function GameLayout({ children }: { children: ReactNode }) {
   const { data: user } = useUser();
@@ -41,12 +42,16 @@ export function GameLayout({ children }: { children: ReactNode }) {
                   <Link href="/hangar" className={`text-xs sm:text-sm font-medium transition-colors hover:text-primary ${location === '/hangar' ? 'text-primary' : 'text-muted-foreground'}`}>
                     HANGAR
                   </Link>
-                  <Link href="/leaderboard" className={`text-xs sm:text-sm font-medium transition-colors hover:text-primary ${location === '/leaderboard' ? 'text-primary' : 'text-muted-foreground'}`}>
-                    LEADERBOARD
-                  </Link>
-                  <Link href="/multiplayer" className={`text-xs sm:text-sm font-medium transition-colors hover:text-primary ${location === '/multiplayer' ? 'text-primary' : 'text-muted-foreground'}`}>
-                    MULTIPLAYER
-                  </Link>
+                  {!isPortal && (
+                    <>
+                      <Link href="/leaderboard" className={`text-xs sm:text-sm font-medium transition-colors hover:text-primary ${location === '/leaderboard' ? 'text-primary' : 'text-muted-foreground'}`}>
+                        LEADERBOARD
+                      </Link>
+                      <Link href="/multiplayer" className={`text-xs sm:text-sm font-medium transition-colors hover:text-primary ${location === '/multiplayer' ? 'text-primary' : 'text-muted-foreground'}`}>
+                        MULTIPLAYER
+                      </Link>
+                    </>
+                  )}
                 </div>
 
                 <div className="flex items-center gap-3 pl-4 border-l border-white/10">
@@ -56,17 +61,21 @@ export function GameLayout({ children }: { children: ReactNode }) {
                     <Gem className="h-4 w-4" />
                     {(progression?.gems ?? user?.gems ?? 0).toLocaleString()}
                   </div>
-                  <span className="hidden sm:block text-sm font-mono text-muted-foreground">
-                    CMDR. {user.username.toUpperCase()}
-                  </span>
-                  <Button 
-                    variant="ghost" 
-                    size="icon"
-                    onClick={() => logout()}
-                    className="text-muted-foreground hover:text-destructive hover:bg-destructive/10"
-                  >
-                    <LogOut className="h-5 w-5" />
-                  </Button>
+                  {!isPortal && (
+                    <>
+                      <span className="hidden sm:block text-sm font-mono text-muted-foreground">
+                        CMDR. {user.username.toUpperCase()}
+                      </span>
+                      <Button 
+                        variant="ghost" 
+                        size="icon"
+                        onClick={() => logout()}
+                        className="text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                      >
+                        <LogOut className="h-5 w-5" />
+                      </Button>
+                    </>
+                  )}
                 </div>
               </div>
             )}

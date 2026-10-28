@@ -2,6 +2,8 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "@shared/routes";
 import { useToast } from "@/hooks/use-toast";
 import { apiUrl } from "@/lib/apiBase";
+import { isPortal } from "@/lib/portal";
+import { recordRun } from "@/lib/local-game-store";
 
 export function useScores() {
   return useQuery({
@@ -22,11 +24,21 @@ export function useSubmitScore() {
   const { toast } = useToast();
 
   return useMutation({
-    mutationFn: async (data: { runId: string; runToken: string }) => {
+    // `score` is only used by portal builds, which have no server to calculate it.
+    mutationFn: async (data: { runId: string; runToken: string; score?: number }): Promise<ScoreResult> => {
+      if (isPortal) {
+        const result = recordRun(data.score ?? 0);
+        return {
+          score: { id: 0, userId: 0, runId: data.runId, score: result.score } as unknown as ScoreResult["score"],
+          gemsEarned: result.gemsEarned,
+          totalGems: result.totalGems,
+          duplicate: false,
+        };
+      }
       const res = await fetch(apiUrl(api.scores.create.path), {
         method: api.scores.create.method,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
+        body: JSON.stringify({ runId: data.runId, runToken: data.runToken }),
         credentials: "include",
       });
 
@@ -44,6 +56,7 @@ export function useSubmitScore() {
       queryClient.setQueryData(["/api/user"], (user: any) =>
         user ? { ...user, gems: result.totalGems } : user,
       );
+      if (isPortal) return;
       toast({
         title: "Score Uploaded",
         description: "Your achievement has been recorded in the galactic archives.",
@@ -64,6 +77,7 @@ export function useStartRun() {
 
   return useMutation({
     mutationFn: async (mode: "solo" | "multiplayer") => {
+      if (isPortal) return { runId: crypto.randomUUID(), runToken: "local", startedAt: Date.now() };
       const res = await fetch(apiUrl(api.runs.start.path), {
         method: api.runs.start.method,
         headers: { "Content-Type": "application/json" },
@@ -97,6 +111,7 @@ export function useStartRun() {
  * run token. Best-effort: any failure resolves to null and never affects play.
  */
 export async function sendRunHeartbeat(runId: string, runToken: string): Promise<string | null> {
+  if (isPortal) return runToken;
   const controller = new AbortController();
   // A hung request must not block the next heartbeat.
   const timeout = window.setTimeout(() => controller.abort(), 6000);
