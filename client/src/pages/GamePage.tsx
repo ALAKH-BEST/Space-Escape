@@ -10,6 +10,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useProgression } from "@/hooks/use-progression";
 import { getSectorEnvironmentById } from "@/lib/sector-environments";
 import { ships } from "@shared/ships";
+import { isPortal } from "@/lib/portal";
 
 export default function GamePage() {
   const search = useSearch();
@@ -34,7 +35,7 @@ export default function GamePage() {
 
   return (
     <GameLayout>
-      <div className="max-w-5xl mx-auto space-y-8 pb-12">
+      <div className={isPortal ? "h-full max-w-5xl mx-auto" : "max-w-5xl mx-auto space-y-8 pb-12"}>
         <AnimatePresence mode="wait">
           {!showGame ? (
             <motion.div
@@ -42,19 +43,19 @@ export default function GamePage() {
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 1.05 }}
-              className="relative flex flex-col items-center justify-center min-h-[60vh] text-center space-y-8"
+              className={isPortal ? "relative flex flex-col items-center justify-center h-full text-center space-y-3 sm:space-y-5" : "relative flex flex-col items-center justify-center min-h-[60vh] text-center space-y-8"}
             >
               <MusicToggle className="absolute right-0 top-0 z-20" popoverAlign="right" />
               <div className="relative">
                 <div className="absolute inset-0 bg-primary/20 blur-3xl rounded-full" />
-                <Rocket className="w-24 h-24 text-primary relative z-10 animate-bounce" />
+                <Rocket className={isPortal ? "w-10 h-10 sm:w-16 sm:h-16 text-primary relative z-10 animate-bounce" : "w-24 h-24 text-primary relative z-10 animate-bounce"} />
               </div>
               
               <div className="space-y-4">
-                <h1 className="text-6xl font-display font-bold text-foreground tracking-tighter">
+                <h1 className={isPortal ? "text-3xl sm:text-5xl font-display font-bold text-foreground tracking-tighter" : "text-6xl font-display font-bold text-foreground tracking-tighter"}>
                   ASTRODODGE
                 </h1>
-                <p className="text-xl text-muted-foreground font-mono max-w-lg mx-auto">
+                <p className={isPortal ? "text-sm sm:text-base text-muted-foreground font-mono max-w-lg mx-auto [@media(max-height:400px)]:hidden" : "text-xl text-muted-foreground font-mono max-w-lg mx-auto"}>
                   Master the void. Navigate the asteroid fields of Sector 7 and survive the cosmic onslaught.
                 </p>
               </div>
@@ -63,13 +64,14 @@ export default function GamePage() {
                 <Button 
                   onClick={() => setShowGame(true)}
                   size="lg"
-                  className="flex-1 h-16 text-xl font-display tracking-widest bg-gradient-to-r from-primary to-accent hover:scale-105 transition-all shadow-xl shadow-primary/20"
+                  className={`flex-1 ${isPortal ? "h-12 text-lg" : "h-16 text-xl"} font-display tracking-widest bg-gradient-to-r from-primary to-accent hover:scale-105 transition-all shadow-xl shadow-primary/20`}
                 >
                   <Play className="mr-2 h-6 w-6 fill-current" />
                   INITIATE MISSION
                 </Button>
               </div>
 
+              {!isPortal && (<>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 w-full mt-8">
                 <div className="p-4 rounded-xl bg-white/5 border border-white/10 backdrop-blur">
                   <Target className="w-6 h-6 text-accent mx-auto mb-2" />
@@ -91,14 +93,22 @@ export default function GamePage() {
               <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-[0.2em] mt-12">
                 Made by Alakh
               </p>
+              </>)}
             </motion.div>
           ) : (
             <motion.div
               key="game"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="space-y-8"
+              className={isPortal ? "h-full flex items-center justify-center" : "space-y-8"}
             >
+              {isPortal ? (
+                // Fit the 16:9 game frame inside whatever space the portal gives, never taller than it.
+                <div className="w-full" style={{ maxWidth: "calc((100dvh - 4rem) * 16 / 9)" }}>
+                  <GameCanvas autoStart={launchFromHangar} initialSectorId={launchSector.id} />
+                </div>
+              ) : (
+              <>
               <div className="flex items-center justify-between">
                 <div>
                   <h1 className="text-4xl font-display font-bold text-foreground mb-2">
@@ -131,6 +141,8 @@ export default function GamePage() {
                   Made by Alakh
                 </p>
               </div>
+              </>
+              )}
             </motion.div>
           )}
         </AnimatePresence>

@@ -232,3 +232,10 @@
     touch-action: none;
   }
 }
+
+/* Portal builds on a phone held sideways: keep the game wide instead of the portrait 4:5 frame. */
+@media (max-width: 767px) and (pointer: coarse) and (orientation: landscape) {
+  .mobile-game-frame.portal-fit-frame {
+    aspect-ratio: 16 / 9;
+  }
+}

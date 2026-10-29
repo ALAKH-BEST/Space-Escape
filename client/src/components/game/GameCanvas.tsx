@@ -1,7 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Link } from "wouter";
 import { AnimatePresence, motion } from "framer-motion";
-import { Gem, Play, RotateCcw, Shield, Sparkles, Trophy, Zap } from "lucide-react";
+import { useQueryClient } from "@tanstack/react-query";
+import { Gem, Play, RotateCcw, Shield, Sparkles, Trophy, Video, Zap } from "lucide-react";
+import { api } from "@shared/routes";
 import { sendRunHeartbeat, useStartRun, useSubmitScore } from "@/hooks/use-scores";
 import { useProgression } from "@/hooks/use-progression";
 import { AchievementToast } from "@/components/game/AchievementToast";
@@ -11,7 +13,8 @@ import { unlockAchievementAudio } from "@/lib/achievement-audio";
 import { playAbilitySound } from "@/lib/ability-sounds";
 import { setMusicMode, startMusic, stopMusic } from "@/lib/background-music";
 import { isPortal } from "@/lib/portal";
-import { gameplayStart, gameplayStop, showBreakAd } from "@/lib/portal-sdk";
+import { gameplayStart, gameplayStop, showBreakAd, showRewardedAd } from "@/lib/portal-sdk";
+import { addGems } from "@/lib/local-game-store";
 import { playCollisionSound } from "@/lib/collision-sound";
 import {
   FIRST_FLIGHT_STORAGE_KEY,
@@ -81,6 +84,9 @@ export function GameCanvas({
   const requestRef = useRef<number>();
   const shipRef = useRef<ShipId>("vanguard");
   const scoreMutation = useSubmitScore();
+  const queryClient = useQueryClient();
+  // Portal builds only: "watch an ad to double this run's gems".
+  const [bonus, setBonus] = useState<{ status: "idle" | "watching" | "claimed" | "unavailable"; gems: number }>({ status: "idle", gems: 0 });
   const startRunMutation = useStartRun();
   const { data: progression, isLoading: isProgressionLoading } = useProgression();
   const startingSectorNumber = getSectorNumberById(initialSectorId);
@@ -311,6 +317,7 @@ export function GameCanvas({
     unlockAchievementAudio();
     startingRunRef.current = true;
     scoreMutation.reset();
+    setBonus({ status: "idle", gems: 0 });
     try {
       const run = await startRunMutation.mutateAsync(multiplayerRef.current ? "multiplayer" : "solo");
       const equippedShip = progression?.equippedShip ?? "vanguard";
@@ -376,6 +383,28 @@ export function GameCanvas({
       // useStartRun reports authorization failures to the pilot.
     });
   }, [autoStart, isProgressionLoading, progression?.equippedShip]);
+
+  const claimBonus = async (gemsEarned: number) => {
+    if (bonus.status !== "idle" || gemsEarned <= 0) return;
+    setBonus({ status: "watching", gems: 0 });
+    let paused = false;
+    const earned = await showRewardedAd(
+      () => {
+        paused = true;
+        stopMusic(0.2);
+      },
+      () => {
+        if (paused) startMusic();
+      },
+    );
+    if (!earned) {
+      setBonus({ status: "unavailable", gems: 0 });
+      return;
+    }
+    const next = addGems(gemsEarned);
+    queryClient.setQueryData([api.progression.get.path], next);
+    setBonus({ status: "claimed", gems: gemsEarned });
+  };
 
   const stopGame = () => {
     const state = gameStateRef.current;
@@ -597,7 +626,7 @@ export function GameCanvas({
   const currentEnvironment = getSectorEnvironmentByNumber(displayedSector);
 
   return (
-    <div className="mobile-game-frame relative w-full aspect-video rounded-xl overflow-hidden border-2 border-primary/30 shadow-2xl shadow-primary/20 bg-black">
+    <div className={`mobile-game-frame ${isPortal ? "portal-fit-frame" : ""} relative w-full aspect-video rounded-xl overflow-hidden border-2 border-primary/30 shadow-2xl shadow-primary/20 bg-black`}>
       <canvas ref={canvasRef} className="w-full h-full block" />
       <MusicToggle />
       {gameState.isPlaying && <MobileControls keys={gameStateRef.current.keys} />}
@@ -650,22 +679,35 @@ export function GameCanvas({
       )}
 
       {gameState.gameOver && (
-        <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/85 backdrop-blur-md p-4">
-          <h2 className="text-4xl sm:text-5xl font-display font-bold text-destructive mb-5 neon-text">MISSION TERMINATED</h2>
-          <div className="grid grid-cols-2 gap-x-8 gap-y-3 text-sm font-mono w-full max-w-md mb-6">
+        <div className={`absolute inset-0 flex flex-col items-center justify-center bg-black/85 backdrop-blur-md p-4 ${isPortal ? "[@media(max-height:520px)]:p-2" : ""}`}>
+          <h2 className={`text-4xl sm:text-5xl font-display font-bold text-destructive mb-5 neon-text ${isPortal ? "[@media(max-height:520px)]:text-2xl [@media(max-height:520px)]:mb-2" : ""}`}>MISSION TERMINATED</h2>
+          <div className={`grid grid-cols-2 gap-x-8 gap-y-3 text-sm font-mono w-full max-w-md mb-6 ${isPortal ? "[@media(max-height:520px)]:grid-cols-4 [@media(max-height:520px)]:max-w-xl [@media(max-height:520px)]:gap-x-4 [@media(max-height:520px)]:gap-y-1 [@media(max-height:520px)]:mb-2" : ""}`}>
             <Result label="FINAL SCORE" value={gameState.score.toLocaleString()} />
             <Result label="SECTOR REACHED" value={gameState.sector.toString().padStart(2, "0")} />
             <Result label="SURVIVAL TIME" value={`${gameState.survivalTime.toFixed(1)}s`} />
             <Result label="GEMS EARNED" value={scoreMutation.data ? `+${scoreMutation.data.gemsEarned}` : "..."} accent />
-            <div className="col-span-2 border-t border-white/10 pt-3 flex justify-between text-cyan-300">
+            <div className={`col-span-2 border-t border-white/10 pt-3 flex justify-between text-cyan-300 ${isPortal ? "[@media(max-height:520px)]:col-span-4 [@media(max-height:520px)]:pt-1" : ""}`}>
               <span>TOTAL GEMS</span>
-              <span className="flex items-center gap-1.5 text-white"><Gem className="h-4 w-4" />{scoreMutation.data?.totalGems ?? "..."}</span>
+              <span className="flex items-center gap-1.5 text-white"><Gem className="h-4 w-4" />{scoreMutation.data ? scoreMutation.data.totalGems + bonus.gems : "..."}</span>
             </div>
           </div>
           {scoreMutation.isPending && <p className="mb-4 text-primary animate-pulse font-mono text-xs">UPLOADING FLIGHT RECORD...</p>}
+          {isPortal && scoreMutation.data && scoreMutation.data.gemsEarned > 0 && bonus.status !== "claimed" && (
+            <Button
+              onClick={() => void claimBonus(scoreMutation.data!.gemsEarned)}
+              disabled={bonus.status !== "idle"}
+              variant="secondary"
+              size="lg"
+              className="mb-4 font-mono [@media(max-height:520px)]:mb-2 [@media(max-height:520px)]:h-8 [@media(max-height:520px)]:text-xs"
+            >
+              <Video className="mr-2 h-5 w-5" />
+              {bonus.status === "watching" ? "WATCHING..." : bonus.status === "unavailable" ? "NO AD AVAILABLE" : `WATCH AD: +${scoreMutation.data.gemsEarned} BONUS GEMS`}
+            </Button>
+          )}
+          {bonus.status === "claimed" && <p className="mb-4 text-cyan-300 font-mono text-xs">BONUS +{bonus.gems} GEMS ADDED</p>}
           <div className="flex flex-wrap justify-center gap-3">
-            <Button onClick={startGame} size="lg" className="font-mono"><RotateCcw className="mr-2 h-5 w-5" /> PLAY AGAIN</Button>
-            <Button asChild variant="outline" size="lg" className="font-mono"><Link href="/hangar">HANGAR</Link></Button>
+            <Button onClick={startGame} size="lg" className={`font-mono ${isPortal ? "[@media(max-height:520px)]:h-8 [@media(max-height:520px)]:text-xs" : ""}`}><RotateCcw className="mr-2 h-5 w-5" /> PLAY AGAIN</Button>
+            <Button asChild variant="outline" size="lg" className={`font-mono ${isPortal ? "[@media(max-height:520px)]:h-8 [@media(max-height:520px)]:text-xs" : ""}`}><Link href="/hangar">HANGAR</Link></Button>
             {!isPortal && <Button asChild variant="outline" size="lg" className="font-mono"><Link href="/leaderboard"><Trophy className="mr-2 h-5 w-5" /> LEADERBOARD</Link></Button>}
           </div>
         </div>

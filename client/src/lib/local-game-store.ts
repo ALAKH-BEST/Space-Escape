@@ -79,6 +79,13 @@ export function equipShip(shipId: ShipId, storage: StorageLike = defaultStorage(
   return save({ ...current, equippedShip: shipId }, storage);
 }
 
+/** Adds gems directly (the rewarded-ad bonus). */
+export function addGems(amount: number, storage: StorageLike = defaultStorage()): LocalProgression {
+  const current = readProgression(storage);
+  const safeAmount = Number.isFinite(amount) ? Math.max(0, Math.floor(amount)) : 0;
+  return save({ ...current, gems: current.gems + safeAmount }, storage);
+}
+
 /** Banks a finished run: one gem for every 10 points, like the server. */
 export function recordRun(score: number, storage: StorageLike = defaultStorage()) {
   const current = readProgression(storage);
