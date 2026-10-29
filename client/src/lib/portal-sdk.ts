@@ -27,6 +27,7 @@ type PokiSdk = {
   gameplayStart: () => void;
   gameplayStop: () => void;
   commercialBreak: (onStart?: () => void) => Promise<void>;
+  rewardedBreak: (onStart?: () => void) => Promise<boolean>;
 };
 
 declare global {
@@ -119,4 +120,38 @@ export function showBreakAd(onStart: () => void, onEnd: () => void) {
       finish();
     }
   })();
+}
+
+/**
+ * Offers a rewarded ad the player chose to watch. Resolves true only if the ad was
+ * watched to the end (so the reward is earned); false on no ad, skip, error or no SDK.
+ * `onStart` pauses and mutes the game, `onEnd` restores it (once, in every case).
+ */
+export function showRewardedAd(onStart: () => void, onEnd: () => void): Promise<boolean> {
+  return new Promise((resolve) => {
+    let ended = false;
+    const finish = (earned: boolean) => {
+      if (!ended) {
+        ended = true;
+        onEnd();
+      }
+      resolve(earned);
+    };
+    void (async () => {
+      if (!(await initPortalSdk())) return finish(false);
+      try {
+        if (portalTarget === "crazygames") {
+          window.CrazyGames!.SDK!.ad.requestAd("rewarded", {
+            adStarted: onStart,
+            adFinished: () => finish(true),
+            adError: () => finish(false),
+          });
+        } else {
+          finish(Boolean(await window.PokiSDK!.rewardedBreak(onStart)));
+        }
+      } catch {
+        finish(false);
+      }
+    })();
+  });
 }

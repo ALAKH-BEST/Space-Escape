@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { equipShip, purchaseShip, readProgression, recordRun, type StorageLike } from "./local-game-store";
+import { addGems, equipShip, purchaseShip, readProgression, recordRun, type StorageLike } from "./local-game-store";
 
 function memoryStorage(initial?: string): StorageLike & { value: string | null } {
   const box = { value: initial ?? null as string | null };
@@ -63,4 +63,12 @@ test("corrupt or tampered saved data falls back safely", () => {
   assert.equal(readProgression(memoryStorage("not json")).gems, 0);
   const tampered = memoryStorage(JSON.stringify({ gems: -5, ownedShips: ["nova", "bogus"], equippedShip: "titan" }));
   assert.deepEqual(readProgression(tampered), { gems: 0, ownedShips: ["vanguard", "nova"], equippedShip: "vanguard" });
+});
+
+test("bonus gems are added and saved, and bad amounts add nothing", () => {
+  const storage = memoryStorage();
+  assert.equal(addGems(40, storage).gems, 40);
+  assert.equal(addGems(-5, storage).gems, 40);
+  assert.equal(addGems(Number.NaN, storage).gems, 40);
+  assert.equal(readProgression(storage).gems, 40);
 });

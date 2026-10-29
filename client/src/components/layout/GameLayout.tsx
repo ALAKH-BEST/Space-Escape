@@ -16,19 +16,20 @@ export function GameLayout({ children }: { children: ReactNode }) {
   const [location] = useLocation();
 
   return (
-    <div className="min-h-screen flex flex-col bg-cover bg-center bg-fixed">
+    // Portal builds fill the iframe exactly (no page scroll); the main area scrolls inside when a page is taller.
+    <div className={isPortal ? "h-[100dvh] overflow-hidden flex flex-col bg-cover bg-center" : "min-h-screen flex flex-col bg-cover bg-center bg-fixed"}>
       {/* Dynamic Background Overlay */}
       <div className="fixed inset-0 bg-background/90 z-0 pointer-events-none" />
 
       {/* Navigation */}
       <nav className="relative z-10 border-b border-white/10 backdrop-blur-md bg-black/20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
+          <div className={isPortal ? "flex items-center justify-between h-12 gap-2" : "flex items-center justify-between h-16"}>
               <div className="flex items-center gap-3">
               <div className="p-2 rounded-lg bg-gradient-to-br from-primary to-accent">
                 <Rocket className="h-6 w-6 text-white" />
               </div>
-              <span className="text-xl font-display font-bold tracking-wider text-white">
+              <span className={`text-xl font-display font-bold tracking-wider text-white ${isPortal ? "max-sm:hidden" : ""}`}>
                 ASTRO<span className="text-primary">DODGE</span>
               </span>
             </div>
@@ -56,7 +57,7 @@ export function GameLayout({ children }: { children: ReactNode }) {
 
                 <div className="flex items-center gap-3 pl-4 border-l border-white/10">
                   {location !== "/game" && <MusicToggle className="relative" popoverAlign="right" />}
-                   <ThemeSelector />
+                  <div className={isPortal ? "max-sm:hidden" : undefined}><ThemeSelector /></div>
                   <div className="hidden sm:flex items-center gap-1.5 text-sm font-mono text-cyan-300" title="Gem balance">
                     <Gem className="h-4 w-4" />
                     {(progression?.gems ?? user?.gems ?? 0).toLocaleString()}
@@ -84,10 +85,10 @@ export function GameLayout({ children }: { children: ReactNode }) {
       </nav>
 
       {/* Main Content */}
-      <main className="relative z-10 flex-1 container mx-auto px-4 py-8">
+      <main className={isPortal ? "relative z-10 flex-1 min-h-0 overflow-y-auto container mx-auto px-2 py-2" : "relative z-10 flex-1 container mx-auto px-4 py-8"}>
         {children}
       </main>
-      <PublicFooter />
+      {!isPortal && <PublicFooter />}
     </div>
   );
 }
