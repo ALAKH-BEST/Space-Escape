@@ -13,7 +13,7 @@ import { unlockAchievementAudio } from "@/lib/achievement-audio";
 import { playAbilitySound } from "@/lib/ability-sounds";
 import { setMusicMode, startMusic, stopMusic } from "@/lib/background-music";
 import { isPortal } from "@/lib/portal";
-import { gameplayStart, gameplayStop, showBreakAd, showRewardedAd } from "@/lib/portal-sdk";
+import { gameplayStart, gameplayStop, happytime, showBreakAd, showRewardedAd } from "@/lib/portal-sdk";
 import { addGems } from "@/lib/local-game-store";
 import { playCollisionSound } from "@/lib/collision-sound";
 import {
@@ -120,6 +120,7 @@ export function GameCanvas({
   const awardAchievement = useCallback((id: AchievementId) => {
     if (earnedAchievementsRef.current.has(id)) return;
     earnedAchievementsRef.current.add(id);
+    if (id !== "firstFlight") happytime();
     const sequence = ++notificationSequenceRef.current;
     setAchievementQueue((queue) => [...queue, { id, sequence }]);
   }, []);

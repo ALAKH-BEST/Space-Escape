@@ -21,7 +21,7 @@ import GoogleAnalytics from "@/components/GoogleAnalytics";
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
 import MultiplayerPage from "@/pages/MultiplayerPage";
 import { isPortal } from "@/lib/portal";
-import { initPortalSdk } from "@/lib/portal-sdk";
+import { initPortalSdk, loadingStop } from "@/lib/portal-sdk";
 
 function ProtectedRoute({ component: Component }: { component: React.ComponentType }) {
   const { data: user, isLoading } = useUser();
@@ -100,6 +100,9 @@ function AppMusic() {
 function App() {
   useEffect(() => {
     void initPortalSdk();
+    // The first screen is in place once the app has mounted and its fonts are ready (or a short wait passes).
+    const fontsReady = document.fonts?.ready ?? Promise.resolve();
+    void Promise.race([fontsReady, new Promise((resolve) => setTimeout(resolve, 3000))]).then(loadingStop);
   }, []);
 
   const content = (

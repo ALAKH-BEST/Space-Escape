@@ -367,11 +367,21 @@ function readVolumePreference() {
 }
 
 let muted = readMutedPreference();
+// Set by a host page (a game portal) that mutes the game; kept apart from the player's own saved choice.
+let externalMuted = false;
 let volume = readVolumePreference();
 const muteListeners = new Set<() => void>();
 
 export function isMusicMuted() {
-  return muted;
+  return muted || externalMuted;
+}
+
+/** Lets a host page mute and unmute the game without touching the player's saved mute setting. */
+export function setExternalMuted(next: boolean) {
+  if (next === externalMuted) return;
+  externalMuted = next;
+  muteListeners.forEach((listener) => listener());
+  sync();
 }
 
 export function subscribeMusicMuted(listener: () => void) {
@@ -401,7 +411,7 @@ export function getMusicVolumeGain() {
 
 /** Multiplier for sound effects: 0 when muted, otherwise the volume setting. */
 export function getAudioGain() {
-  return muted ? 0 : volumeToGain(volume);
+  return muted || externalMuted ? 0 : volumeToGain(volume);
 }
 
 export function setAudioVolume(nextVolume: number) {
@@ -637,7 +647,7 @@ export function getMusicMode() {
 
 function sync() {
   const pageHidden = typeof document !== "undefined" && document.hidden;
-  if (wantPlaying && !muted && volume > 0 && !pageHidden) {
+  if (wantPlaying && !muted && !externalMuted && volume > 0 && !pageHidden) {
     begin();
   } else {
     halt(wantPlaying ? QUICK_FADE_SECONDS : stopFadeSeconds);
