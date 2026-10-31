@@ -3,6 +3,7 @@
 // interrupts play.
 
 import { portalTarget } from "./portal";
+import { setExternalMuted } from "./background-music";
 
 type CrazyGamesSdk = {
   init: () => Promise<void>;
@@ -12,6 +13,9 @@ type CrazyGamesSdk = {
     gameplayStop: () => void;
     loadingStart?: () => void;
     loadingStop?: () => void;
+    happytime?: () => void;
+    settings?: { muteAudio?: boolean };
+    addSettingsChangeListener?: (listener: (settings: { muteAudio?: boolean }) => void) => void;
   };
   ad: {
     requestAd: (
@@ -51,7 +55,16 @@ export function initPortalSdk(): Promise<boolean> {
         if (!sdk) return false;
         await sdk.init();
         // Calls throw on any domain that is not CrazyGames or localhost.
-        return sdk.environment !== "disabled";
+        if (sdk.environment === "disabled") return false;
+        try {
+          sdk.game.loadingStart?.();
+          // Follow the portal's own mute setting (its mute button, or muting while an ad plays).
+          setExternalMuted(Boolean(sdk.game.settings?.muteAudio));
+          sdk.game.addSettingsChangeListener?.((settings) => setExternalMuted(Boolean(settings.muteAudio)));
+        } catch {
+          // Optional SDK features must never block the game.
+        }
+        return true;
       }
       const sdk = window.PokiSDK;
       if (!sdk) return false;
@@ -73,6 +86,20 @@ async function withSdk(action: () => void) {
   } catch {
     // SDK problems must never affect gameplay.
   }
+}
+
+/** The game finished loading and is ready to play (CrazyGames; Poki is told in init). */
+export function loadingStop() {
+  void withSdk(() => {
+    if (portalTarget === "crazygames") window.CrazyGames?.SDK?.game.loadingStop?.();
+  });
+}
+
+/** A celebratory moment (a reward earned). CrazyGames shows a small effect; Poki has no equivalent. */
+export function happytime() {
+  void withSdk(() => {
+    if (portalTarget === "crazygames") window.CrazyGames?.SDK?.game.happytime?.();
+  });
 }
 
 /** The player is actively playing (a run started). */

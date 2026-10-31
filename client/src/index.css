@@ -233,6 +233,21 @@
   }
 }
 
+/* Portal builds: show the touch pad on any touch device, including phones held sideways (wider than 767px). */
+@media (pointer: coarse) {
+  .mobile-game-frame.portal-fit-frame .game-mobile-dpad {
+    position: absolute;
+    right: max(0.75rem, env(safe-area-inset-right));
+    bottom: max(0.75rem, env(safe-area-inset-bottom));
+    z-index: 20;
+    display: grid;
+    grid-template-columns: repeat(3, 3.5rem);
+    grid-template-rows: repeat(2, 3.5rem);
+    gap: 0.5rem;
+    touch-action: none;
+  }
+}
+
 /* Portal builds on a phone held sideways: keep the game wide instead of the portrait 4:5 frame. */
 @media (max-width: 767px) and (pointer: coarse) and (orientation: landscape) {
   .mobile-game-frame.portal-fit-frame {
