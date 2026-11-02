@@ -69,6 +69,9 @@ const SECTOR_TRANSITION_MS = 1600;
 /** The sector (background, label) advances every this many points. */
 const SCORE_PER_SECTOR = 500;
 const RUN_HEARTBEAT_MS = 2000;
+/** Solo runs begin after a 3-2-1 countdown, one step every this many milliseconds. */
+const COUNTDOWN_STEP_MS = 650;
+const COUNTDOWN_FROM = 3;
 
 export function GameCanvas({
   multiplayer,
@@ -88,6 +91,8 @@ export function GameCanvas({
   const scoreMutation = useSubmitScore();
   const queryClient = useQueryClient();
   // Portal builds only: "watch an ad to double this run's gems".
+  const [countdown, setCountdown] = useState<number | null>(null);
+  const countdownTimerRef = useRef<number | null>(null);
   const [bonus, setBonus] = useState<{ status: "idle" | "watching" | "claimed" | "unavailable"; gems: number }>({ status: "idle", gems: 0 });
   const startRunMutation = useStartRun();
   const { data: progression, isLoading: isProgressionLoading } = useProgression();
@@ -314,6 +319,31 @@ export function GameCanvas({
     playAbilitySound(ship.id === "phantom" ? "phase" : "overdrive");
   };
 
+  useEffect(() => () => {
+    if (countdownTimerRef.current !== null) window.clearInterval(countdownTimerRef.current);
+  }, []);
+
+  // Solo runs start after a short 3-2-1 so the pilot is ready; multiplayer starts together, so it skips this.
+  const startWithCountdown = () => {
+    if (countdownTimerRef.current !== null || startingRunRef.current || gameStateRef.current.isPlaying) return;
+    unlockAchievementAudio();
+    let step = COUNTDOWN_FROM;
+    setCountdown(step);
+    countdownTimerRef.current = window.setInterval(() => {
+      step -= 1;
+      if (step > 0) {
+        setCountdown(step);
+        return;
+      }
+      window.clearInterval(countdownTimerRef.current ?? undefined);
+      countdownTimerRef.current = null;
+      setCountdown(null);
+      void startGame().catch(() => {
+        // useStartRun reports authorization failures to the pilot.
+      });
+    }, COUNTDOWN_STEP_MS);
+  };
+
   const startGame = async () => {
     const canvas = canvasRef.current;
     if (!canvas || startingRunRef.current || gameStateRef.current.isPlaying) return;
@@ -382,9 +412,7 @@ export function GameCanvas({
     ) return;
 
     autoStartAttemptedRef.current = true;
-    void startGame().catch(() => {
-      // useStartRun reports authorization failures to the pilot.
-    });
+    startWithCountdown();
   }, [autoStart, isProgressionLoading, progression?.equippedShip]);
 
   const claimBonus = async (gemsEarned: number) => {
@@ -671,17 +699,35 @@ export function GameCanvas({
         </button>
       )}
 
-       {!gameState.isPlaying && !gameState.gameOver && !multiplayer && (
+      {countdown !== null && (
+        <div className="absolute inset-0 z-30 flex flex-col items-center justify-center bg-black/70 backdrop-blur-sm" role="status" aria-live="assertive">
+          <div className="mb-2 font-mono text-xs tracking-[0.3em] text-white/60">LAUNCH IN</div>
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={countdown}
+              initial={{ opacity: 0, scale: 1.6 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.7 }}
+              transition={{ duration: 0.25, ease: "easeOut" }}
+              className="font-display text-8xl font-bold text-white neon-text"
+            >
+              {countdown}
+            </motion.div>
+          </AnimatePresence>
+        </div>
+      )}
+
+       {!gameState.isPlaying && !gameState.gameOver && !multiplayer && countdown === null && (
         <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/60 backdrop-blur-sm">
           <h2 className="text-4xl font-display font-bold text-white mb-6 animate-pulse">READY COMMANDER?</h2>
-          <Button onClick={startGame} disabled={startRunMutation.isPending} size="lg" className="text-xl px-12 py-8 rounded-full bg-gradient-to-r from-primary to-accent hover:scale-105 transition-transform shadow-lg shadow-primary/40">
+          <Button onClick={startWithCountdown} disabled={startRunMutation.isPending} size="lg" className="text-xl px-12 py-8 rounded-full bg-gradient-to-r from-primary to-accent hover:scale-105 transition-transform shadow-lg shadow-primary/40">
             <Play className="mr-3 h-8 w-8" /> {startRunMutation.isPending ? "AUTHORIZING..." : "LAUNCH MISSION"}
           </Button>
           <div className="mt-8 text-muted-foreground font-mono text-sm">CONTROLS: ARROW KEYS OR WASD · ABILITY: SPACE</div>
         </div>
       )}
 
-      {gameState.gameOver && (
+      {gameState.gameOver && countdown === null && (
         <div className={`absolute inset-0 flex flex-col items-center justify-center bg-black/85 backdrop-blur-md p-4 ${isPortal ? "[@media(max-height:520px)]:p-2" : ""}`}>
           <h2 className={`text-4xl sm:text-5xl font-display font-bold text-destructive mb-5 neon-text ${isPortal ? "[@media(max-height:520px)]:text-2xl [@media(max-height:520px)]:mb-2" : ""}`}>MISSION TERMINATED</h2>
           <div className={`grid grid-cols-2 gap-x-8 gap-y-3 text-sm font-mono w-full max-w-md mb-6 ${isPortal ? "[@media(max-height:520px)]:grid-cols-4 [@media(max-height:520px)]:max-w-xl [@media(max-height:520px)]:gap-x-4 [@media(max-height:520px)]:gap-y-1 [@media(max-height:520px)]:mb-2" : ""}`}>
@@ -709,7 +755,7 @@ export function GameCanvas({
           )}
           {bonus.status === "claimed" && <p className="mb-4 text-cyan-300 font-mono text-xs">BONUS +{bonus.gems} GEMS ADDED</p>}
           <div className="flex flex-wrap justify-center gap-3">
-            <Button onClick={startGame} size="lg" className={`font-mono ${isPortal ? "[@media(max-height:520px)]:h-8 [@media(max-height:520px)]:text-xs" : ""}`}><RotateCcw className="mr-2 h-5 w-5" /> PLAY AGAIN</Button>
+            <Button onClick={startWithCountdown} size="lg" className={`font-mono ${isPortal ? "[@media(max-height:520px)]:h-8 [@media(max-height:520px)]:text-xs" : ""}`}><RotateCcw className="mr-2 h-5 w-5" /> PLAY AGAIN</Button>
             <Button asChild variant="outline" size="lg" className={`font-mono ${isPortal ? "[@media(max-height:520px)]:h-8 [@media(max-height:520px)]:text-xs" : ""}`}><Link href="/hangar">HANGAR</Link></Button>
             {!isPortal && <Button asChild variant="outline" size="lg" className="font-mono"><Link href="/leaderboard"><Trophy className="mr-2 h-5 w-5" /> LEADERBOARD</Link></Button>}
           </div>
