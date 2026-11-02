@@ -66,6 +66,8 @@ const PLAYER_SIZE = 30;
 const OBSTACLE_SPEED = 3.5;
 const SPAWN_RATE = 1500;
 const SECTOR_TRANSITION_MS = 1600;
+/** The sector (background, label) advances every this many points. */
+const SCORE_PER_SECTOR = 500;
 const RUN_HEARTBEAT_MS = 2000;
 
 export function GameCanvas({
@@ -424,7 +426,7 @@ export function GameCanvas({
       score: finalScore,
       gameOver: true,
       survivalTime,
-      sector: startingSectorNumber + Math.floor(finalScore / 100),
+      sector: startingSectorNumber + Math.floor(finalScore / SCORE_PER_SECTOR),
     });
     gameplayStop();
     if (isPortal) {
@@ -448,7 +450,7 @@ export function GameCanvas({
             setGameState((previous) => ({
               ...previous,
               score: result.score.score,
-              sector: startingSectorNumber + Math.floor(result.score.score / 100),
+              sector: startingSectorNumber + Math.floor(result.score.score / SCORE_PER_SECTOR),
             }));
           },
         },
@@ -463,7 +465,7 @@ export function GameCanvas({
     const ship = ships[shipRef.current];
     if (!canvas || !ctx || !state.isPlaying) return;
 
-    const activeSector = startingSectorNumber + Math.floor(state.score / 100);
+    const activeSector = startingSectorNumber + Math.floor(state.score / SCORE_PER_SECTOR);
     if (activeSector !== backgroundSectorRef.current) {
       sectorTransitionRef.current = {
         from: backgroundSectorRef.current,
@@ -623,7 +625,7 @@ export function GameCanvas({
   };
 
   const currentShip = ships[shipRef.current];
-  const displayedSector = startingSectorNumber + Math.floor(gameState.score / 100);
+  const displayedSector = startingSectorNumber + Math.floor(gameState.score / SCORE_PER_SECTOR);
   const currentEnvironment = getSectorEnvironmentByNumber(displayedSector);
 
   return (
