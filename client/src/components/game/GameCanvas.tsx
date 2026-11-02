@@ -17,6 +17,15 @@ import { gameplayStart, gameplayStop, happytime, showBreakAd, showRewardedAd } f
 import { addGems } from "@/lib/local-game-store";
 import { playCollisionSound } from "@/lib/collision-sound";
 import {
+  DEATH_EFFECT_MS,
+  drawParticles,
+  effectsActive,
+  emitBurst,
+  emitTrail,
+  stepParticles,
+  type Particle,
+} from "@/lib/game-effects";
+import {
   FIRST_FLIGHT_STORAGE_KEY,
   isLastPilotStanding,
   isNearMiss,
@@ -87,6 +96,9 @@ export function GameCanvas({
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const requestRef = useRef<number>();
+  const particlesRef = useRef<Particle[]>([]);
+  const deathEffectRef = useRef<number | null>(null);
+  const [scorePop, setScorePop] = useState(0);
   const shipRef = useRef<ShipId>("vanguard");
   const scoreMutation = useSubmitScore();
   const queryClient = useQueryClient();
@@ -344,11 +356,69 @@ export function GameCanvas({
     }, COUNTDOWN_STEP_MS);
   };
 
+  const cancelDeathEffect = () => {
+    if (deathEffectRef.current !== null) cancelAnimationFrame(deathEffectRef.current);
+    deathEffectRef.current = null;
+    particlesRef.current.length = 0;
+  };
+
+  useEffect(() => () => {
+    if (deathEffectRef.current !== null) cancelAnimationFrame(deathEffectRef.current);
+  }, []);
+
+  // A short crash animation: the field slows down, sparks fly, the screen flashes and shakes.
+  const runDeathEffect = (hitX: number, hitY: number, color: string) => {
+    const canvas = canvasRef.current;
+    const ctx = canvas?.getContext("2d");
+    if (!canvas || !ctx) return;
+    const state = gameStateRef.current;
+    const particles = particlesRef.current;
+    emitBurst(particles, hitX, hitY, color, 36);
+    emitBurst(particles, hitX, hitY, "#ffffff", 14);
+    const sector = backgroundSectorRef.current;
+    const startedAt = performance.now();
+    const frame = (timestamp: number) => {
+      const progress = Math.min(1, (timestamp - startedAt) / DEATH_EFFECT_MS);
+      ctx.fillStyle = "#02040a";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.save();
+      const shake = (1 - progress) * 9;
+      ctx.translate((Math.random() - 0.5) * 2 * shake, (Math.random() - 0.5) * 2 * shake);
+      drawSectorEnvironment(ctx, canvas.width, canvas.height, sector, timestamp);
+      ctx.fillStyle = "rgba(255, 255, 255, 0.6)";
+      state.stars.forEach((star) => {
+        star.x -= star.speed * 0.2;
+        if (star.x < 0) star.x = canvas.width;
+        ctx.beginPath();
+        ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
+        ctx.fill();
+      });
+      state.obstacles.forEach((obstacle) => {
+        obstacle.x -= obstacle.speed * 0.2;
+        drawObstacle(ctx, obstacle);
+      });
+      stepParticles(particles, 0.6);
+      drawParticles(ctx, particles);
+      ctx.restore();
+      const flash = (1 - progress) * (1 - progress) * 0.55;
+      ctx.fillStyle = `rgba(255, 255, 255, ${flash})`;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      if (progress < 1) {
+        deathEffectRef.current = requestAnimationFrame(frame);
+      } else {
+        deathEffectRef.current = null;
+        particles.length = 0;
+      }
+    };
+    deathEffectRef.current = requestAnimationFrame(frame);
+  };
+
   const startGame = async () => {
     const canvas = canvasRef.current;
     if (!canvas || startingRunRef.current || gameStateRef.current.isPlaying) return;
     unlockAchievementAudio();
     startingRunRef.current = true;
+    cancelDeathEffect();
     scoreMutation.reset();
     setBonus({ status: "idle", gems: 0 });
     try {
@@ -460,15 +530,18 @@ export function GameCanvas({
     if (isPortal) {
       // Portals pay for ads shown at natural pauses: the moment a run ends is one.
       let paused = false;
-      showBreakAd(
-        () => {
-          paused = true;
-          stopMusic(0.2);
-        },
-        () => {
-          if (paused) startMusic();
-        },
-      );
+      // Let the crash animation finish before the ad takes over the screen.
+      window.setTimeout(() => {
+        showBreakAd(
+          () => {
+            paused = true;
+            stopMusic(0.2);
+          },
+          () => {
+            if (paused) startMusic();
+          },
+        );
+      }, effectsActive() ? DEATH_EFFECT_MS : 0);
     }
     if (state.runId && state.runToken) {
       scoreMutation.mutate(
@@ -582,9 +655,11 @@ export function GameCanvas({
           state.obstacles.splice(index, 1);
           setAbilityUi({ label: "FORTRESS", status: `${state.shieldCharges} SHIELDS`, active: state.shieldCharges > 0 });
           playCollisionSound("shield");
+          if (effectsActive()) emitBurst(particlesRef.current, obstacle.x, obstacle.y, "#fbbf24", 16);
           continue;
         }
         playCollisionSound("explosion");
+        if (effectsActive()) runDeathEffect(state.player.x, state.player.y, ship.color);
         stopGame();
         return;
       }
@@ -592,6 +667,7 @@ export function GameCanvas({
       if (obstacle.x < -100) {
         state.obstacles.splice(index, 1);
         state.score += 10 * (ship.id === "nova" && abilityActive ? 2 : 1);
+        if (effectsActive()) setScorePop((count) => count + 1);
       }
     }
 
@@ -647,6 +723,9 @@ export function GameCanvas({
       }
     }
 
+    if (effectsActive()) emitTrail(particlesRef.current, state.player.x, state.player.y, ship.color);
+    stepParticles(particlesRef.current);
+    drawParticles(ctx, particlesRef.current);
     drawPlayer(ctx, state.player.x, state.player.y, ship, abilityActive);
     setGameState((previous) => ({ ...previous, score: state.score }));
     requestRef.current = requestAnimationFrame(gameLoop);
@@ -666,7 +745,12 @@ export function GameCanvas({
         onDismiss={dismissAchievement}
       />
       <div className="absolute top-4 right-4 text-right font-mono text-white">
-        <div className="text-2xl font-bold neon-text">SCORE: {Math.floor(gameState.score)}</div>
+        <div className="text-2xl font-bold neon-text">
+          SCORE:{" "}
+          <motion.span key={scorePop} initial={scorePop > 0 ? { scale: 1.22 } : false} animate={{ scale: 1 }} transition={{ duration: 0.18, ease: "easeOut" }} className="inline-block origin-right">
+            {Math.floor(gameState.score)}
+          </motion.span>
+        </div>
         {gameState.isPlaying && (
           <>
             <div className="text-[10px] text-muted-foreground tracking-widest">{currentShip.name}</div>
@@ -728,7 +812,12 @@ export function GameCanvas({
       )}
 
       {gameState.gameOver && countdown === null && (
-        <div className={`absolute inset-0 flex flex-col items-center justify-center bg-black/85 backdrop-blur-md p-4 ${isPortal ? "[@media(max-height:520px)]:p-2" : ""}`}>
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={effectsActive() ? { delay: DEATH_EFFECT_MS / 1000 - 0.1, duration: 0.35 } : { duration: 0 }}
+          className={`absolute inset-0 flex flex-col items-center justify-center bg-black/85 backdrop-blur-md p-4 ${isPortal ? "[@media(max-height:520px)]:p-2" : ""}`}
+        >
           <h2 className={`text-4xl sm:text-5xl font-display font-bold text-destructive mb-5 neon-text ${isPortal ? "[@media(max-height:520px)]:text-2xl [@media(max-height:520px)]:mb-2" : ""}`}>MISSION TERMINATED</h2>
           <div className={`grid grid-cols-2 gap-x-8 gap-y-3 text-sm font-mono w-full max-w-md mb-6 ${isPortal ? "[@media(max-height:520px)]:grid-cols-4 [@media(max-height:520px)]:max-w-xl [@media(max-height:520px)]:gap-x-4 [@media(max-height:520px)]:gap-y-1 [@media(max-height:520px)]:mb-2" : ""}`}>
             <Result label="FINAL SCORE" value={gameState.score.toLocaleString()} />
@@ -759,7 +848,7 @@ export function GameCanvas({
             <Button asChild variant="outline" size="lg" className={`font-mono ${isPortal ? "[@media(max-height:520px)]:h-8 [@media(max-height:520px)]:text-xs" : ""}`}><Link href="/hangar">HANGAR</Link></Button>
             {!isPortal && <Button asChild variant="outline" size="lg" className="font-mono"><Link href="/leaderboard"><Trophy className="mr-2 h-5 w-5" /> LEADERBOARD</Link></Button>}
           </div>
-        </div>
+        </motion.div>
       )}
     </div>
   );

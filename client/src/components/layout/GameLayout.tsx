@@ -7,6 +7,7 @@ import { Gem, Rocket, LogOut } from "lucide-react";
 import { PublicFooter } from "@/components/layout/PublicFooter";
 import { ThemeSelector } from "@/components/theme/ThemeSelector";
 import { MusicToggle } from "@/components/game/MusicToggle";
+import { SettingsMenu } from "@/components/layout/SettingsMenu";
 import { isPortal } from "@/lib/portal";
 
 export function GameLayout({ children }: { children: ReactNode }) {
@@ -58,6 +59,7 @@ export function GameLayout({ children }: { children: ReactNode }) {
                 <div className="flex items-center gap-3 pl-4 border-l border-white/10">
                   {location !== "/game" && <MusicToggle className="relative" popoverAlign="right" />}
                   <div className={isPortal ? "max-sm:hidden" : undefined}><ThemeSelector /></div>
+                  <SettingsMenu />
                   <div className="hidden sm:flex items-center gap-1.5 text-sm font-mono text-cyan-300" title="Gem balance">
                     <Gem className="h-4 w-4" />
                     {(progression?.gems ?? user?.gems ?? 0).toLocaleString()}

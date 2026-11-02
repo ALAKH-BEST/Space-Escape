@@ -12,7 +12,7 @@
     "test": "npm run test:multiplayer && npm run test:run-authority && npm run test:achievements && npm run test:portal",
     "test:multiplayer": "tsx --test server/multiplayer.test.ts",
     "test:run-authority": "tsx --test server/run-authority.test.ts",
-    "test:achievements": "tsx --test client/src/lib/game-achievements.test.ts",
+    "test:achievements": "tsx --test client/src/lib/game-achievements.test.ts client/src/lib/game-effects.test.ts",
     "test:portal": "tsx --test client/src/lib/local-game-store.test.ts",
     "start": "NODE_ENV=production node dist/index.cjs",
     "check": "tsc",
