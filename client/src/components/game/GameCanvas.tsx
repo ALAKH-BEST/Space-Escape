@@ -40,6 +40,7 @@ import {
   type SectorEnvironment,
 } from "@/lib/sector-environments";
 import { ships, type ShipId } from "@shared/ships";
+import { scoreForPlayTime } from "@shared/scoring";
 import { Button } from "@/components/ui/button";
 import type { MultiplayerRoom } from "@/hooks/use-multiplayer";
 
@@ -99,7 +100,6 @@ export function GameCanvas({
   const requestRef = useRef<number>();
   const particlesRef = useRef<Particle[]>([]);
   const deathEffectRef = useRef<number | null>(null);
-  const [scorePop, setScorePop] = useState(0);
   const shipRef = useRef<ShipId>("vanguard");
   const scoreMutation = useSubmitScore();
   // This run against the saved best, set once the run's final score is known. Solo runs only.
@@ -156,7 +156,11 @@ export function GameCanvas({
     stars: [] as { x: number; y: number; size: number; speed: number }[],
     keys: { ArrowUp: false, ArrowDown: false, ArrowLeft: false, ArrowRight: false, w: false, s: false, a: false, d: false },
     lastSpawn: 0,
+    // Internal pacing measure: drives obstacle speed and spawn rate only.
     score: 0,
+    // Milliseconds actually played. The score on screen and on the results screen comes from this.
+    playMs: 0,
+    lastFrameAt: 0,
     isPlaying: false,
     startedAt: 0,
     runId: "",
@@ -259,7 +263,7 @@ export function GameCanvas({
       const elapsedSeconds = Math.max(0, (now - state.startedAt) / 1000);
       if (elapsedSeconds >= 30) awardAchievement("longHaul");
       if (elapsedSeconds >= 100) awardAchievement("centuryClub");
-      if (state.score >= 400) awardAchievement("deepSpaceVoyager");
+      if (scoreForPlayTime(state.playMs) >= 400) awardAchievement("deepSpaceVoyager");
 
       const activeMultiplayer = multiplayerRef.current;
       if (activeMultiplayer?.room.phase === "running") {
@@ -440,6 +444,8 @@ export function GameCanvas({
         player: { x: 50, y: canvas.height / 2 },
         obstacles: [],
         score: 0,
+        playMs: 0,
+        lastFrameAt: 0,
         isPlaying: true,
         lastSpawn: now,
         startedAt: now,
@@ -516,7 +522,7 @@ export function GameCanvas({
     if (!state.isPlaying) return;
     if (requestRef.current) cancelAnimationFrame(requestRef.current);
     state.isPlaying = false;
-    const finalScore = Math.floor(state.score);
+    const finalScore = scoreForPlayTime(state.playMs);
     const survivalTime = Math.max(0, (performance.now() - state.startedAt) / 1000);
     const activeMultiplayer = multiplayerRef.current;
     const canvas = canvasRef.current;
@@ -549,7 +555,7 @@ export function GameCanvas({
     }
     if (state.runId && state.runToken) {
       scoreMutation.mutate(
-        { runId: state.runId, runToken: state.runToken, score: finalScore },
+        { runId: state.runId, runToken: state.runToken, score: finalScore, playMs: state.playMs },
         {
           onSuccess: (result) => {
             setGameState((previous) => ({
@@ -574,7 +580,11 @@ export function GameCanvas({
     const ship = ships[shipRef.current];
     if (!canvas || !ctx || !state.isPlaying) return;
 
-    const activeSector = startingSectorNumber + Math.floor(state.score / SCORE_PER_SECTOR);
+    // Frames can be far apart (a throttled tab); never credit more than a quarter second for one.
+    if (state.lastFrameAt) state.playMs += Math.min(250, Math.max(0, timestamp - state.lastFrameAt));
+    state.lastFrameAt = timestamp;
+    const liveScore = scoreForPlayTime(state.playMs);
+    const activeSector = startingSectorNumber + Math.floor(liveScore / SCORE_PER_SECTOR);
     if (activeSector !== backgroundSectorRef.current) {
       sectorTransitionRef.current = {
         from: backgroundSectorRef.current,
@@ -675,7 +685,6 @@ export function GameCanvas({
       if (obstacle.x < -100) {
         state.obstacles.splice(index, 1);
         state.score += 10 * (ship.id === "nova" && abilityActive ? 2 : 1);
-        if (effectsActive()) setScorePop((count) => count + 1);
       }
     }
 
@@ -735,7 +744,7 @@ export function GameCanvas({
     stepParticles(particlesRef.current);
     drawParticles(ctx, particlesRef.current);
     drawPlayer(ctx, state.player.x, state.player.y, ship, abilityActive);
-    setGameState((previous) => ({ ...previous, score: state.score }));
+    setGameState((previous) => (previous.score === liveScore ? previous : { ...previous, score: liveScore }));
     requestRef.current = requestAnimationFrame(gameLoop);
   };
 
@@ -755,9 +764,7 @@ export function GameCanvas({
       <div className="absolute top-4 right-4 text-right font-mono text-white">
         <div className="text-2xl font-bold neon-text">
           SCORE:{" "}
-          <motion.span key={scorePop} initial={scorePop > 0 ? { scale: 1.22 } : false} animate={{ scale: 1 }} transition={{ duration: 0.18, ease: "easeOut" }} className="inline-block origin-right">
-            {Math.floor(gameState.score)}
-          </motion.span>
+          {Math.floor(gameState.score)}
         </div>
         {gameState.isPlaying && (
           <>

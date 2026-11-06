@@ -6,7 +6,7 @@ import { api } from "@shared/routes";
 import { z } from "zod";
 import { isShipId } from "@shared/ships";
 import {
-  calculateRunScore,
+  calculateReportedScore,
   issueRun,
   legacyRunTokensAllowed,
   refreshRun,
@@ -35,7 +35,7 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
       const result = await storage.createScore({
         userId: req.user!.id,
         runId: claims.runId,
-        score: calculateRunScore(claims),
+        score: calculateReportedScore(claims, input.playMs),
       });
 
       res.status(201).json(result);

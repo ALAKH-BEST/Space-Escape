@@ -59,6 +59,8 @@ export const api = {
       input: z.object({
         runId: z.string().uuid(),
         runToken: z.string().min(1),
+        // How long the game was actually played, in milliseconds. Optional so older clients still work.
+        playMs: z.number().finite().min(0).optional(),
       }).strict(),
       responses: {
         201: z.object({
