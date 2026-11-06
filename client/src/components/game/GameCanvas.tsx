@@ -15,6 +15,7 @@ import { setMusicMode, startMusic, stopMusic } from "@/lib/background-music";
 import { isPortal } from "@/lib/portal";
 import { gameplayStart, gameplayStop, happytime, showBreakAd, showRewardedAd } from "@/lib/portal-sdk";
 import { addGems } from "@/lib/local-game-store";
+import { recordPersonalBest, type PersonalBestResult } from "@/lib/personal-best";
 import { playCollisionSound } from "@/lib/collision-sound";
 import {
   DEATH_EFFECT_MS,
@@ -101,6 +102,8 @@ export function GameCanvas({
   const [scorePop, setScorePop] = useState(0);
   const shipRef = useRef<ShipId>("vanguard");
   const scoreMutation = useSubmitScore();
+  // This run against the saved best, set once the run's final score is known. Solo runs only.
+  const [personalBest, setPersonalBest] = useState<PersonalBestResult | null>(null);
   const queryClient = useQueryClient();
   // Portal builds only: "watch an ad to double this run's gems".
   const [countdown, setCountdown] = useState<number | null>(null);
@@ -466,6 +469,7 @@ export function GameCanvas({
         active: equippedShip === "titan",
       });
       if (equippedShip === "titan") playAbilitySound("fortress");
+      setPersonalBest(null);
       setGameState({ isPlaying: true, score: 0, gameOver: false, survivalTime: 0, sector: startingSectorNumber });
       requestRef.current = requestAnimationFrame(gameLoop);
     } finally {
@@ -553,9 +557,13 @@ export function GameCanvas({
               score: result.score.score,
               sector: startingSectorNumber + Math.floor(result.score.score / SCORE_PER_SECTOR),
             }));
+            // The score the server accepted is the one that counts as a best.
+            if (!activeMultiplayer) setPersonalBest(recordPersonalBest(result.score.score));
           },
         },
       );
+    } else if (!activeMultiplayer) {
+      setPersonalBest(recordPersonalBest(finalScore));
     }
   };
 
@@ -819,11 +827,30 @@ export function GameCanvas({
           className={`absolute inset-0 flex flex-col items-center justify-center bg-black/85 backdrop-blur-md p-4 ${isPortal ? "[@media(max-height:520px)]:p-2" : ""}`}
         >
           <h2 className={`text-4xl sm:text-5xl font-display font-bold text-destructive mb-5 neon-text ${isPortal ? "[@media(max-height:520px)]:text-2xl [@media(max-height:520px)]:mb-2" : ""}`}>MISSION TERMINATED</h2>
+          {personalBest?.isNewBest && (
+            <motion.div
+              initial={effectsActive() ? { opacity: 0, scale: 0.8 } : false}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ type: "spring", stiffness: 260, damping: 18 }}
+              className={`mb-4 flex items-center gap-2 rounded-full border border-yellow-300/60 bg-yellow-300/10 px-4 py-1.5 font-display text-sm font-bold tracking-widest text-yellow-300 ${isPortal ? "[@media(max-height:520px)]:mb-1 [@media(max-height:520px)]:py-0.5 [@media(max-height:520px)]:text-xs" : ""}`}
+            >
+              <Trophy className="h-4 w-4" /> NEW PERSONAL BEST
+            </motion.div>
+          )}
           <div className={`grid grid-cols-2 gap-x-8 gap-y-3 text-sm font-mono w-full max-w-md mb-6 ${isPortal ? "[@media(max-height:520px)]:grid-cols-4 [@media(max-height:520px)]:max-w-xl [@media(max-height:520px)]:gap-x-4 [@media(max-height:520px)]:gap-y-1 [@media(max-height:520px)]:mb-2" : ""}`}>
             <Result label="FINAL SCORE" value={gameState.score.toLocaleString()} />
             <Result label="SECTOR REACHED" value={gameState.sector.toString().padStart(2, "0")} />
             <Result label="SURVIVAL TIME" value={`${gameState.survivalTime.toFixed(1)}s`} />
             <Result label="GEMS EARNED" value={scoreMutation.data ? `+${scoreMutation.data.gemsEarned}` : "..."} accent />
+            {!multiplayer && (
+              <div className={`col-span-2 border-t border-white/10 pt-3 ${isPortal ? "[@media(max-height:520px)]:col-span-4 [@media(max-height:520px)]:pt-1" : ""}`}>
+                <div className="flex justify-between text-yellow-300">
+                  <span>PERSONAL BEST</span>
+                  <span className="text-white">{personalBest ? personalBest.best.toLocaleString() : "..."}</span>
+                </div>
+                {personalBest && <p className="mt-1 text-[11px] tracking-wide text-muted-foreground">{bestNote(personalBest, gameState.score)}</p>}
+              </div>
+            )}
             <div className={`col-span-2 border-t border-white/10 pt-3 flex justify-between text-cyan-300 ${isPortal ? "[@media(max-height:520px)]:col-span-4 [@media(max-height:520px)]:pt-1" : ""}`}>
               <span>TOTAL GEMS</span>
               <span className="flex items-center gap-1.5 text-white"><Gem className="h-4 w-4" />{scoreMutation.data ? scoreMutation.data.totalGems + bonus.gems : "..."}</span>
@@ -866,6 +893,17 @@ function readFirstFlightFlag() {
 function nextRandom(state: { rngSeed: number }) {
   state.rngSeed = (state.rngSeed * 1664525 + 1013904223) >>> 0;
   return state.rngSeed / 4_294_967_296;
+}
+
+/** One line under the best score: how this run compares with it. */
+function bestNote(result: PersonalBestResult, score: number) {
+  if (result.isNewBest) {
+    return result.previous === null
+      ? "FIRST RECORDED SCORE. THIS IS THE ONE TO BEAT."
+      : `BEAT YOUR PREVIOUS BEST BY ${(result.best - result.previous).toLocaleString()}`;
+  }
+  if (score >= result.best) return "MATCHED YOUR BEST";
+  return `${(result.best - score).toLocaleString()} TO BEAT YOUR BEST`;
 }
 
 function Result({ label, value, accent = false }: { label: string; value: string; accent?: boolean }) {
