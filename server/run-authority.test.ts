@@ -246,3 +246,34 @@ test("end to end: heartbeats require a signed-in pilot and a valid token", async
   assert.equal((await call("/api/runs/heartbeat", { runId: "nope", runToken: run.runToken })).status, 400);
   assert.equal((await call("/api/runs/heartbeat", { runId: run.runId, runToken: run.runToken })).status, 200);
 });
+
+// ---------------------------------------------------------------------------
+// Reported play time: the recorded score matches the one shown during the run.
+// ---------------------------------------------------------------------------
+
+import { calculateReportedScore } from "./run-authority";
+import { scoreForPlayTime } from "../shared/scoring";
+
+test("scoreForPlayTime is 12 points per second, floored and capped", () => {
+  assert.equal(scoreForPlayTime(0), 0);
+  assert.equal(scoreForPlayTime(999), 11);
+  assert.equal(scoreForPlayTime(6_000), 72);
+  assert.equal(scoreForPlayTime(10 * 60 * 60 * 1_000), MAX_AUTHORITATIVE_SCORE);
+  assert.equal(scoreForPlayTime(Number.NaN), 0);
+  assert.equal(scoreForPlayTime(-5), 0);
+});
+
+test("an honest reported play time is recorded exactly as shown", () => {
+  const run = issueRun(7, "solo");
+  const claims = verifyRun(run.runId, run.runToken, 7, run.startedAt + 6_100);
+  const submittedAt = claims.startedAt + 6_100;
+  // Server credited 6.1s (73 points); the game showed 6.0s (72 points).
+  assert.equal(calculateReportedScore(claims, 6_000, submittedAt), 72);
+  assert.equal(calculateReportedScore(claims, undefined, submittedAt), 73);
+});
+
+test("a client cannot report more play than the server credited", () => {
+  const run = issueRun(7, "solo");
+  const claims = verifyRun(run.runId, run.runToken, 7, run.startedAt + 6_000);
+  assert.equal(calculateReportedScore(claims, 600_000, claims.startedAt + 6_000), 72);
+});

@@ -1,8 +1,10 @@
 import { createHmac, randomUUID, timingSafeEqual } from "node:crypto";
 
-export const SERVER_SCORE_RATE = 12;
-export const MAX_RUN_SECONDS = 15 * 60;
-export const MAX_AUTHORITATIVE_SCORE = SERVER_SCORE_RATE * MAX_RUN_SECONDS;
+import { MAX_RUN_SECONDS, MAX_SCORE, SCORE_PER_SECOND, scoreForPlayTime } from "@shared/scoring";
+
+export { MAX_RUN_SECONDS };
+export const SERVER_SCORE_RATE = SCORE_PER_SECOND;
+export const MAX_AUTHORITATIVE_SCORE = MAX_SCORE;
 
 /**
  * A running game checks in with the server every couple of seconds (only while
@@ -158,8 +160,7 @@ export function refreshRun(runId: string, runToken: string, userId: number, now 
 }
 
 export function calculateAuthoritativeScore(startedAt: number, endedAt = Date.now()) {
-  const elapsedSeconds = Math.max(0, Math.min(MAX_RUN_SECONDS, (endedAt - startedAt) / 1000));
-  return Math.min(MAX_AUTHORITATIVE_SCORE, Math.floor(elapsedSeconds * SERVER_SCORE_RATE));
+  return scoreForPlayTime(endedAt - startedAt);
 }
 
 /** The score for a finished run, given its verified token and the submission time. */
@@ -171,4 +172,16 @@ export function calculateRunScore(claims: RunClaims, now = Date.now()) {
   const finalGap = Math.max(0, now - claims.lastBeatAt);
   const activeMs = claims.activeMs + Math.min(finalGap, MAX_HEARTBEAT_GAP_MS);
   return calculateAuthoritativeScore(claims.startedAt, claims.startedAt + activeMs);
+}
+
+/**
+ * The score recorded for a run. The game reports how long it actually played
+ * and shows that run's score live, so an honest run is recorded exactly as
+ * shown. The server's own credited time stays the ceiling: a client can claim
+ * less than it was credited, never more.
+ */
+export function calculateReportedScore(claims: RunClaims, reportedPlayMs: number | undefined, now = Date.now()) {
+  const credited = calculateRunScore(claims, now);
+  if (reportedPlayMs === undefined) return credited;
+  return Math.min(credited, scoreForPlayTime(reportedPlayMs));
 }

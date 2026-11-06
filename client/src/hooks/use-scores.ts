@@ -25,7 +25,7 @@ export function useSubmitScore() {
 
   return useMutation({
     // `score` is only used by portal builds, which have no server to calculate it.
-    mutationFn: async (data: { runId: string; runToken: string; score?: number }): Promise<ScoreResult> => {
+    mutationFn: async (data: { runId: string; runToken: string; score?: number; playMs?: number }): Promise<ScoreResult> => {
       if (isPortal) {
         const result = recordRun(data.score ?? 0);
         return {
@@ -38,7 +38,7 @@ export function useSubmitScore() {
       const res = await fetch(apiUrl(api.scores.create.path), {
         method: api.scores.create.method,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ runId: data.runId, runToken: data.runToken }),
+        body: JSON.stringify({ runId: data.runId, runToken: data.runToken, playMs: data.playMs }),
         credentials: "include",
       });
 
