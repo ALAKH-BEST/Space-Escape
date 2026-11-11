@@ -166,3 +166,40 @@ test("rejects client score and alive tampering in multiplayer", async () => {
     await new Promise<void>((resolve, reject) => server.close((error) => (error ? reject(error) : resolve())));
   }
 });
+test("survives malformed messages instead of crashing the server", async () => {
+  const server = createServer();
+  setupMultiplayer(server);
+  await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", () => resolve()));
+  const address = server.address();
+  assert(address && typeof address !== "string");
+  const url = `ws://127.0.0.1:${address.port}/ws`;
+  const bad = await openSocket(url);
+  const good = await openSocket(url);
+
+  try {
+    for (const payload of [
+      { type: "room:create" },
+      { type: "room:create", username: 42 },
+      { type: "room:join", username: "Pilot" },
+      { type: "room:join", username: "Pilot", roomId: { nope: true } },
+    ]) {
+      const rejected = nextMessage(bad, (message) => message.type === "room:error");
+      send(bad, payload);
+      await rejected;
+    }
+
+    // The server is still up and serving other players.
+    const created = nextMessage(good, (message) => message.type === "room:update");
+    send(good, { type: "room:create", username: "Pilot" });
+    assert.equal((await created).room?.players.length, 1);
+
+    // An oversized message closes that connection only.
+    const closed = new Promise<void>((resolve) => bad.once("close", () => resolve()));
+    bad.send("x".repeat(10_000));
+    await closed;
+    assert.equal(good.readyState, WebSocket.OPEN);
+  } finally {
+    await Promise.all([closeSocket(bad), closeSocket(good)]);
+    await new Promise<void>((resolve, reject) => server.close((error) => (error ? reject(error) : resolve())));
+  }
+});

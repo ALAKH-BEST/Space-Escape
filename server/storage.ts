@@ -55,15 +55,16 @@ export class DatabaseStorage implements IStorage {
     }
 
     return db.transaction(async (tx) => {
-      const [existing] = await tx
-        .select()
-        .from(scores)
-        .where(and(eq(scores.userId, score.userId), eq(scores.runId, score.runId)));
-
       const [user] = await tx.select().from(users).where(eq(users.id, score.userId));
       if (!user) throw new ProgressionError("Pilot not found");
 
-      if (existing) {
+      // The unique index on (user, run) decides who wins when the same run is submitted twice at once.
+      const [newScore] = await tx.insert(scores).values(score).onConflictDoNothing().returning();
+      if (!newScore) {
+        const [existing] = await tx
+          .select()
+          .from(scores)
+          .where(and(eq(scores.userId, score.userId), eq(scores.runId, score.runId)));
         return {
           score: existing,
           gemsEarned: 0,
@@ -72,7 +73,6 @@ export class DatabaseStorage implements IStorage {
         };
       }
 
-      const [newScore] = await tx.insert(scores).values(score).returning();
       const gemsEarned = Math.floor(score.score / 10);
       const [updatedUser] = await tx
         .update(users)
@@ -114,7 +114,8 @@ export class DatabaseStorage implements IStorage {
 
   async purchaseShip(userId: number, shipId: ShipId): Promise<Progression> {
     return db.transaction(async (tx) => {
-      const [user] = await tx.select().from(users).where(eq(users.id, userId));
+      // Lock the row so a purchase cannot overwrite gems or ships changed at the same moment.
+      const [user] = await tx.select().from(users).where(eq(users.id, userId)).for("update");
       if (!user) throw new ProgressionError("Pilot not found");
 
       const ownedShips = this.normalizeOwnedShips(user.ownedShips);

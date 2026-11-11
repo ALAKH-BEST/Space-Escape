@@ -7,6 +7,7 @@ import { promisify } from "util";
 import { storage } from "./storage";
 import { User as SelectUser } from "@shared/schema";
 import MemoryStoreFactory from "memorystore";
+import { isUniqueViolation, loginInputSchema, registerInputSchema, toPublicUser } from "./auth-input";
 
 const MemoryStore = MemoryStoreFactory(session);
 
@@ -32,6 +33,9 @@ async function comparePasswords(supplied: string, stored: string) {
 }
 
 export function setupAuth(app: Express) {
+  if (process.env.NODE_ENV === "production" && !process.env.SESSION_SECRET) {
+    throw new Error("SESSION_SECRET must be set in production");
+  }
   const sessionSettings: session.SessionOptions = {
     secret: process.env.SESSION_SECRET || "secret_key",
     resave: false,
@@ -73,20 +77,28 @@ export function setupAuth(app: Express) {
 
   app.post("/api/register", async (req, res, next) => {
     try {
-      const existingUser = await storage.getUserByUsername(req.body.username);
-      if (existingUser) {
-        return res.status(400).send("Username already exists");
+      const parsed = registerInputSchema.safeParse(req.body);
+      if (!parsed.success) {
+        return res.status(400).json({ message: parsed.error.issues[0]?.message ?? "Invalid registration" });
+      }
+      const { username, password } = parsed.data;
+
+      if (await storage.getUserByUsername(username)) {
+        return res.status(400).json({ message: "Username already exists" });
       }
 
-      const hashedPassword = await hashPassword(req.body.password);
-      const user = await storage.createUser({
-        ...req.body,
-        password: hashedPassword,
-      });
+      let user;
+      try {
+        user = await storage.createUser({ username, password: await hashPassword(password) });
+      } catch (error) {
+        // Two signups for the same name at once: the database picks one.
+        if (isUniqueViolation(error)) return res.status(400).json({ message: "Username already exists" });
+        throw error;
+      }
 
       req.login(user, (err) => {
         if (err) return next(err);
-        res.status(201).json(user);
+        res.status(201).json(toPublicUser(user));
       });
     } catch (err) {
       next(err);
@@ -94,13 +106,16 @@ export function setupAuth(app: Express) {
   });
 
   app.post("/api/login", (req, res, next) => {
+    if (!loginInputSchema.safeParse(req.body).success) {
+      return res.status(401).json({ message: "Invalid username or password" });
+    }
     passport.authenticate("local", (err: unknown, user: Express.User | false | undefined) => {
       if (err) return next(err);
       if (!user) return res.status(401).json({ message: "Invalid username or password" });
 
       req.logIn(user, (loginError) => {
         if (loginError) return next(loginError);
-        res.status(200).json(user);
+        res.status(200).json(toPublicUser(user));
       });
     })(req, res, next);
   });
@@ -114,6 +129,6 @@ export function setupAuth(app: Express) {
 
   app.get("/api/user", (req, res) => {
     if (!req.isAuthenticated()) return res.sendStatus(401);
-    res.json(req.user);
+    res.json(toPublicUser(req.user!));
   });
 }

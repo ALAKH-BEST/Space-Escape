@@ -1,4 +1,4 @@
-import { pgTable, text, serial, integer } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, uniqueIndex } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
@@ -12,12 +12,17 @@ export const users = pgTable("users", {
   equippedShip: text("equipped_ship").notNull().default("vanguard"),
 });
 
-export const scores = pgTable("scores", {
-  id: serial("id").primaryKey(),
-  userId: integer("user_id").notNull().references(() => users.id),
-  score: integer("score").notNull(),
-  runId: text("run_id"),
-});
+export const scores = pgTable(
+  "scores",
+  {
+    id: serial("id").primaryKey(),
+    userId: integer("user_id").notNull().references(() => users.id),
+    score: integer("score").notNull(),
+    runId: text("run_id"),
+  },
+  // One score per run, enforced by the database so two simultaneous submissions cannot both pay out.
+  (table) => [uniqueIndex("scores_user_run_idx").on(table.userId, table.runId)],
+);
 
 export const insertUserSchema = createInsertSchema(users).pick({
   username: true,

@@ -10,6 +10,7 @@ const ROOM_CODE_LENGTH = 6;
 const PLAYER_COLORS = ["#22d3ee", "#f472b6", "#facc15", "#a78bfa"];
 const PLAYER_HEARTBEAT_TIMEOUT_MS = 1_200;
 const MAX_POSITION_DELTA_PER_SECOND = 2.5;
+const MAX_MESSAGE_BYTES = 4 * 1024;
 
 type RoomPlayer = {
   id: string;
@@ -126,11 +127,14 @@ function leaveRoom(socket: WebSocket) {
   broadcastRoom(room);
 }
 
-function joinRoom(socket: WebSocket, username: string, roomId: string, create: boolean) {
+function joinRoom(socket: WebSocket, username: unknown, roomId: unknown, create: boolean) {
+  if (typeof username !== "string" || (!create && typeof roomId !== "string")) {
+    return send(socket, { type: "room:error", message: "Invalid multiplayer message." });
+  }
   const normalizedUsername = username.trim().slice(0, 24);
   if (!normalizedUsername) return send(socket, { type: "room:error", message: "Commander name is required." });
 
-  const id = create ? createRoomCode() : roomId.trim().toUpperCase();
+  const id = create ? createRoomCode() : (roomId as string).trim().toUpperCase();
   let room = rooms.get(id);
   if (!room && !create) return send(socket, { type: "room:error", message: "That room no longer exists." });
   if (room && room.players.size >= MAX_PLAYERS) return send(socket, { type: "room:error", message: "That room is full." });
@@ -241,7 +245,7 @@ function handleMessage(socket: WebSocket, raw: string) {
 }
 
 export function setupMultiplayer(server: Server) {
-  const webSocketServer = new WebSocketServer({ server, path: "/ws" });
+  const webSocketServer = new WebSocketServer({ server, path: "/ws", maxPayload: MAX_MESSAGE_BYTES });
   const ticker = setInterval(() => {
     const now = Date.now();
     rooms.forEach((room) => advanceRoom(room, now));
@@ -249,7 +253,15 @@ export function setupMultiplayer(server: Server) {
   ticker.unref();
   server.once("close", () => clearInterval(ticker));
   webSocketServer.on("connection", (socket) => {
-    socket.on("message", (message) => handleMessage(socket, message.toString()));
+    socket.on("message", (message) => {
+      // A malformed message must never take the whole server down.
+      try {
+        handleMessage(socket, message.toString());
+      } catch (error) {
+        console.error("multiplayer message failed", error);
+        send(socket, { type: "room:error", message: "Invalid multiplayer message." });
+      }
+    });
     socket.on("close", () => leaveRoom(socket));
     socket.on("error", () => leaveRoom(socket));
   });
