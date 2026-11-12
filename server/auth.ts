@@ -6,10 +6,12 @@ import { scrypt, randomBytes, timingSafeEqual } from "crypto";
 import { promisify } from "util";
 import { storage } from "./storage";
 import { User as SelectUser } from "@shared/schema";
-import MemoryStoreFactory from "memorystore";
+import connectPgSimple from "connect-pg-simple";
+import { pool } from "./db";
+import { createAuthLimiters } from "./rate-limit";
 import { isUniqueViolation, loginInputSchema, registerInputSchema, toPublicUser } from "./auth-input";
 
-const MemoryStore = MemoryStoreFactory(session);
+const PgStore = connectPgSimple(session);
 
 declare global {
   namespace Express {
@@ -40,10 +42,16 @@ export function setupAuth(app: Express) {
     secret: process.env.SESSION_SECRET || "secret_key",
     resave: false,
     saveUninitialized: false,
-    store: new MemoryStore({
-      checkPeriod: 86400000,
-    }),
+    // Sessions live in Postgres so players stay logged in across restarts and redeploys.
+    store: new PgStore({ pool, tableName: "session", createTableIfMissing: true }),
+    cookie: {
+      maxAge: 30 * 24 * 60 * 60 * 1000,
+      httpOnly: true,
+      sameSite: "lax",
+      secure: "auto",
+    },
   };
+  const limiters = createAuthLimiters();
 
   app.set("trust proxy", 1);
   app.use(session(sessionSettings));
@@ -75,7 +83,7 @@ export function setupAuth(app: Express) {
     }
   });
 
-  app.post("/api/register", async (req, res, next) => {
+  app.post("/api/register", limiters.register, async (req, res, next) => {
     try {
       const parsed = registerInputSchema.safeParse(req.body);
       if (!parsed.success) {
@@ -105,7 +113,7 @@ export function setupAuth(app: Express) {
     }
   });
 
-  app.post("/api/login", (req, res, next) => {
+  app.post("/api/login", limiters.login, (req, res, next) => {
     if (!loginInputSchema.safeParse(req.body).success) {
       return res.status(401).json({ message: "Invalid username or password" });
     }
