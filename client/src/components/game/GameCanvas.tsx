@@ -15,6 +15,7 @@ import { setMusicMode, startMusic, stopMusic } from "@/lib/background-music";
 import { isPortal } from "@/lib/portal";
 import { gameplayStart, gameplayStop, happytime, showBreakAd, showRewardedAd } from "@/lib/portal-sdk";
 import { addGems } from "@/lib/local-game-store";
+import { createMovementKeys, isMovementKey, normalizeKey, releaseAllKeys } from "@/lib/input-keys";
 import { recordPersonalBest, type PersonalBestResult } from "@/lib/personal-best";
 import { playCollisionSound } from "@/lib/collision-sound";
 import {
@@ -154,7 +155,7 @@ export function GameCanvas({
     player: { x: 50, y: 200 },
     obstacles: [] as Obstacle[],
     stars: [] as { x: number; y: number; size: number; speed: number }[],
-    keys: { ArrowUp: false, ArrowDown: false, ArrowLeft: false, ArrowRight: false, w: false, s: false, a: false, d: false },
+    keys: createMovementKeys(),
     lastSpawn: 0,
     // Internal pacing measure: drives obstacle speed and spawn rate only.
     score: 0,
@@ -236,21 +237,32 @@ export function GameCanvas({
         activateAbility();
         return;
       }
-      if (Object.prototype.hasOwnProperty.call(state.keys, e.key)) {
-        state.keys[e.key as keyof typeof state.keys] = true;
-        if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(e.key)) e.preventDefault();
+      const key = normalizeKey(e.key);
+      if (isMovementKey(state.keys, key)) {
+        state.keys[key] = true;
+        if (key.startsWith("Arrow")) e.preventDefault();
       }
     };
     const handleKeyUp = (e: KeyboardEvent) => {
-      if (Object.prototype.hasOwnProperty.call(gameStateRef.current.keys, e.key)) {
-        gameStateRef.current.keys[e.key as keyof typeof gameStateRef.current.keys] = false;
+      const key = normalizeKey(e.key);
+      if (isMovementKey(gameStateRef.current.keys, key)) {
+        gameStateRef.current.keys[key] = false;
       }
+    };
+    // Switching windows while holding a key means the key-up never arrives; let go so the ship stops.
+    const releaseKeys = () => releaseAllKeys(gameStateRef.current.keys);
+    const releaseWhenHidden = () => {
+      if (document.hidden) releaseKeys();
     };
     window.addEventListener("keydown", handleKeyDown);
     window.addEventListener("keyup", handleKeyUp);
+    window.addEventListener("blur", releaseKeys);
+    document.addEventListener("visibilitychange", releaseWhenHidden);
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
       window.removeEventListener("keyup", handleKeyUp);
+      window.removeEventListener("blur", releaseKeys);
+      document.removeEventListener("visibilitychange", releaseWhenHidden);
     };
   }, []);
 

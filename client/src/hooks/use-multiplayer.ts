@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { apiBaseUrl } from "@/lib/apiBase";
+import { MultiplayerConnection } from "@/lib/multiplayer-connection";
 
 export type MultiplayerPlayer = {
   id: string;
@@ -33,50 +34,63 @@ function websocketUrl() {
 }
 
 export function useMultiplayer(username: string | undefined) {
-  const socketRef = useRef<WebSocket | null>(null);
+  const connectionRef = useRef<MultiplayerConnection | null>(null);
   const [room, setRoom] = useState<MultiplayerRoom | null>(null);
   const [error, setError] = useState("");
   const [connected, setConnected] = useState(false);
 
   useEffect(() => {
     if (!username) return;
-    const socket = new WebSocket(websocketUrl());
-    socketRef.current = socket;
-    socket.onopen = () => setConnected(true);
-    socket.onclose = () => setConnected(false);
-    socket.onerror = () => setError("Multiplayer link unavailable. Try again.");
-    socket.onmessage = (event) => {
-      const message = JSON.parse(event.data);
-      if (message.type === "room:update") {
+    const connection = new MultiplayerConnection(websocketUrl(), {
+      onOpen: () => {
+        setConnected(true);
         setError("");
-        setRoom(message.room);
-      } else if (message.type === "room:error") {
-        setError(message.message);
-      } else if (message.type === "player:update") {
-        setRoom((current) =>
-          current
-            ? {
-                ...current,
-                players: current.players.map((player) =>
-                  player.id === message.player.id ? message.player : player,
-                ),
-              }
-            : current,
-        );
-      }
-    };
+      },
+      onClose: ({ wasLeave }) => {
+        setConnected(false);
+        // The server drops a pilot from their room when the link closes, so the room is gone either way.
+        setRoom(null);
+        if (!wasLeave) setError("Connection lost. Reconnecting...");
+      },
+      onError: () => setError("Multiplayer link unavailable. Retrying..."),
+      onMessage: (data) => {
+        let message;
+        try {
+          message = JSON.parse(data);
+        } catch {
+          return;
+        }
+        if (message.type === "room:update") {
+          setError("");
+          setRoom(message.room);
+        } else if (message.type === "room:error") {
+          setError(message.message);
+        } else if (message.type === "player:update") {
+          setRoom((current) =>
+            current
+              ? {
+                  ...current,
+                  players: current.players.map((player) =>
+                    player.id === message.player.id ? message.player : player,
+                  ),
+                }
+              : current,
+          );
+        }
+      },
+    });
+    connectionRef.current = connection;
 
     return () => {
-      socket.close();
-      socketRef.current = null;
+      connection.dispose();
+      connectionRef.current = null;
       setRoom(null);
+      setConnected(false);
     };
   }, [username]);
 
   const send = useCallback((message: unknown) => {
-    if (socketRef.current?.readyState === WebSocket.OPEN) {
-      socketRef.current.send(JSON.stringify(message));
-    }
+    connectionRef.current?.send(message);
   }, []);
 
   const createRoom = useCallback(() => send({ type: "room:create", username }), [send, username]);
@@ -90,7 +104,7 @@ export function useMultiplayer(username: string | undefined) {
     [send],
   );
   const leaveRoom = useCallback(() => {
-    socketRef.current?.close();
+    connectionRef.current?.leave();
     setRoom(null);
   }, []);
 
