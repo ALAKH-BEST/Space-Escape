@@ -1,3 +1,4 @@
+import plugin from "tailwindcss/plugin";
 import type { Config } from "tailwindcss";
 
 export default {
@@ -105,5 +106,16 @@ export default {
       },
     },
   },
-  plugins: [require("tailwindcss-animate"), require("@tailwindcss/typography")],
+  plugins: [
+    require("tailwindcss-animate"),
+    require("@tailwindcss/typography"),
+    // A phone held sideways: a touch screen that is wide enough for desktop styles but far too short for them.
+    plugin(({ addVariant }) => {
+      // The :not() adds a little specificity so these styles beat the plain `sm:` ones that also match here.
+      addVariant(
+        "phone-landscape",
+        "@media (min-width: 640px) and (max-height: 500px) and (pointer: coarse) { &:not(.phone-landscape-never) }",
+      );
+    }),
+  ],
 } satisfies Config;

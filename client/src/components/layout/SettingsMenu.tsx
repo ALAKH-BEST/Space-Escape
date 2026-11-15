@@ -2,6 +2,7 @@ import { useSyncExternalStore } from "react";
 import { Settings } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Switch } from "@/components/ui/switch";
+import { ThemeSelector } from "@/components/theme/ThemeSelector";
 import { setVisualEffectsEnabled, subscribeVisualEffects, visualEffectsEnabled } from "@/lib/game-effects";
 
 export function SettingsMenu() {
@@ -31,6 +32,11 @@ export function SettingsMenu() {
             </p>
           </div>
           <Switch id="visual-effects" checked={effects} onCheckedChange={setVisualEffectsEnabled} aria-label="Visual effects" />
+        </div>
+        {/* The top bar has no room for the theme picker on phones, so it lives here instead. */}
+        <div className="mt-4 flex items-center justify-between gap-4 lg:hidden">
+          <span className="text-sm text-foreground">Theme</span>
+          <ThemeSelector />
         </div>
       </PopoverContent>
     </Popover>
