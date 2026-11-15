@@ -52,10 +52,10 @@ export default function GamePage() {
               </div>
               
               <div className="space-y-4">
-                <h1 className={isPortal ? "text-3xl sm:text-5xl font-display font-bold text-foreground tracking-tighter" : "text-6xl font-display font-bold text-foreground tracking-tighter"}>
+                <h1 className={isPortal ? "text-3xl sm:text-5xl font-display font-bold text-foreground tracking-tighter" : "text-4xl min-[400px]:text-5xl sm:text-6xl font-display font-bold text-foreground tracking-tighter"}>
                   ASTRODODGE
                 </h1>
-                <p className={isPortal ? "text-sm sm:text-base text-muted-foreground font-mono max-w-lg mx-auto [@media(max-height:400px)]:hidden" : "text-xl text-muted-foreground font-mono max-w-lg mx-auto"}>
+                <p className={isPortal ? "text-sm sm:text-base text-muted-foreground font-mono max-w-lg mx-auto [@media(max-height:400px)]:hidden" : "text-base sm:text-xl text-muted-foreground font-mono max-w-lg mx-auto"}>
                   Master the void. Navigate the asteroid fields of Sector 7 and survive the cosmic onslaught.
                 </p>
               </div>
@@ -100,7 +100,7 @@ export default function GamePage() {
               key="game"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className={isPortal ? "h-full flex items-center justify-center" : "space-y-8"}
+              className={isPortal ? "h-full flex items-center justify-center" : "space-y-4 sm:space-y-8 phone-landscape:space-y-2"}
             >
               {isPortal ? (
                 // Fit the 16:9 game frame inside whatever space the portal gives, never taller than it.
@@ -111,10 +111,10 @@ export default function GamePage() {
               <>
               <div className="flex items-center justify-between">
                 <div>
-                  <h1 className="text-4xl font-display font-bold text-foreground mb-2">
+                  <h1 className="text-base min-[400px]:text-xl sm:text-4xl phone-landscape:text-base font-display font-bold text-foreground mb-1 sm:mb-2 phone-landscape:mb-0">
                     STARTING SECTOR: {launchSector.name.toUpperCase()}
                   </h1>
-                  <p className="text-muted-foreground font-mono">
+                  <p className="max-sm:hidden phone-landscape:hidden text-muted-foreground font-mono">
                     OBJECTIVE: SURVIVE AS LONG AS POSSIBLE
                   </p>
                 </div>

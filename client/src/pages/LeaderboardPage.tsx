@@ -41,9 +41,9 @@ export default function LeaderboardPage() {
               <Table>
                 <TableHeader>
                   <TableRow className="border-white/10 hover:bg-transparent">
-                    <TableHead className="w-[100px] text-primary">RANK</TableHead>
-                    <TableHead className="text-primary">PILOT</TableHead>
-                    <TableHead className="text-right text-primary">SCORE</TableHead>
+                    <TableHead className="w-14 px-2 sm:w-[100px] sm:px-4 text-primary">RANK</TableHead>
+                    <TableHead className="px-2 sm:px-4 text-primary">PILOT</TableHead>
+                    <TableHead className="px-2 sm:px-4 text-right text-primary">SCORE</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -53,23 +53,23 @@ export default function LeaderboardPage() {
                         key={score.id}
                         className="border-white/5 hover:bg-white/5 transition-colors group"
                       >
-                        <TableCell className="font-mono font-bold text-lg">
-                          {index === 0 && <Medal className="h-6 w-6 text-yellow-500 inline mr-2" />}
-                          {index === 1 && <Medal className="h-6 w-6 text-gray-400 inline mr-2" />}
-                          {index === 2 && <Medal className="h-6 w-6 text-amber-700 inline mr-2" />}
+                        <TableCell className="px-2 sm:px-4 font-mono font-bold text-base sm:text-lg">
+                          {index === 0 && <Medal className="h-5 w-5 sm:h-6 sm:w-6 text-yellow-500 inline mr-1 sm:mr-2" />}
+                          {index === 1 && <Medal className="h-5 w-5 sm:h-6 sm:w-6 text-gray-400 inline mr-1 sm:mr-2" />}
+                          {index === 2 && <Medal className="h-5 w-5 sm:h-6 sm:w-6 text-amber-700 inline mr-1 sm:mr-2" />}
                           <span className="opacity-50">#{index + 1}</span>
                         </TableCell>
-                        <TableCell>
+                        <TableCell className="px-2 sm:px-4">
                           <div className="flex items-center gap-3">
-                            <div className="h-8 w-8 rounded-full bg-primary/20 flex items-center justify-center">
+                            <div className="max-sm:hidden h-8 w-8 rounded-full bg-primary/20 flex items-center justify-center">
                               <User className="h-4 w-4 text-primary" />
                             </div>
-                            <span className="font-medium text-foreground group-hover:text-primary transition-colors">
+                            <span className="min-w-0 break-words font-medium text-foreground group-hover:text-primary transition-colors">
                               {score.username}
                             </span>
                           </div>
                         </TableCell>
-                        <TableCell className="text-right font-mono text-xl text-accent">
+                        <TableCell className="px-2 sm:px-4 text-right font-mono text-base sm:text-xl text-accent">
                           {score.score.toLocaleString()}
                         </TableCell>
                       </TableRow>
