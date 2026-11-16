@@ -16,6 +16,7 @@ import { isPortal } from "@/lib/portal";
 import { gameplayStart, gameplayStop, happytime, showBreakAd, showRewardedAd } from "@/lib/portal-sdk";
 import { addGems } from "@/lib/local-game-store";
 import { frameScaleFor } from "@/lib/frame-time";
+import { shiftClockForPause } from "@/lib/pause";
 import { createMovementKeys, isMovementKey, normalizeKey, releaseAllKeys } from "@/lib/input-keys";
 import { recordPersonalBest, type PersonalBestResult } from "@/lib/personal-best";
 import { playCollisionSound } from "@/lib/collision-sound";
@@ -110,6 +111,12 @@ export function GameCanvas({
   // Portal builds only: "watch an ad to double this run's gems".
   const [countdown, setCountdown] = useState<number | null>(null);
   const countdownTimerRef = useRef<number | null>(null);
+  const [paused, setPaused] = useState(false);
+  const [resumeCountdown, setResumeCountdown] = useState<number | null>(null);
+  const resumeTimerRef = useRef<number | null>(null);
+  // The key and focus listeners below are set up once, so they reach the latest pause functions through these.
+  const pauseGameRef = useRef<() => void>(() => {});
+  const requestResumeRef = useRef<() => void>(() => {});
   const [bonus, setBonus] = useState<{ status: "idle" | "watching" | "claimed" | "unavailable"; gems: number }>({ status: "idle", gems: 0 });
   const startRunMutation = useStartRun();
   const { data: progression, isLoading: isProgressionLoading } = useProgression();
@@ -163,6 +170,8 @@ export function GameCanvas({
     // Milliseconds actually played. The score on screen and on the results screen comes from this.
     playMs: 0,
     lastFrameAt: 0,
+    // performance.now() when the run was paused, or 0 while it is running.
+    pausedAt: 0,
     isPlaying: false,
     startedAt: 0,
     runId: "",
@@ -233,6 +242,13 @@ export function GameCanvas({
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       const state = gameStateRef.current;
+      if (state.isPlaying && (e.code === "KeyP" || e.code === "Escape" || (state.pausedAt && (e.code === "Space" || e.code === "Enter")))) {
+        e.preventDefault();
+        if (state.pausedAt) requestResumeRef.current();
+        else pauseGameRef.current();
+        return;
+      }
+      if (state.pausedAt) return;
       if (e.code === "Space" && state.isPlaying) {
         e.preventDefault();
         activateAbility();
@@ -257,20 +273,31 @@ export function GameCanvas({
     };
     window.addEventListener("keydown", handleKeyDown);
     window.addEventListener("keyup", handleKeyUp);
+    // Leaving the game (another app, a call, a notification, another tab or window) pauses a solo run.
+    const autoPause = () => pauseGameRef.current();
+    const pauseWhenHidden = () => {
+      if (document.hidden) autoPause();
+    };
     window.addEventListener("blur", releaseKeys);
     document.addEventListener("visibilitychange", releaseWhenHidden);
+    window.addEventListener("blur", autoPause);
+    window.addEventListener("pagehide", autoPause);
+    document.addEventListener("visibilitychange", pauseWhenHidden);
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
       window.removeEventListener("keyup", handleKeyUp);
       window.removeEventListener("blur", releaseKeys);
       document.removeEventListener("visibilitychange", releaseWhenHidden);
+      window.removeEventListener("blur", autoPause);
+      window.removeEventListener("pagehide", autoPause);
+      document.removeEventListener("visibilitychange", pauseWhenHidden);
     };
   }, []);
 
   useEffect(() => {
     const timer = window.setInterval(() => {
       const state = gameStateRef.current;
-      if (!state.isPlaying) return;
+      if (!state.isPlaying || state.pausedAt) return;
       const ship = ships[shipRef.current];
       const now = performance.now();
       const elapsedSeconds = Math.max(0, (now - state.startedAt) / 1000);
@@ -321,8 +348,8 @@ export function GameCanvas({
   useEffect(() => {
     let inFlight = false;
     const timer = window.setInterval(() => {
-      const { isPlaying, runId, runToken } = gameStateRef.current;
-      if (!isPlaying || !runId || !runToken || inFlight || document.hidden) return;
+      const { isPlaying, runId, runToken, pausedAt } = gameStateRef.current;
+      if (!isPlaying || pausedAt || !runId || !runToken || inFlight || document.hidden) return;
       inFlight = true;
       void sendRunHeartbeat(runId, runToken)
         .then((nextToken) => {
@@ -341,7 +368,7 @@ export function GameCanvas({
     const state = gameStateRef.current;
     const ship = ships[shipRef.current];
     const now = performance.now();
-    if (!state.isPlaying || ship.id === "vanguard" || ship.id === "titan" || now < state.abilityCooldownUntil) return;
+    if (!state.isPlaying || state.pausedAt || ship.id === "vanguard" || ship.id === "titan" || now < state.abilityCooldownUntil) return;
 
     const duration = ship.id === "phantom" ? 3000 : 5000;
     const cooldown = ship.id === "phantom" ? 12000 : 15000;
@@ -354,6 +381,53 @@ export function GameCanvas({
   useEffect(() => () => {
     if (countdownTimerRef.current !== null) window.clearInterval(countdownTimerRef.current);
   }, []);
+
+  useEffect(() => () => {
+    if (resumeTimerRef.current !== null) window.clearInterval(resumeTimerRef.current);
+  }, []);
+
+  // Pausing stops the animation and the run's clocks. Multiplayer cannot pause: the other pilots keep flying.
+  const pauseGame = () => {
+    const state = gameStateRef.current;
+    if (!state.isPlaying || state.pausedAt || multiplayerRef.current) return;
+    state.pausedAt = performance.now();
+    if (requestRef.current) cancelAnimationFrame(requestRef.current);
+    releaseAllKeys(state.keys);
+    setPaused(true);
+  };
+
+  const resumeGame = () => {
+    const state = gameStateRef.current;
+    if (!state.isPlaying || !state.pausedAt) return;
+    const resumedAt = performance.now();
+    const pausedMs = Math.max(0, resumedAt - state.pausedAt);
+    Object.assign(state, shiftClockForPause(state, state.pausedAt, resumedAt));
+    if (sectorTransitionRef.current) sectorTransitionRef.current.startedAt += pausedMs;
+    state.pausedAt = 0;
+    state.lastFrameAt = 0;
+    setPaused(false);
+    setResumeCountdown(null);
+    requestRef.current = requestAnimationFrame(gameLoop);
+  };
+
+  // A short 3-2-1 before flying again, so a pilot coming back from a call is ready.
+  const requestResume = () => {
+    if (!gameStateRef.current.pausedAt || resumeTimerRef.current !== null) return;
+    let step = COUNTDOWN_FROM;
+    setResumeCountdown(step);
+    resumeTimerRef.current = window.setInterval(() => {
+      step -= 1;
+      if (step > 0) {
+        setResumeCountdown(step);
+        return;
+      }
+      window.clearInterval(resumeTimerRef.current ?? undefined);
+      resumeTimerRef.current = null;
+      resumeGame();
+    }, COUNTDOWN_STEP_MS);
+  };
+  pauseGameRef.current = pauseGame;
+  requestResumeRef.current = requestResume;
 
   // Solo runs start after a short 3-2-1 so the pilot is ready; multiplayer starts together, so it skips this.
   const startWithCountdown = () => {
@@ -459,6 +533,7 @@ export function GameCanvas({
         score: 0,
         playMs: 0,
         lastFrameAt: 0,
+        pausedAt: 0,
         isPlaying: true,
         lastSpawn: now,
         startedAt: now,
@@ -591,7 +666,7 @@ export function GameCanvas({
     const ctx = canvas?.getContext("2d");
     const state = gameStateRef.current;
     const ship = ships[shipRef.current];
-    if (!canvas || !ctx || !state.isPlaying) return;
+    if (!canvas || !ctx || !state.isPlaying || state.pausedAt) return;
 
     // Frames can be far apart (a throttled tab); never credit more than a quarter second for one.
     if (state.lastFrameAt) state.playMs += Math.min(250, Math.max(0, timestamp - state.lastFrameAt));
@@ -828,6 +903,26 @@ export function GameCanvas({
               {countdown}
             </motion.div>
           </AnimatePresence>
+        </div>
+      )}
+
+      {paused && (
+        <div className="absolute inset-0 z-30 flex flex-col items-center justify-center gap-3 bg-black/75 backdrop-blur-sm p-4" role="dialog" aria-label="Game paused">
+          {resumeCountdown === null ? (
+            <>
+              <h2 className="font-display text-3xl sm:text-5xl phone-landscape:text-2xl font-bold text-white">PAUSED</h2>
+              <p className="font-mono text-xs text-white/60 phone-landscape:hidden">YOUR RUN IS ON HOLD</p>
+              <Button onClick={requestResume} size="lg" className="font-mono px-8">
+                <Play className="mr-2 h-5 w-5" /> RESUME
+              </Button>
+              <p className="hidden sm:block phone-landscape:hidden font-mono text-[11px] tracking-widest text-white/40">P, ESC OR SPACE TO RESUME</p>
+            </>
+          ) : (
+            <div role="status" aria-live="assertive" className="flex flex-col items-center">
+              <div className="mb-1 font-mono text-xs tracking-[0.3em] text-white/60">RESUMING IN</div>
+              <div className="font-display text-7xl phone-landscape:text-5xl font-bold text-white neon-text">{resumeCountdown}</div>
+            </div>
+          )}
         </div>
       )}
 
