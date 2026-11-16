@@ -4,6 +4,11 @@ import { useToast } from "@/hooks/use-toast";
 import { apiUrl } from "@/lib/apiBase";
 import { isPortal } from "@/lib/portal";
 import { recordRun } from "@/lib/local-game-store";
+import { HttpError, withRetries } from "@/lib/retry";
+
+// Phones drop connections. Waits before each of three retries; the server pays a run once however often it is sent.
+const SUBMIT_RETRY_DELAYS_MS = [1000, 2500, 5000];
+const SUBMIT_TIMEOUT_MS = 10_000;
 
 export function useScores() {
   return useQuery({
@@ -35,15 +40,30 @@ export function useSubmitScore() {
           duplicate: false,
         };
       }
-      const res = await fetch(apiUrl(api.scores.create.path), {
-        method: api.scores.create.method,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ runId: data.runId, runToken: data.runToken, playMs: data.playMs }),
-        credentials: "include",
-      });
+      const { value, attempts } = await withRetries(async () => {
+        const controller = new AbortController();
+        const timeout = window.setTimeout(() => controller.abort(), SUBMIT_TIMEOUT_MS);
+        try {
+          const res = await fetch(apiUrl(api.scores.create.path), {
+            method: api.scores.create.method,
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ runId: data.runId, runToken: data.runToken, playMs: data.playMs }),
+            credentials: "include",
+            signal: controller.signal,
+          });
+          if (!res.ok) throw new HttpError(res.status);
+          return api.scores.create.responses[201].parse(await res.json());
+        } finally {
+          window.clearTimeout(timeout);
+        }
+      }, { delaysMs: SUBMIT_RETRY_DELAYS_MS });
 
-      if (!res.ok) throw new Error("Failed to submit score");
-      return api.scores.create.responses[201].parse(await res.json());
+      // If an earlier attempt reached the server but its reply was lost, the retry is told "already recorded"
+      // with nothing earned. The gems were paid then, so show what that run earned (the server pays score / 10).
+      if (attempts > 1 && value.duplicate) {
+        return { ...value, gemsEarned: Math.floor(value.score.score / 10) };
+      }
+      return value;
     },
     onSuccess: (result) => {
       queryClient.invalidateQueries({ queryKey: ["/api/scores"] });

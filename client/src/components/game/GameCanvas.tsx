@@ -15,6 +15,7 @@ import { setMusicMode, startMusic, stopMusic } from "@/lib/background-music";
 import { isPortal } from "@/lib/portal";
 import { gameplayStart, gameplayStop, happytime, showBreakAd, showRewardedAd } from "@/lib/portal-sdk";
 import { addGems } from "@/lib/local-game-store";
+import { frameScaleFor } from "@/lib/frame-time";
 import { createMovementKeys, isMovementKey, normalizeKey, releaseAllKeys } from "@/lib/input-keys";
 import { recordPersonalBest, type PersonalBestResult } from "@/lib/personal-best";
 import { playCollisionSound } from "@/lib/collision-sound";
@@ -594,6 +595,8 @@ export function GameCanvas({
 
     // Frames can be far apart (a throttled tab); never credit more than a quarter second for one.
     if (state.lastFrameAt) state.playMs += Math.min(250, Math.max(0, timestamp - state.lastFrameAt));
+    // Movement below is written per 60Hz frame; scale it by the real frame time so every screen plays at the same speed.
+    const frameScale = state.lastFrameAt ? frameScaleFor(timestamp - state.lastFrameAt) : 1;
     state.lastFrameAt = timestamp;
     const liveScore = scoreForPlayTime(state.playMs);
     const activeSector = startingSectorNumber + Math.floor(liveScore / SCORE_PER_SECTOR);
@@ -626,7 +629,7 @@ export function GameCanvas({
       playAbilitySound(ship.id === "phantom" ? "phaseEnd" : "overdriveEnd");
     }
     abilityWasActiveRef.current = abilityActive;
-    const movementSpeed = (4.5 + ship.speed * 0.4) * (0.8 + ship.handling * 0.05) * (ship.id === "nova" && abilityActive ? 1.5 : 1);
+    const movementSpeed = (4.5 + ship.speed * 0.4) * (0.8 + ship.handling * 0.05) * (ship.id === "nova" && abilityActive ? 1.5 : 1) * frameScale;
     if (state.keys.ArrowUp || state.keys.w) state.player.y -= movementSpeed;
     if (state.keys.ArrowDown || state.keys.s) state.player.y += movementSpeed;
     if (state.keys.ArrowLeft || state.keys.a) state.player.x -= movementSpeed;
@@ -635,7 +638,7 @@ export function GameCanvas({
     state.player.x = Math.max(PLAYER_SIZE, Math.min(canvas.width - PLAYER_SIZE, state.player.x));
 
     state.stars.forEach((star) => {
-      star.x -= star.speed;
+      star.x -= star.speed * frameScale;
       if (star.x < 0) star.x = canvas.width;
       ctx.fillStyle = `rgba(255, 255, 255, ${Math.random() * 0.5 + 0.3})`;
       ctx.beginPath();
@@ -661,7 +664,7 @@ export function GameCanvas({
     for (let index = state.obstacles.length - 1; index >= 0; index--) {
       const obstacle = state.obstacles[index];
       const wasAheadOfPlayer = obstacle.x > state.player.x;
-      obstacle.x -= obstacle.speed;
+      obstacle.x -= obstacle.speed * frameScale;
       drawObstacle(ctx, obstacle);
 
       const dx = state.player.x - obstacle.x;
@@ -700,7 +703,7 @@ export function GameCanvas({
       }
     }
 
-    state.score += 0.1 * (ship.id === "nova" && abilityActive ? 2 : 1);
+    state.score += 0.1 * (ship.id === "nova" && abilityActive ? 2 : 1) * frameScale;
 
     const activeMultiplayer = multiplayerRef.current;
     if (activeMultiplayer?.room.phase === "running") {
@@ -876,6 +879,14 @@ export function GameCanvas({
             </div>
           </div>
           {scoreMutation.isPending && <p className="mb-4 text-primary animate-pulse font-mono text-xs">UPLOADING FLIGHT RECORD...</p>}
+          {scoreMutation.isError && scoreMutation.variables && (
+            <div className="mb-4 flex flex-col items-center gap-2">
+              <p className="font-mono text-xs text-destructive">COULD NOT REACH THE MAINFRAME. YOUR RUN IS SAFE TO RETRY.</p>
+              <Button variant="secondary" size="sm" className="font-mono" onClick={() => scoreMutation.mutate(scoreMutation.variables!)}>
+                <RotateCcw className="mr-2 h-4 w-4" /> RETRY UPLOAD
+              </Button>
+            </div>
+          )}
           {isPortal && scoreMutation.data && scoreMutation.data.gemsEarned > 0 && bonus.status !== "claimed" && (
             <Button
               onClick={() => void claimBonus(scoreMutation.data!.gemsEarned)}

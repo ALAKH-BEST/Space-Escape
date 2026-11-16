@@ -214,6 +214,18 @@
 html,
 body {
   overflow-x: hidden;
+  /* Double-tap no longer zooms the page (pinch still does), and taps respond without the old 300ms wait. */
+  touch-action: manipulation;
+}
+
+/* While playing, a drag on the game must steer the game, not scroll the page, pull to refresh, or select text. */
+.mobile-game-frame {
+  touch-action: none;
+  overscroll-behavior: contain;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .game-mobile-dpad {
