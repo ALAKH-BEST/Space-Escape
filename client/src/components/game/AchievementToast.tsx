@@ -20,7 +20,7 @@ export function AchievementToast({ notice, onDismiss }: AchievementToastProps) {
   }, [notice?.sequence, onDismiss]);
 
   return (
-    <div className="pointer-events-none absolute left-1/2 top-5 z-30 w-[min(92%,420px)] -translate-x-1/2">
+    <div className="pointer-events-none absolute left-1/2 top-[4.5rem] sm:top-5 phone-landscape:top-[4.25rem] z-30 w-[min(92%,420px)] max-sm:w-[min(88%,300px)] phone-landscape:w-[min(60%,320px)] -translate-x-1/2">
       <AnimatePresence mode="wait" initial={false}>
         {notice && (
           <motion.div
@@ -35,21 +35,21 @@ export function AchievementToast({ notice, onDismiss }: AchievementToastProps) {
               ? { opacity: 0 }
               : { opacity: 0, y: -10, scale: 0.97, filter: "blur(3px)" }}
             transition={{ duration: reduceMotion ? 0.12 : 0.32, ease: "easeOut" }}
-            className="relative overflow-hidden rounded-xl border border-amber-200/35 bg-slate-950/90 px-4 py-3 shadow-[0_0_28px_rgba(251,191,36,0.18)] backdrop-blur-md"
+            className="relative overflow-hidden rounded-xl border border-amber-200/35 bg-slate-950/90 px-3 py-2 sm:px-4 sm:py-3 shadow-[0_0_28px_rgba(251,191,36,0.18)] backdrop-blur-md"
           >
-            <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-amber-200/25 bg-amber-300/10 text-amber-200">
-                <Trophy className="h-5 w-5" />
+            <div className="flex items-center gap-2 sm:gap-3">
+              <div className="flex h-8 w-8 sm:h-10 sm:w-10 shrink-0 items-center justify-center rounded-lg border border-amber-200/25 bg-amber-300/10 text-amber-200">
+                <Trophy className="h-4 w-4 sm:h-5 sm:w-5" />
               </div>
               <div className="min-w-0">
-                <div className="flex items-center gap-1.5 text-[9px] font-mono uppercase tracking-[0.22em] text-amber-200/75">
+                <div className="flex items-center gap-1.5 text-[9px] phone-landscape:hidden font-mono uppercase tracking-[0.22em] text-amber-200/75">
                   <Sparkles className="h-3 w-3" />
                   Reward unlocked
                 </div>
-                <div className="mt-0.5 font-display text-base font-bold uppercase tracking-wide text-white">
+                <div className="mt-0.5 font-display text-sm sm:text-base font-bold uppercase tracking-wide text-white">
                   {achievementCatalog[notice.id].title}
                 </div>
-                <p className="mt-0.5 text-xs text-slate-300">
+                <p className="mt-0.5 text-xs text-slate-300 phone-landscape:hidden">
                   {achievementCatalog[notice.id].description}
                 </p>
               </div>
