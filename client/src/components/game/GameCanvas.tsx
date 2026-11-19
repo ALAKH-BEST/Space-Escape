@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Link } from "wouter";
 import { AnimatePresence, motion } from "framer-motion";
 import { useQueryClient } from "@tanstack/react-query";
-import { Gem, Play, RotateCcw, Shield, Sparkles, Trophy, Video, Zap } from "lucide-react";
+import { Gem, Play, RotateCcw, Share2, Shield, Sparkles, Trophy, Video, Zap } from "lucide-react";
 import { api } from "@shared/routes";
 import { sendRunHeartbeat, useStartRun, useSubmitScore } from "@/hooks/use-scores";
 import { useProgression } from "@/hooks/use-progression";
@@ -43,6 +43,7 @@ import {
   type SectorEnvironment,
 } from "@/lib/sector-environments";
 import { ships, type ShipId } from "@shared/ships";
+import { shareRun } from "@/lib/share-card";
 import { scoreForPlayTime } from "@shared/scoring";
 import { Button } from "@/components/ui/button";
 import type { MultiplayerRoom } from "@/hooks/use-multiplayer";
@@ -117,6 +118,7 @@ export function GameCanvas({
   // The key and focus listeners below are set up once, so they reach the latest pause functions through these.
   const pauseGameRef = useRef<() => void>(() => {});
   const requestResumeRef = useRef<() => void>(() => {});
+  const [shareStatus, setShareStatus] = useState<"idle" | "working" | "shared" | "saved" | "failed">("idle");
   const [bonus, setBonus] = useState<{ status: "idle" | "watching" | "claimed" | "unavailable"; gems: number }>({ status: "idle", gems: 0 });
   const startRunMutation = useStartRun();
   const { data: progression, isLoading: isProgressionLoading } = useProgression();
@@ -515,6 +517,7 @@ export function GameCanvas({
     cancelDeathEffect();
     scoreMutation.reset();
     setBonus({ status: "idle", gems: 0 });
+    setShareStatus("idle");
     try {
       const run = await startRunMutation.mutateAsync(multiplayerRef.current ? "multiplayer" : "solo");
       const equippedShip = progression?.equippedShip ?? "vanguard";
@@ -582,6 +585,25 @@ export function GameCanvas({
     autoStartAttemptedRef.current = true;
     startWithCountdown();
   }, [autoStart, isProgressionLoading, progression?.equippedShip]);
+
+  const shareResult = async () => {
+    if (shareStatus === "working") return;
+    setShareStatus("working");
+    try {
+      const ship = ships[shipRef.current];
+      const outcome = await shareRun({
+        score: gameState.score,
+        sector: gameState.sector,
+        survivalSeconds: gameState.survivalTime,
+        shipName: ship.name,
+        shipColor: ship.color,
+        newBest: !!personalBest?.isNewBest,
+      });
+      setShareStatus(outcome === "cancelled" ? "idle" : outcome);
+    } catch {
+      setShareStatus("failed");
+    }
+  };
 
   const claimBonus = async (gemsEarned: number) => {
     if (bonus.status !== "idle" || gemsEarned <= 0) return;
@@ -997,6 +1019,19 @@ export function GameCanvas({
           {bonus.status === "claimed" && <p className="mb-4 text-cyan-300 font-mono text-xs">BONUS +{bonus.gems} GEMS ADDED</p>}
           <div className="flex flex-wrap justify-center gap-3">
             <Button onClick={startWithCountdown} size="lg" className={`font-mono ${isPortal ? "[@media(max-height:520px)]:h-8 [@media(max-height:520px)]:text-xs" : ""}`}><RotateCcw className="mr-2 h-5 w-5" /> PLAY AGAIN</Button>
+            {!multiplayer && !isPortal && (
+              <Button
+                onClick={() => void shareResult()}
+                disabled={shareStatus === "working"}
+                variant="secondary"
+                size="lg"
+                className="font-mono"
+                aria-label="Share this run as a picture"
+              >
+                <Share2 className="mr-2 h-5 w-5" />
+                {shareStatus === "working" ? "MAKING CARD..." : shareStatus === "saved" ? "IMAGE SAVED" : shareStatus === "shared" ? "SHARED" : shareStatus === "failed" ? "TRY AGAIN" : "SHARE"}
+              </Button>
+            )}
             <Button asChild variant="outline" size="lg" className={`font-mono ${isPortal ? "[@media(max-height:520px)]:h-8 [@media(max-height:520px)]:text-xs" : ""}`}><Link href="/hangar">HANGAR</Link></Button>
             {!isPortal && <Button asChild variant="outline" size="lg" className="font-mono"><Link href="/leaderboard"><Trophy className="mr-2 h-5 w-5" /> LEADERBOARD</Link></Button>}
           </div>
