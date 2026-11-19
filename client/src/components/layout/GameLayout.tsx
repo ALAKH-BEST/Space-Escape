@@ -25,7 +25,7 @@ export function GameLayout({ children }: { children: ReactNode }) {
 
   return (
     // Portal builds fill the iframe exactly (no page scroll); the main area scrolls inside when a page is taller.
-    <div className={isPortal ? "h-[100dvh] overflow-hidden flex flex-col bg-cover bg-center" : "min-h-screen flex flex-col bg-cover bg-center bg-fixed"}>
+    <div className={isPortal ? "h-[100dvh] overflow-hidden flex flex-col bg-cover bg-center" : "desktop-fit-root min-h-screen flex flex-col bg-cover bg-center bg-fixed"}>
       {/* Dynamic Background Overlay */}
       <div className="fixed inset-0 bg-background/90 z-0 pointer-events-none" />
 
