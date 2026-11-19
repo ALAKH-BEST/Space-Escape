@@ -963,20 +963,20 @@ export function GameCanvas({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={effectsActive() ? { delay: DEATH_EFFECT_MS / 1000 - 0.1, duration: 0.35 } : { duration: 0 }}
-          className={`absolute inset-0 flex flex-col items-center justify-center bg-black/85 backdrop-blur-md p-4 ${isPortal ? "[@media(max-height:520px)]:p-2" : ""}`}
+          className={`results-overlay absolute inset-0 flex flex-col items-center justify-center bg-black/85 backdrop-blur-md p-4 ${isPortal ? "[@media(max-height:520px)]:p-2" : ""}`}
         >
-          <h2 className={`text-4xl sm:text-5xl font-display font-bold text-destructive mb-5 neon-text ${isPortal ? "[@media(max-height:520px)]:text-2xl [@media(max-height:520px)]:mb-2" : ""}`}>MISSION TERMINATED</h2>
+          <h2 className={`results-title text-4xl sm:text-5xl font-display font-bold text-destructive mb-5 neon-text ${isPortal ? "[@media(max-height:520px)]:text-2xl [@media(max-height:520px)]:mb-2" : ""}`}>MISSION TERMINATED</h2>
           {personalBest?.isNewBest && (
             <motion.div
               initial={effectsActive() ? { opacity: 0, scale: 0.8 } : false}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ type: "spring", stiffness: 260, damping: 18 }}
-              className={`mb-4 flex items-center gap-2 rounded-full border border-yellow-300/60 bg-yellow-300/10 px-4 py-1.5 font-display text-sm font-bold tracking-widest text-yellow-300 ${isPortal ? "[@media(max-height:520px)]:mb-1 [@media(max-height:520px)]:py-0.5 [@media(max-height:520px)]:text-xs" : ""}`}
+              className={`results-pill mb-4 flex items-center gap-2 rounded-full border border-yellow-300/60 bg-yellow-300/10 px-4 py-1.5 font-display text-sm font-bold tracking-widest text-yellow-300 ${isPortal ? "[@media(max-height:520px)]:mb-1 [@media(max-height:520px)]:py-0.5 [@media(max-height:520px)]:text-xs" : ""}`}
             >
               <Trophy className="h-4 w-4" /> NEW PERSONAL BEST
             </motion.div>
           )}
-          <div className={`grid grid-cols-2 gap-x-8 gap-y-3 text-sm font-mono w-full max-w-md mb-6 ${isPortal ? "[@media(max-height:520px)]:grid-cols-4 [@media(max-height:520px)]:max-w-xl [@media(max-height:520px)]:gap-x-4 [@media(max-height:520px)]:gap-y-1 [@media(max-height:520px)]:mb-2" : ""}`}>
+          <div className={`results-stats grid grid-cols-2 gap-x-8 gap-y-3 text-sm font-mono w-full max-w-md mb-6 ${isPortal ? "[@media(max-height:520px)]:grid-cols-4 [@media(max-height:520px)]:max-w-xl [@media(max-height:520px)]:gap-x-4 [@media(max-height:520px)]:gap-y-1 [@media(max-height:520px)]:mb-2" : ""}`}>
             <Result label="FINAL SCORE" value={gameState.score.toLocaleString()} />
             <Result label="SECTOR REACHED" value={gameState.sector.toString().padStart(2, "0")} />
             <Result label="SURVIVAL TIME" value={`${gameState.survivalTime.toFixed(1)}s`} />
@@ -987,7 +987,7 @@ export function GameCanvas({
                   <span>PERSONAL BEST</span>
                   <span className="text-white">{personalBest ? personalBest.best.toLocaleString() : "..."}</span>
                 </div>
-                {personalBest && <p className="mt-1 text-[11px] tracking-wide text-muted-foreground">{bestNote(personalBest, gameState.score)}</p>}
+                {personalBest && <p className="results-note mt-1 text-[11px] tracking-wide text-muted-foreground">{bestNote(personalBest, gameState.score)}</p>}
               </div>
             )}
             <div className={`col-span-2 border-t border-white/10 pt-3 flex justify-between text-cyan-300 ${isPortal ? "[@media(max-height:520px)]:col-span-4 [@media(max-height:520px)]:pt-1" : ""}`}>
@@ -1017,8 +1017,8 @@ export function GameCanvas({
             </Button>
           )}
           {bonus.status === "claimed" && <p className="mb-4 text-cyan-300 font-mono text-xs">BONUS +{bonus.gems} GEMS ADDED</p>}
-          <div className="flex flex-wrap justify-center gap-3">
-            <Button onClick={startWithCountdown} size="lg" className={`font-mono ${isPortal ? "[@media(max-height:520px)]:h-8 [@media(max-height:520px)]:text-xs" : ""}`}><RotateCcw className="mr-2 h-5 w-5" /> PLAY AGAIN</Button>
+          <div className="results-actions flex flex-wrap justify-center gap-3">
+            <Button onClick={startWithCountdown} size="lg" className={`font-mono ${isPortal ? "[@media(max-height:520px)]:h-8 [@media(max-height:520px)]:text-xs" : ""}`}><RotateCcw className="results-btn-icon mr-2 h-5 w-5" /> PLAY AGAIN</Button>
             {!multiplayer && !isPortal && (
               <Button
                 onClick={() => void shareResult()}
@@ -1028,12 +1028,12 @@ export function GameCanvas({
                 className="font-mono"
                 aria-label="Share this run as a picture"
               >
-                <Share2 className="mr-2 h-5 w-5" />
+                <Share2 className="results-btn-icon mr-2 h-5 w-5" />
                 {shareStatus === "working" ? "MAKING CARD..." : shareStatus === "saved" ? "IMAGE SAVED" : shareStatus === "shared" ? "SHARED" : shareStatus === "failed" ? "TRY AGAIN" : "SHARE"}
               </Button>
             )}
             <Button asChild variant="outline" size="lg" className={`font-mono ${isPortal ? "[@media(max-height:520px)]:h-8 [@media(max-height:520px)]:text-xs" : ""}`}><Link href="/hangar">HANGAR</Link></Button>
-            {!isPortal && <Button asChild variant="outline" size="lg" className="font-mono"><Link href="/leaderboard"><Trophy className="mr-2 h-5 w-5" /> LEADERBOARD</Link></Button>}
+            {!isPortal && <Button asChild variant="outline" size="lg" className="font-mono"><Link href="/leaderboard"><Trophy className="results-btn-icon mr-2 h-5 w-5" /> LEADERBOARD</Link></Button>}
           </div>
         </motion.div>
       )}
