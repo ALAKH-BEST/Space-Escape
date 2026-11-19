@@ -259,7 +259,8 @@ export function GameCanvas({
       const key = normalizeKey(e.key);
       if (isMovementKey(state.keys, key)) {
         state.keys[key] = true;
-        if (key.startsWith("Arrow")) e.preventDefault();
+        // Only hold the page still while flying; before launch and during the countdown the arrows scroll as usual.
+        if (state.isPlaying && key.startsWith("Arrow")) e.preventDefault();
       }
     };
     const handleKeyUp = (e: KeyboardEvent) => {

@@ -35,7 +35,7 @@ export default function GamePage() {
 
   return (
     <GameLayout>
-      <div className={isPortal ? "h-full max-w-5xl mx-auto" : "max-w-5xl mx-auto space-y-8 pb-12"}>
+      <div className={isPortal ? "h-full max-w-5xl mx-auto" : "fit-page max-w-5xl mx-auto space-y-8 pb-12"}>
         <AnimatePresence mode="wait">
           {!showGame ? (
             <motion.div
@@ -100,7 +100,7 @@ export default function GamePage() {
               key="game"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className={isPortal ? "h-full flex items-center justify-center" : "space-y-4 sm:space-y-8 phone-landscape:space-y-2"}
+              className={isPortal ? "h-full flex items-center justify-center" : "fit-stage space-y-4 sm:space-y-8 phone-landscape:space-y-2"}
             >
               {isPortal ? (
                 // Fit the 16:9 game frame inside whatever space the portal gives, never taller than it.
@@ -111,7 +111,7 @@ export default function GamePage() {
               <>
               <div className="flex items-center justify-between">
                 <div>
-                  <h1 className="text-base min-[400px]:text-xl sm:text-4xl phone-landscape:text-base font-display font-bold text-foreground mb-1 sm:mb-2 phone-landscape:mb-0">
+                  <h1 className="fit-title text-base min-[400px]:text-xl sm:text-4xl phone-landscape:text-base font-display font-bold text-foreground mb-1 sm:mb-2 phone-landscape:mb-0">
                     STARTING SECTOR: {launchSector.name.toUpperCase()}
                   </h1>
                   <p className="max-sm:hidden phone-landscape:hidden text-muted-foreground font-mono">
@@ -128,15 +128,23 @@ export default function GamePage() {
                 </Button>
               </div>
 
-              <GameCanvas autoStart={launchFromHangar} initialSectorId={launchSector.id} />
+              <div className="fit-frame-slot">
+                <GameCanvas autoStart={launchFromHangar} initialSectorId={launchSector.id} />
+              </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="fit-strip font-mono text-[11px] uppercase tracking-widest text-muted-foreground">
+                <span>Rank <b className="text-foreground">CADET</b></span>
+                <span>Best <b className="text-foreground">---</b></span>
+                <span>Ship <b className="text-foreground">{currentShip.name} · OPERATIONAL</b></span>
+              </div>
+
+              <div className="fit-hide grid grid-cols-1 md:grid-cols-3 gap-6">
                 <StatsCard label="CURRENT RANK" value="CADET" delay={0} />
                 <StatsCard label="BEST SCORE" value="---" delay={100} />
                 <StatsCard label="SHIP STATUS" value={`${currentShip.name} · OPERATIONAL`} delay={200} />
               </div>
               
-              <div className="text-center">
+              <div className="fit-hide text-center">
                 <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-[0.2em]">
                   Made by Alakh
                 </p>
