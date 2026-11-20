@@ -96,7 +96,7 @@ export function useStartRun() {
   const { toast } = useToast();
 
   return useMutation({
-    mutationFn: async (mode: "solo" | "multiplayer" | "daily") => {
+    mutationFn: async (mode: "solo" | "multiplayer") => {
       if (isPortal) return { runId: crypto.randomUUID(), runToken: "local", startedAt: Date.now() };
       const res = await fetch(apiUrl(api.runs.start.path), {
         method: api.runs.start.method,

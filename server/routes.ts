@@ -42,7 +42,6 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
       const result = await storage.createScore({
         userId: req.user!.id,
         runId: claims.runId,
-        challengeDate: claims.challengeDate,
         score: calculateReportedScore(claims, input.playMs),
       });
 
@@ -59,12 +58,9 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
     try {
       if (!req.isAuthenticated()) return res.status(401).send();
       const { mode, heartbeat } = api.runs.start.input.parse(req.body);
-      const challengeDate = mode === "daily" ? dailyDate() : undefined;
-      const run = issueRun(req.user!.id, mode, {
-        legacy: legacyRunTokensAllowed() && !heartbeat,
-        challengeDate,
-      });
-      res.status(201).json(challengeDate ? { ...run, seed: dailySeed(challengeDate) } : run);
+      res.status(201).json(
+        issueRun(req.user!.id, mode, { legacy: legacyRunTokensAllowed() && !heartbeat }),
+      );
     } catch (error) {
       if (error instanceof z.ZodError || error instanceof RunAuthorityError) {
         return res.status(400).json({ message: error instanceof Error ? error.message : "Invalid run" });

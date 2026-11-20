@@ -277,28 +277,3 @@ test("a client cannot report more play than the server credited", () => {
   const claims = verifyRun(run.runId, run.runToken, 7, run.startedAt + 6_000);
   assert.equal(calculateReportedScore(claims, 600_000, claims.startedAt + 6_000), 72);
 });
-
-// ---------------------------------------------------------------------------
-// Daily challenge runs carry their day inside the signed token.
-// ---------------------------------------------------------------------------
-
-test("a daily run remembers its day and cannot be moved to another", () => {
-  const run = issueRun(7, "daily", { challengeDate: "2026-11-20" });
-  assert.equal(run.challengeDate, "2026-11-20");
-  assert.equal(verifyRun(run.runId, run.runToken, 7, run.startedAt + 5_000).challengeDate, "2026-11-20");
-
-  // Swap the day inside the payload: the signature no longer matches.
-  const [payload, signature] = run.runToken.split(".");
-  const claims = JSON.parse(Buffer.from(payload, "base64url").toString("utf8"));
-  claims.challengeDate = "2026-11-21";
-  const forged = Buffer.from(JSON.stringify(claims)).toString("base64url");
-  assert.throws(() => verifyRun(run.runId, `${forged}.${signature}`, 7));
-});
-
-test("a daily run needs a real day, and ordinary runs have none", () => {
-  assert.throws(() => issueRun(7, "daily"));
-  assert.throws(() => issueRun(7, "daily", { challengeDate: "2026-02-30" }));
-  const solo = issueRun(7, "solo");
-  assert.equal(solo.challengeDate, undefined);
-  assert.equal(verifyRun(solo.runId, solo.runToken, 7, solo.startedAt + 1_000).challengeDate, undefined);
-});

@@ -526,9 +526,7 @@ export function GameCanvas({
     setBonus({ status: "idle", gems: 0 });
     setShareStatus("idle");
     try {
-      const run = await startRunMutation.mutateAsync(
-        multiplayerRef.current ? "multiplayer" : dailyActive ? "daily" : "solo",
-      );
+      const run = await startRunMutation.mutateAsync(multiplayerRef.current ? "multiplayer" : "solo");
       const equippedShip = progression?.equippedShip ?? "vanguard";
       shipRef.current = equippedShip;
       const now = performance.now();
@@ -555,7 +553,7 @@ export function GameCanvas({
         abilityActiveUntil: 0,
         abilityCooldownUntil: 0,
         // Multiplayer shares the room's course and a daily run the day's course; otherwise every run is new.
-        rngSeed: multiplayerRef.current?.room.seed ?? run.seed ?? Math.floor(Math.random() * 2_147_483_647),
+        rngSeed: multiplayerRef.current?.room.seed ?? (dailyActive ? dailyQuery.data?.seed : undefined) ?? Math.floor(Math.random() * 2_147_483_647),
         lastPositionBroadcast: 0,
       };
       gameplayStart();
