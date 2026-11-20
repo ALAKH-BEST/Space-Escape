@@ -5,6 +5,7 @@ import { ProgressionError, storage } from "./storage";
 import { api } from "@shared/routes";
 import { z } from "zod";
 import { isShipId } from "@shared/ships";
+import { dailyDate, dailyEndsAt, dailySeed } from "@shared/daily";
 import {
   calculateReportedScore,
   issueRun,
@@ -22,6 +23,12 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
   app.get(api.scores.list.path, async (req, res) => {
     const topScores = await storage.getTopScores();
     res.json(topScores);
+  });
+
+  // Today's challenge: the day, its seed and when it ends.
+  app.get(api.daily.today.path, (_req, res) => {
+    const date = dailyDate();
+    res.json({ date, seed: dailySeed(date), endsAt: dailyEndsAt(date) });
   });
 
   app.post(api.scores.create.path, async (req, res) => {

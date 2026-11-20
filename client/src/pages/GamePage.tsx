@@ -4,10 +4,11 @@ import { GameLayout } from "@/components/layout/GameLayout";
 import { GameCanvas } from "@/components/game/GameCanvas";
 import { MusicToggle } from "@/components/game/MusicToggle";
 import { Card } from "@/components/ui/card";
-import { Info, Play, Rocket, Trophy, Target } from "lucide-react";
+import { CalendarDays, Info, Play, Rocket, Trophy, Target } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
 import { useProgression } from "@/hooks/use-progression";
+import { formatTimeLeft, useDaily } from "@/hooks/use-daily";
 import { getSectorEnvironmentById } from "@/lib/sector-environments";
 import { ships } from "@shared/ships";
 import { isPortal } from "@/lib/portal";
@@ -24,6 +25,9 @@ export default function GamePage() {
   const launchFromHangar = launchRequest.direct;
   const launchSector = launchRequest.sector;
   const [showGame, setShowGame] = useState(launchFromHangar);
+  // True when the pilot chose today's daily challenge rather than an ordinary mission.
+  const [daily, setDaily] = useState(false);
+  const { data: dailyInfo } = useDaily();
   const { data: progression } = useProgression();
   const currentShip = ships[progression?.equippedShip ?? "vanguard"];
 
@@ -62,7 +66,7 @@ export default function GamePage() {
 
               <div className="flex flex-col sm:flex-row gap-4 w-full max-w-md">
                 <Button 
-                  onClick={() => setShowGame(true)}
+                  onClick={() => { setDaily(false); setShowGame(true); }}
                   size="lg"
                   className={`flex-1 ${isPortal ? "h-12 text-lg" : "h-16 text-xl"} font-display tracking-widest bg-gradient-to-r from-primary to-accent hover:scale-105 transition-all shadow-xl shadow-primary/20`}
                 >
@@ -70,6 +74,27 @@ export default function GamePage() {
                   INITIATE MISSION
                 </Button>
               </div>
+
+              {!isPortal && dailyInfo && (
+                <button
+                  type="button"
+                  onClick={() => { setDaily(true); setShowGame(true); }}
+                  className="w-full max-w-md rounded-xl border border-violet-400/40 bg-violet-500/10 px-5 py-4 text-left backdrop-blur transition hover:border-violet-300/70 hover:bg-violet-500/20"
+                >
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="flex items-center gap-2 font-display text-lg font-bold tracking-wider text-violet-200">
+                      <CalendarDays className="h-5 w-5" /> DAILY CHALLENGE
+                    </span>
+                    <span className="font-mono text-[11px] uppercase tracking-widest text-muted-foreground">{dailyInfo.date}</span>
+                  </div>
+                  <p className="mt-1 font-mono text-xs text-muted-foreground">
+                    The same course for every pilot today. New one at midnight UTC.
+                  </p>
+                  <div className="mt-2 text-right font-mono text-[11px] uppercase tracking-widest text-muted-foreground">
+                    {formatTimeLeft(dailyInfo.endsAt)} left
+                  </div>
+                </button>
+              )}
 
               {!isPortal && (<>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 w-full mt-8">
@@ -112,10 +137,10 @@ export default function GamePage() {
               <div className="flex items-center justify-between">
                 <div>
                   <h1 className="fit-title text-base min-[400px]:text-xl sm:text-4xl phone-landscape:text-base font-display font-bold text-foreground mb-1 sm:mb-2 phone-landscape:mb-0">
-                    STARTING SECTOR: {launchSector.name.toUpperCase()}
+                    {daily ? `DAILY CHALLENGE · ${dailyInfo?.date ?? ""}` : `STARTING SECTOR: ${launchSector.name.toUpperCase()}`}
                   </h1>
                   <p className="max-sm:hidden phone-landscape:hidden text-muted-foreground font-mono">
-                    OBJECTIVE: SURVIVE AS LONG AS POSSIBLE
+                    {daily ? "SAME COURSE FOR EVERY PILOT TODAY" : "OBJECTIVE: SURVIVE AS LONG AS POSSIBLE"}
                   </p>
                 </div>
                 <Button 
@@ -129,7 +154,7 @@ export default function GamePage() {
               </div>
 
               <div className="fit-frame-slot">
-                <GameCanvas autoStart={launchFromHangar} initialSectorId={launchSector.id} />
+                <GameCanvas autoStart={launchFromHangar} initialSectorId={launchSector.id} daily={daily} />
               </div>
 
               <div className="fit-strip font-mono text-[11px] uppercase tracking-widest text-muted-foreground">

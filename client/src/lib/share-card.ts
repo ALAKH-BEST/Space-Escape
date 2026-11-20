@@ -8,6 +8,8 @@ export type ShareStats = {
   shipName: string;
   shipColor: string;
   newBest: boolean;
+  /** The UTC day (YYYY-MM-DD) when this was a daily challenge run. */
+  dailyDate?: string;
 };
 
 export const CARD_WIDTH = 1080;
@@ -24,8 +26,9 @@ export function formatSurvival(seconds: number): string {
 export function shareText(stats: ShareStats, url: string): string {
   const sector = getSectorEnvironmentByNumber(stats.sector);
   const best = stats.newBest ? " A new personal best!" : "";
+  const where = stats.dailyDate ? `the ${stats.dailyDate} daily challenge in ASTRODODGE` : "ASTRODODGE";
   return (
-    `I scored ${stats.score.toLocaleString("en-US")} in ASTRODODGE and reached Sector ${stats.sector} ` +
+    `I scored ${stats.score.toLocaleString("en-US")} in ${where} and reached Sector ${stats.sector} ` +
     `(${sector.name}) in ${formatSurvival(stats.survivalSeconds)}.${best} Can you beat it? ${url}`
   );
 }
@@ -117,7 +120,7 @@ export function drawShareCard(ctx: CanvasRenderingContext2D, stats: ShareStats, 
   ctx.shadowBlur = 0;
   ctx.fillStyle = withAlpha(p.debris, 0.8);
   ctx.font = font(600, 28);
-  ctx.fillText("MISSION TERMINATED", W / 2, 250);
+  ctx.fillText(stats.dailyDate ? `DAILY CHALLENGE  ·  ${stats.dailyDate}` : "MISSION TERMINATED", W / 2, 250);
 
   // The ship, nose up, with an engine glow.
   const sx = W / 2;

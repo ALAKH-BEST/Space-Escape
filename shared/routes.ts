@@ -74,6 +74,19 @@ export const api = {
       },
     },
   },
+  daily: {
+    today: {
+      method: "GET" as const,
+      path: "/api/daily",
+      responses: {
+        200: z.object({
+          date: z.string(),
+          seed: z.number().int(),
+          endsAt: z.number().int(),
+        }),
+      },
+    },
+  },
   runs: {
     start: {
       method: "POST" as const,
