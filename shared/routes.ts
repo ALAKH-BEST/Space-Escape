@@ -74,12 +74,25 @@ export const api = {
       },
     },
   },
+  daily: {
+    today: {
+      method: "GET" as const,
+      path: "/api/daily",
+      responses: {
+        200: z.object({
+          date: z.string(),
+          seed: z.number().int(),
+          endsAt: z.number().int(),
+        }),
+      },
+    },
+  },
   runs: {
     start: {
       method: "POST" as const,
       path: "/api/runs/start",
       input: z.object({
-        mode: z.enum(["solo", "multiplayer"]),
+        mode: z.enum(["solo", "multiplayer", "daily"]),
         heartbeat: z.boolean().optional(),
       }).strict(),
       responses: {
@@ -87,6 +100,9 @@ export const api = {
           runId: z.string().uuid(),
           runToken: z.string().min(1),
           startedAt: z.number().int(),
+          // Daily runs only: the day and the seed that makes its course.
+          challengeDate: z.string().optional(),
+          seed: z.number().int().optional(),
         }),
         401: z.void(),
       },

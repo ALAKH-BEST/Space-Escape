@@ -6,6 +6,7 @@ import { Gem, Play, RotateCcw, Share2, Shield, Sparkles, Trophy, Video, Zap } fr
 import { api } from "@shared/routes";
 import { sendRunHeartbeat, useStartRun, useSubmitScore } from "@/hooks/use-scores";
 import { useProgression } from "@/hooks/use-progression";
+import { useDaily } from "@/hooks/use-daily";
 import { AchievementToast } from "@/components/game/AchievementToast";
 import { MobileControls } from "@/components/game/MobileControls";
 import { MusicToggle } from "@/components/game/MusicToggle";
@@ -92,6 +93,7 @@ export function GameCanvas({
   multiplayer,
   autoStart = false,
   initialSectorId = "violet-expanse",
+  daily = false,
 }: {
   multiplayer?: {
     room: MultiplayerRoom;
@@ -99,6 +101,8 @@ export function GameCanvas({
   };
   autoStart?: boolean;
   initialSectorId?: SectorEnvironment["id"];
+  /** Fly today's daily challenge: the same course for everyone, scored on the daily board. */
+  daily?: boolean;
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const requestRef = useRef<number>();
@@ -121,6 +125,8 @@ export function GameCanvas({
   const [shareStatus, setShareStatus] = useState<"idle" | "working" | "shared" | "saved" | "failed">("idle");
   const [bonus, setBonus] = useState<{ status: "idle" | "watching" | "claimed" | "unavailable"; gems: number }>({ status: "idle", gems: 0 });
   const startRunMutation = useStartRun();
+  const dailyQuery = useDaily();
+  const dailyActive = daily && !multiplayer && !isPortal;
   const { data: progression, isLoading: isProgressionLoading } = useProgression();
   const startingSectorNumber = getSectorNumberById(initialSectorId);
   const backgroundSectorRef = useRef(startingSectorNumber);
@@ -520,7 +526,9 @@ export function GameCanvas({
     setBonus({ status: "idle", gems: 0 });
     setShareStatus("idle");
     try {
-      const run = await startRunMutation.mutateAsync(multiplayerRef.current ? "multiplayer" : "solo");
+      const run = await startRunMutation.mutateAsync(
+        multiplayerRef.current ? "multiplayer" : dailyActive ? "daily" : "solo",
+      );
       const equippedShip = progression?.equippedShip ?? "vanguard";
       shipRef.current = equippedShip;
       const now = performance.now();
@@ -546,7 +554,8 @@ export function GameCanvas({
         shieldCharges: equippedShip === "titan" ? 3 : 0,
         abilityActiveUntil: 0,
         abilityCooldownUntil: 0,
-        rngSeed: multiplayerRef.current?.room.seed ?? Math.floor(Math.random() * 2_147_483_647),
+        // Multiplayer shares the room's course and a daily run the day's course; otherwise every run is new.
+        rngSeed: multiplayerRef.current?.room.seed ?? run.seed ?? Math.floor(Math.random() * 2_147_483_647),
         lastPositionBroadcast: 0,
       };
       gameplayStart();
@@ -596,6 +605,7 @@ export function GameCanvas({
         score: gameState.score,
         sector: gameState.sector,
         survivalSeconds: gameState.survivalTime,
+        dailyDate: dailyActive ? dailyQuery.data?.date : undefined,
         shipName: ship.name,
         shipColor: ship.color,
         newBest: !!personalBest?.isNewBest,
@@ -966,7 +976,7 @@ export function GameCanvas({
           transition={effectsActive() ? { delay: DEATH_EFFECT_MS / 1000 - 0.1, duration: 0.35 } : { duration: 0 }}
           className={`results-overlay absolute inset-0 flex flex-col items-center justify-center bg-black/85 backdrop-blur-md p-4 ${isPortal ? "[@media(max-height:520px)]:p-2" : ""}`}
         >
-          <h2 className={`results-title text-4xl sm:text-5xl font-display font-bold text-destructive mb-5 neon-text ${isPortal ? "[@media(max-height:520px)]:text-2xl [@media(max-height:520px)]:mb-2" : ""}`}>MISSION TERMINATED</h2>
+          <h2 className={`results-title text-4xl sm:text-5xl font-display font-bold text-destructive mb-5 neon-text ${isPortal ? "[@media(max-height:520px)]:text-2xl [@media(max-height:520px)]:mb-2" : ""}`}>{dailyActive ? "DAILY COMPLETE" : "MISSION TERMINATED"}</h2>
           {personalBest?.isNewBest && (
             <motion.div
               initial={effectsActive() ? { opacity: 0, scale: 0.8 } : false}

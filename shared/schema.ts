@@ -1,4 +1,4 @@
-import { pgTable, text, serial, integer, uniqueIndex } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, uniqueIndex, index } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
@@ -19,9 +19,14 @@ export const scores = pgTable(
     userId: integer("user_id").notNull().references(() => users.id),
     score: integer("score").notNull(),
     runId: text("run_id"),
+    // The UTC day (YYYY-MM-DD) of a daily challenge run; null for ordinary runs.
+    challengeDate: text("challenge_date"),
   },
   // One score per run, enforced by the database so two simultaneous submissions cannot both pay out.
-  (table) => [uniqueIndex("scores_user_run_idx").on(table.userId, table.runId)],
+  (table) => [
+    uniqueIndex("scores_user_run_idx").on(table.userId, table.runId),
+    index("scores_challenge_idx").on(table.challengeDate, table.score),
+  ],
 );
 
 export const insertUserSchema = createInsertSchema(users).pick({

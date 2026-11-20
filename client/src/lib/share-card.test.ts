@@ -87,3 +87,18 @@ test("a huge score still fits on the card", () => {
   assert.ok(CARD_WIDTH === 1080 && CARD_HEIGHT === 1350);
   assert.ok(widths.length > 0 && widths[widths.length - 1] <= CARD_WIDTH - 160, "the score was shrunk to fit");
 });
+
+test("a daily challenge run says so in the message and on the card", () => {
+  const stats = { score: 900, sector: 2, survivalSeconds: 75, shipName: "VANGUARD", shipColor: "#33ccff", newBest: false, dailyDate: "2026-11-20" };
+  assert.match(shareText(stats, "https://x.test"), /2026-11-20 daily challenge in ASTRODODGE/);
+  assert.doesNotMatch(shareText({ ...stats, dailyDate: undefined }, "https://x.test"), /daily/);
+
+  const drawn: string[] = [];
+  const ctx = new Proxy({}, {
+    get: (_t, prop) => (prop === "fillText" ? (text: string) => drawn.push(text) : () => ({ addColorStop() {} })),
+    set: () => true,
+  }) as unknown as CanvasRenderingContext2D;
+  drawShareCard(ctx, stats, "sans-serif", "astrododge.test");
+  assert.ok(drawn.some((t) => t.includes("DAILY CHALLENGE") && t.includes("2026-11-20")));
+  assert.ok(!drawn.includes("MISSION TERMINATED"));
+});

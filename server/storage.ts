@@ -1,6 +1,6 @@
 import { users, scores, type User, type InsertUser, type Score, type InsertScore } from "@shared/schema";
 import { db } from "./db";
-import { eq, desc, and, sql } from "drizzle-orm";
+import { eq, desc, and, sql, gt } from "drizzle-orm";
 import { ships, type ShipId } from "@shared/ships";
 import { MAX_AUTHORITATIVE_SCORE } from "./run-authority";
 
@@ -10,6 +10,8 @@ export type Progression = {
   equippedShip: ShipId;
 };
 
+export type DailyEntry = { userId: number; username: string; score: number };
+
 export class ProgressionError extends Error {}
 
 export interface IStorage {
@@ -17,13 +19,15 @@ export interface IStorage {
   getUserByUsername(username: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
   
-  createScore(score: InsertScore & { userId: number; runId: string }): Promise<{
+  createScore(score: InsertScore & { userId: number; runId: string; challengeDate?: string }): Promise<{
     score: Score;
     gemsEarned: number;
     totalGems: number;
     duplicate: boolean;
   }>;
   getTopScores(limit?: number): Promise<(Score & { username: string })[]>;
+  getDailyScores(date: string, limit?: number): Promise<DailyEntry[]>;
+  getDailyStanding(date: string, userId: number): Promise<{ rank: number; score: number } | null>;
   getProgression(userId: number): Promise<Progression>;
   purchaseShip(userId: number, shipId: ShipId): Promise<Progression>;
   equipShip(userId: number, shipId: ShipId): Promise<Progression>;
@@ -45,7 +49,7 @@ export class DatabaseStorage implements IStorage {
     return user;
   }
 
-  async createScore(score: InsertScore & { userId: number; runId: string }) {
+  async createScore(score: InsertScore & { userId: number; runId: string; challengeDate?: string }) {
     if (
       !Number.isInteger(score.score) ||
       score.score < 0 ||
@@ -96,6 +100,7 @@ export class DatabaseStorage implements IStorage {
         score: scores.score,
         userId: scores.userId,
         runId: scores.runId,
+        challengeDate: scores.challengeDate,
         username: users.username,
       })
       .from(scores)
@@ -104,6 +109,43 @@ export class DatabaseStorage implements IStorage {
       .limit(limit);
     
     return result;
+  }
+
+  /** Each pilot's best run on a day's challenge, highest first (earliest score wins a tie). */
+  async getDailyScores(date: string, limit = 20): Promise<DailyEntry[]> {
+    const best = sql<number>`max(${scores.score})`;
+    const rows = await db
+      .select({ userId: scores.userId, username: users.username, score: best })
+      .from(scores)
+      .innerJoin(users, eq(scores.userId, users.id))
+      .where(eq(scores.challengeDate, date))
+      .groupBy(scores.userId, users.username)
+      .orderBy(desc(best), sql`min(${scores.id})`)
+      .limit(limit);
+    return rows.map((row) => ({ ...row, score: Number(row.score) }));
+  }
+
+  /** A pilot's best score on a day and their place among everyone who played it, or null if they have not played. */
+  async getDailyStanding(date: string, userId: number) {
+    const [mine] = await db
+      .select({ score: sql<number>`max(${scores.score})` })
+      .from(scores)
+      .where(and(eq(scores.challengeDate, date), eq(scores.userId, userId)));
+    const score = mine?.score === null || mine?.score === undefined ? null : Number(mine.score);
+    if (score === null) return null;
+
+    const [ahead] = await db
+      .select({ count: sql<number>`count(*)` })
+      .from(
+        db
+          .select({ userId: scores.userId, best: sql<number>`max(${scores.score})`.as("best") })
+          .from(scores)
+          .where(eq(scores.challengeDate, date))
+          .groupBy(scores.userId)
+          .as("daily_best"),
+      )
+      .where(gt(sql`best`, score));
+    return { rank: Number(ahead?.count ?? 0) + 1, score };
   }
 
   async getProgression(userId: number): Promise<Progression> {

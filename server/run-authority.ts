@@ -1,5 +1,6 @@
 import { createHmac, randomUUID, timingSafeEqual } from "node:crypto";
 
+import { isDailyDate } from "@shared/daily";
 import { MAX_RUN_SECONDS, MAX_SCORE, SCORE_PER_SECOND, scoreForPlayTime } from "@shared/scoring";
 
 export { MAX_RUN_SECONDS };
@@ -23,13 +24,15 @@ export const MAX_HEARTBEAT_GAP_MS = 10_000;
  */
 const LEGACY_RUN_WINDOW_MS = 20 * 60 * 1_000;
 
-export type RunMode = "solo" | "multiplayer";
+export type RunMode = "solo" | "multiplayer" | "daily";
 
 type BaseClaims = {
   runId: string;
   userId: number;
   mode: RunMode;
   startedAt: number;
+  /** The UTC day a daily challenge run was started on; set only when mode is "daily". */
+  challengeDate?: string;
 };
 
 type LegacyRunClaims = BaseClaims & { version: 1 };
@@ -73,9 +76,22 @@ function encodeClaims(claims: RunClaims) {
   return `${encodedClaims}.${sign(encodedClaims)}`;
 }
 
-export function issueRun(userId: number, mode: RunMode, options: { legacy?: boolean } = {}) {
+export function issueRun(
+  userId: number,
+  mode: RunMode,
+  options: { legacy?: boolean; challengeDate?: string } = {},
+) {
   const startedAt = Date.now();
-  const base = { runId: randomUUID(), userId, mode, startedAt };
+  if (mode === "daily" && !isDailyDate(options.challengeDate)) {
+    throw new RunAuthorityError("A daily run needs a challenge day");
+  }
+  const base = {
+    runId: randomUUID(),
+    userId,
+    mode,
+    startedAt,
+    ...(mode === "daily" ? { challengeDate: options.challengeDate } : {}),
+  };
   const claims: RunClaims = options.legacy
     ? { version: 1, ...base }
     : { version: 2, ...base, lastBeatAt: startedAt, activeMs: 0 };
@@ -83,6 +99,7 @@ export function issueRun(userId: number, mode: RunMode, options: { legacy?: bool
     runId: claims.runId,
     runToken: encodeClaims(claims),
     startedAt: claims.startedAt,
+    challengeDate: claims.challengeDate,
   };
 }
 
@@ -113,7 +130,8 @@ export function verifyRun(runId: string, runToken: string, userId: number, now =
     (claims.version !== 1 && claims.version !== 2) ||
     claims.runId !== runId ||
     claims.userId !== userId ||
-    (claims.mode !== "solo" && claims.mode !== "multiplayer") ||
+    (claims.mode !== "solo" && claims.mode !== "multiplayer" && claims.mode !== "daily") ||
+    (claims.mode === "daily" ? !isDailyDate(claims.challengeDate) : claims.challengeDate !== undefined) ||
     !Number.isInteger(claims.startedAt) ||
     claims.startedAt > now + 30_000
   ) {
