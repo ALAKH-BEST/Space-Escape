@@ -8,10 +8,11 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useEquipShip, useProgression, usePurchaseShip } from "@/hooks/use-progression";
 import { sectorEnvironments, type SectorEnvironment } from "@/lib/sector-environments";
-import { ships, type ShipDefinition, type ShipId } from "@shared/ships";
+import { ships, shipsByPrice, type ShipDefinition, type ShipId } from "@shared/ships";
 import "./hangar.css";
 
-const shipOrder: ShipId[] = ["vanguard", "phantom", "titan", "nova"];
+// Cheapest first, so the roster reads as a progression.
+const shipOrder: ShipId[] = shipsByPrice.map((ship) => ship.id);
 
 export default function HangarPage() {
   const { data: progression, isLoading } = useProgression();
@@ -319,6 +320,18 @@ function ShipModel({ shipId }: { shipId: ShipId }) {
       body: "M382 130 100 38 166 130 100 222Z",
       wing: "M218 130 128 42 150 130 128 218Z",
     },
+    comet: {
+      body: "M376 130 108 52 150 130 108 208Z",
+      wing: "M200 130 120 86 156 130 120 174Z",
+    },
+    aegis: {
+      body: "M360 130 270 62 150 62 108 130 150 198 270 198Z",
+      wing: "M300 130 250 90 170 90 140 130 170 170 250 170Z",
+    },
+    eclipse: {
+      body: "M384 130 150 36 112 130 150 224Z",
+      wing: "M240 130 168 66 190 130 168 194Z",
+    },
   };
   const hull = hulls[shipId];
   const hullGradientId = `ship-hull-${shipId}`;
@@ -347,6 +360,9 @@ function ShipModel({ shipId }: { shipId: ShipId }) {
         <path d="M182 93 223 78M182 167l41 15" stroke="rgba(255,255,255,.62)" strokeWidth="3" strokeLinecap="round" />
         {shipId === "titan" && <><rect x="128" y="91" width="24" height="78" rx="7" fill="#78350f" stroke="#fbbf24" strokeWidth="3" /><path d="M276 101v58" stroke="#fbbf24" strokeWidth="5" /></>}
         {shipId === "nova" && <><path d="m252 103 53-27M252 157l53 27" stroke="var(--ship-glow)" strokeWidth="5" strokeLinecap="round" /><circle cx="319" cy="76" r="5" fill="#fff" /><circle cx="319" cy="184" r="5" fill="#fff" /></>}
+        {shipId === "comet" && <path d="M96 112H40M96 148H40M84 130H28" stroke="var(--ship-glow)" strokeWidth="3" strokeLinecap="round" strokeDasharray="10 8" />}
+        {shipId === "aegis" && <><path d="M338 62a86 86 0 0 1 0 136" stroke="var(--ship-glow)" strokeWidth="5" strokeLinecap="round" strokeOpacity=".8" /><path d="M356 86a62 62 0 0 1 0 88" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeOpacity=".5" /></>}
+        {shipId === "eclipse" && <><circle cx="226" cy="130" r="60" stroke="var(--ship-glow)" strokeWidth="3" strokeDasharray="4 9" strokeOpacity=".8" /><circle cx="226" cy="130" r="20" fill="#0b1020" stroke="var(--ship-glow)" strokeWidth="3" /></>}
         {shipId === "phantom" && <><path d="M223 103 180 43M223 157l-43 60" stroke="#e0f2fe" strokeOpacity=".75" strokeWidth="3" /><path d="M102 130H56" stroke="#22d3ee" strokeWidth="2" strokeDasharray="5 7" /></>}
       </svg>
     </div>
@@ -463,6 +479,9 @@ function ShipVisual({ shipId, color }: { shipId: ShipId; color: string }) {
         {shipId === "vanguard" && <><path fill="#f8fafc" d="M142 50 56 20 68 50 56 80Z" /><path fill={color} d="M68 50 35 28 48 50 35 72Z" /><ellipse cx="98" cy="50" rx="16" ry="7" fill="#0ea5e9" /></>}
         {shipId === "phantom" && <><path fill="#e0f2fe" d="M145 50 47 18 65 50 47 82Z" /><path fill={color} d="M65 50 28 38 43 50 28 62Z" /><path d="M83 35 63 16M83 65 63 84" /></>}
         {shipId === "titan" && <><path fill="#fbbf24" d="M135 50 75 22 57 35 38 50 57 65 75 78Z" /><path fill="#78350f" d="M75 35h35l17 15-17 15H75l-12-15Z" /><rect x="43" y="39" width="12" height="22" rx="3" /></>}
+        {shipId === "comet" && <><path fill="#ecfccb" d="M144 50 54 22 70 50 54 78Z" /><path fill={color} d="M78 50 46 30 54 50 46 70Z" /><ellipse cx="102" cy="50" rx="14" ry="6" fill="#0ea5e9" /></>}
+        {shipId === "aegis" && <><path fill="#fee2e2" d="M140 50 106 22 52 24 40 50 52 76 106 78Z" /><path fill={color} d="M96 38H62v24h34Z" /><path d="M114 30 56 22M114 70 56 78" /></>}
+        {shipId === "eclipse" && <><path fill="#1e1b4b" d="M146 50 66 20 42 50 66 80Z" /><circle cx="78" cy="50" r="11" fill={color} /></>}
         {shipId === "nova" && <><path fill="#fdf2f8" d="M148 50 52 22 72 50 52 78Z" /><path fill={color} d="M75 50 42 20 49 50 42 80Z" /><path d="m85 32 25-15M85 68l25 15" /><ellipse cx="103" cy="50" rx="12" ry="5" fill="#db2777" /></>}
       </svg>
     </div>

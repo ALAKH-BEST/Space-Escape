@@ -1,7 +1,8 @@
 import { z } from "zod";
 import { insertUserSchema, users, scores } from "./schema";
+import { shipIds } from "./ships";
 
-const shipIdSchema = z.enum(["vanguard", "phantom", "titan", "nova"]);
+const shipIdSchema = z.enum(shipIds);
 
 export const api = {
   auth: {

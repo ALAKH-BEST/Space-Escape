@@ -4,7 +4,16 @@
 import { getAudioGain } from "@/lib/background-music";
 import { getSfxContext } from "@/lib/collision-sound";
 
-export type AbilitySoundKind = "phase" | "phaseEnd" | "overdrive" | "overdriveEnd" | "fortress";
+export type AbilitySoundKind =
+  | "phase"
+  | "phaseEnd"
+  | "overdrive"
+  | "overdriveEnd"
+  | "fortress"
+  | "afterburner"
+  | "barrier"
+  | "timewarp"
+  | "timewarpEnd";
 
 function createOutput(context: BaseAudioContext, level: number) {
   const output = context.createGain();
@@ -139,6 +148,36 @@ export function buildAbilitySound(context: BaseAudioContext, when: number, kind:
       glide(context, out, when, 0.8, "triangle", 380, 392, 0.12, 0.15);
       sweptNoise(context, out, when, 0.35, 600, 1800, 0.14, "bandpass", 2);
       glide(context, out, when + 0.18, 0.6, "sine", 1175, 1175, 0.07, 0.01);
+      break;
+    }
+    case "afterburner": {
+      // Comet C3 - Afterburner: a short, sharp burst of thrust.
+      const out = createOutput(context, 0.4 * volume);
+      sweptNoise(context, out, when, 0.3, 700, 2600, 0.26, "bandpass", 1.2);
+      glide(context, out, when, 0.3, "sawtooth", 160, 420, 0.14, 0.01, 0, { from: 600, to: 3000 });
+      break;
+    }
+    case "barrier": {
+      // Aegis - Barrier: a clean, rising chime as a charge comes up.
+      const out = createOutput(context, 0.3 * volume);
+      glide(context, out, when, 0.5, "sine", 523, 784, 0.2, 0.04);
+      glide(context, out, when + 0.1, 0.5, "sine", 784, 1047, 0.14, 0.04);
+      glide(context, out, when, 0.5, "triangle", 262, 392, 0.1, 0.04);
+      break;
+    }
+    case "timewarp": {
+      // Eclipse - Time Warp: the world winding down, a deep falling sweep.
+      const out = createOutput(context, 0.4 * volume);
+      glide(context, out, when, 0.7, "sine", 880, 110, 0.24, 0.05);
+      glide(context, out, when, 0.7, "triangle", 660, 82, 0.14, 0.05, 7);
+      sweptNoise(context, out, when, 0.5, 3000, 300, 0.12, "lowpass", 0.8);
+      break;
+    }
+    case "timewarpEnd": {
+      // Time Warp ending: time snapping back, a quick rising sweep.
+      const out = createOutput(context, 0.36 * volume);
+      glide(context, out, when, 0.3, "sine", 120, 700, 0.2, 0.02);
+      sweptNoise(context, out, when, 0.25, 400, 2800, 0.14, "bandpass", 1.5);
       break;
     }
   }

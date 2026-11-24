@@ -7,6 +7,16 @@ import { api } from "@shared/routes";
 import { sendRunHeartbeat, useStartRun, useSubmitScore } from "@/hooks/use-scores";
 import { useProgression } from "@/hooks/use-progression";
 import { useDaily } from "@/hooks/use-daily";
+import {
+  BARRIER_MAX_CHARGES,
+  BARRIER_REGEN_MS,
+  hasButtonAbility,
+  hasShield,
+  movementBoost,
+  obstacleSpeedFactor,
+  regenerateBarrier,
+  startingShields,
+} from "@/lib/ship-abilities";
 import { AchievementToast } from "@/components/game/AchievementToast";
 import { MobileControls } from "@/components/game/MobileControls";
 import { MusicToggle } from "@/components/game/MusicToggle";
@@ -185,6 +195,8 @@ export function GameCanvas({
     runId: "",
     runToken: "",
     shieldCharges: 0,
+    // Play time towards the next Aegis barrier charge.
+    barrierProgressMs: 0,
     abilityActiveUntil: 0,
     abilityCooldownUntil: 0,
     rngSeed: 1,
@@ -328,9 +340,9 @@ export function GameCanvas({
         }
       }
 
-      if (ship.id === "titan") {
-        setAbilityUi({ label: "FORTRESS", status: `${state.shieldCharges} SHIELDS`, active: state.shieldCharges > 0 });
-      } else if (ship.id === "vanguard") {
+      if (hasShield(ship)) {
+        setAbilityUi({ label: ship.ability, status: shieldStatus(ship.abilityKind, state), active: state.shieldCharges > 0 });
+      } else if (!hasButtonAbility(ship)) {
         setAbilityUi({ label: "ABILITY", status: "NONE", active: false });
       } else if (now < state.abilityActiveUntil) {
         setAbilityUi({
@@ -377,14 +389,13 @@ export function GameCanvas({
     const state = gameStateRef.current;
     const ship = ships[shipRef.current];
     const now = performance.now();
-    if (!state.isPlaying || state.pausedAt || ship.id === "vanguard" || ship.id === "titan" || now < state.abilityCooldownUntil) return;
+    if (!state.isPlaying || state.pausedAt || !hasButtonAbility(ship) || now < state.abilityCooldownUntil) return;
 
-    const duration = ship.id === "phantom" ? 3000 : 5000;
-    const cooldown = ship.id === "phantom" ? 12000 : 15000;
+    const duration = ship.abilityDuration;
     state.abilityActiveUntil = now + duration;
-    state.abilityCooldownUntil = now + cooldown;
+    state.abilityCooldownUntil = now + ship.abilityCooldown;
     setAbilityUi({ label: ship.ability, status: `ACTIVE — ${(duration / 1000).toFixed(1)}s`, active: true });
-    playAbilitySound(ship.id === "phantom" ? "phase" : "overdrive");
+    playAbilitySound(ship.abilityKind as "phase" | "overdrive" | "afterburner" | "timewarp");
   };
 
   useEffect(() => () => {
@@ -549,7 +560,8 @@ export function GameCanvas({
         startedAt: now,
         runId: run.runId,
         runToken: run.runToken,
-        shieldCharges: equippedShip === "titan" ? 3 : 0,
+        shieldCharges: startingShields(ships[equippedShip]),
+        barrierProgressMs: 0,
         abilityActiveUntil: 0,
         abilityCooldownUntil: 0,
         // Multiplayer shares the room's course and a daily run the day's course; otherwise every run is new.
@@ -570,10 +582,13 @@ export function GameCanvas({
       deathBurstsRef.current.clear();
       setAbilityUi({
         label: ships[equippedShip].ability,
-        status: equippedShip === "titan" ? "3 SHIELDS" : equippedShip === "vanguard" ? "NONE" : "READY — SPACE",
-        active: equippedShip === "titan",
+        status: hasShield(ships[equippedShip])
+          ? shieldStatus(ships[equippedShip].abilityKind, { shieldCharges: startingShields(ships[equippedShip]), barrierProgressMs: 0 })
+          : hasButtonAbility(ships[equippedShip]) ? "READY — SPACE" : "NONE",
+        active: hasShield(ships[equippedShip]),
       });
-      if (equippedShip === "titan") playAbilitySound("fortress");
+      if (ships[equippedShip].abilityKind === "fortress") playAbilitySound("fortress");
+      if (ships[equippedShip].abilityKind === "barrier") playAbilitySound("barrier");
       setPersonalBest(null);
       setGameState({ isPlaying: true, score: 0, gameOver: false, survivalTime: 0, sector: startingSectorNumber });
       requestRef.current = requestAnimationFrame(gameLoop);
@@ -700,7 +715,9 @@ export function GameCanvas({
     if (!canvas || !ctx || !state.isPlaying || state.pausedAt) return;
 
     // Frames can be far apart (a throttled tab); never credit more than a quarter second for one.
+    const playMsBefore = state.playMs;
     if (state.lastFrameAt) state.playMs += Math.min(250, Math.max(0, timestamp - state.lastFrameAt));
+    const frameMs = state.playMs - playMsBefore;
     // Movement below is written per 60Hz frame; scale it by the real frame time so every screen plays at the same speed.
     const frameScale = state.lastFrameAt ? frameScaleFor(timestamp - state.lastFrameAt) : 1;
     state.lastFrameAt = timestamp;
@@ -731,11 +748,19 @@ export function GameCanvas({
 
     const now = performance.now();
     const abilityActive = now < state.abilityActiveUntil;
-    if (abilityWasActiveRef.current && !abilityActive && (ship.id === "phantom" || ship.id === "nova")) {
-      playAbilitySound(ship.id === "phantom" ? "phaseEnd" : "overdriveEnd");
+    if (abilityWasActiveRef.current && !abilityActive) {
+      const endSound = { phase: "phaseEnd", overdrive: "overdriveEnd", timewarp: "timewarpEnd" }[ship.abilityKind as string];
+      if (endSound) playAbilitySound(endSound as "phaseEnd" | "overdriveEnd" | "timewarpEnd");
     }
     abilityWasActiveRef.current = abilityActive;
-    const movementSpeed = (4.5 + ship.speed * 0.4) * (0.8 + ship.handling * 0.05) * (ship.id === "nova" && abilityActive ? 1.5 : 1) * frameScale;
+    if (ship.abilityKind === "barrier") {
+      const rebuilt = regenerateBarrier(state.shieldCharges, state.barrierProgressMs, frameMs);
+      if (rebuilt.charges > state.shieldCharges) playAbilitySound("barrier");
+      state.shieldCharges = rebuilt.charges;
+      state.barrierProgressMs = rebuilt.progressMs;
+    }
+    const obstacleSpeed = obstacleSpeedFactor(ship, abilityActive);
+    const movementSpeed = (4.5 + ship.speed * 0.4) * (0.8 + ship.handling * 0.05) * movementBoost(ship, abilityActive) * frameScale;
     if (state.keys.ArrowUp || state.keys.w) state.player.y -= movementSpeed;
     if (state.keys.ArrowDown || state.keys.s) state.player.y += movementSpeed;
     if (state.keys.ArrowLeft || state.keys.a) state.player.x -= movementSpeed;
@@ -770,7 +795,7 @@ export function GameCanvas({
     for (let index = state.obstacles.length - 1; index >= 0; index--) {
       const obstacle = state.obstacles[index];
       const wasAheadOfPlayer = obstacle.x > state.player.x;
-      obstacle.x -= obstacle.speed * frameScale;
+      obstacle.x -= obstacle.speed * frameScale * obstacleSpeed;
       drawObstacle(ctx, obstacle);
 
       const dx = state.player.x - obstacle.x;
@@ -786,13 +811,13 @@ export function GameCanvas({
         }
       }
       if (distance < collisionRadius) {
-        if (ship.id === "phantom" && abilityActive) {
+        if (ship.abilityKind === "phase" && abilityActive) {
           continue;
         }
-        if (ship.id === "titan" && state.shieldCharges > 0) {
+        if (hasShield(ship) && state.shieldCharges > 0) {
           state.shieldCharges -= 1;
           state.obstacles.splice(index, 1);
-          setAbilityUi({ label: "FORTRESS", status: `${state.shieldCharges} SHIELDS`, active: state.shieldCharges > 0 });
+          setAbilityUi({ label: ship.ability, status: shieldStatus(ship.abilityKind, state), active: state.shieldCharges > 0 });
           playCollisionSound("shield");
           if (effectsActive()) emitBurst(particlesRef.current, obstacle.x, obstacle.y, "#fbbf24", 16);
           continue;
@@ -805,11 +830,11 @@ export function GameCanvas({
 
       if (obstacle.x < -100) {
         state.obstacles.splice(index, 1);
-        state.score += 10 * (ship.id === "nova" && abilityActive ? 2 : 1);
+        state.score += 10 * (ship.abilityKind === "overdrive" && abilityActive ? 2 : 1);
       }
     }
 
-    state.score += 0.1 * (ship.id === "nova" && abilityActive ? 2 : 1) * frameScale;
+    state.score += 0.1 * (ship.abilityKind === "overdrive" && abilityActive ? 2 : 1) * frameScale;
 
     const activeMultiplayer = multiplayerRef.current;
     if (activeMultiplayer?.room.phase === "running") {
@@ -911,10 +936,10 @@ export function GameCanvas({
         <button
           type="button"
           onClick={activateAbility}
-          disabled={currentShip.id === "vanguard" || currentShip.id === "titan"}
+          disabled={!hasButtonAbility(currentShip)}
           className={`absolute bottom-4 left-4 flex items-center gap-3 rounded-lg border px-4 py-2 text-left font-mono transition-all ${abilityUi.active ? "border-primary bg-primary/30 shadow-[0_0_20px_rgba(124,58,237,0.45)]" : "border-white/20 bg-black/60"} disabled:cursor-default`}
         >
-          {currentShip.id === "titan" ? <Shield className="h-5 w-5 text-amber-300" /> : <Sparkles className="h-5 w-5 text-cyan-300" />}
+          {hasShield(currentShip) ? <Shield className="h-5 w-5 text-amber-300" /> : <Sparkles className="h-5 w-5 text-cyan-300" />}
           <span><span className="block text-[10px] tracking-widest text-muted-foreground">{abilityUi.label}</span><span className="block text-xs text-white">{abilityUi.status}</span></span>
         </button>
       )}
@@ -1106,6 +1131,13 @@ function drawObstacle(ctx: CanvasRenderingContext2D, obstacle: Obstacle) {
   ctx.restore();
 }
 
+/** The ability button's line for a shield ship: charges held, and for a barrier the wait for the next one. */
+function shieldStatus(kind: string, state: { shieldCharges: number; barrierProgressMs: number }) {
+  const held = `${state.shieldCharges} ${state.shieldCharges === 1 ? "SHIELD" : "SHIELDS"}`;
+  if (kind !== "barrier" || state.shieldCharges >= BARRIER_MAX_CHARGES) return held;
+  return `${held} — +1 IN ${Math.ceil((BARRIER_REGEN_MS - state.barrierProgressMs) / 1000)}s`;
+}
+
 function drawPlayer(ctx: CanvasRenderingContext2D, x: number, y: number, ship: typeof ships[ShipId], abilityActive: boolean) {
   ctx.save();
   ctx.translate(x, y);
@@ -1113,7 +1145,7 @@ function drawPlayer(ctx: CanvasRenderingContext2D, x: number, y: number, ship: t
   ctx.shadowColor = ship.color;
   const flameHeight = 15 + Math.random() * 10;
   const flameGradient = ctx.createLinearGradient(0, 0, -flameHeight, 0);
-  flameGradient.addColorStop(0, ship.id === "titan" ? "#f59e0b" : "#f472b6");
+  flameGradient.addColorStop(0, { titan: "#f59e0b", comet: "#bef264", aegis: "#fca5a5", eclipse: "#d8b4fe" }[ship.id as string] ?? "#f472b6");
   flameGradient.addColorStop(1, "transparent");
   ctx.beginPath();
   ctx.fillStyle = flameGradient;
@@ -1128,6 +1160,30 @@ function drawPlayer(ctx: CanvasRenderingContext2D, x: number, y: number, ship: t
     ctx.moveTo(24, 0); ctx.lineTo(-8, 15); ctx.lineTo(-15, 9); ctx.lineTo(-15, -9); ctx.lineTo(-8, -15); ctx.closePath(); ctx.fill();
     ctx.fillStyle = "#78350f";
     ctx.fillRect(-2, -8, 14, 16);
+  } else if (ship.id === "comet") {
+    ctx.fillStyle = "#ecfccb";
+    ctx.beginPath();
+    ctx.moveTo(26, 0); ctx.lineTo(-9, 11); ctx.lineTo(-4, 0); ctx.lineTo(-9, -11); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = "#a3e635";
+    ctx.beginPath(); ctx.moveTo(2, -4); ctx.lineTo(-13, -13); ctx.lineTo(-8, 0); ctx.lineTo(-13, 13); ctx.lineTo(2, 4); ctx.fill();
+  } else if (ship.id === "aegis") {
+    ctx.fillStyle = "#fee2e2";
+    ctx.beginPath();
+    ctx.moveTo(25, 0); ctx.lineTo(8, 14); ctx.lineTo(-12, 12); ctx.lineTo(-12, -12); ctx.lineTo(8, -14); ctx.closePath(); ctx.fill();
+    ctx.strokeStyle = "#f87171";
+    ctx.lineWidth = 2.5;
+    ctx.beginPath(); ctx.moveTo(14, -11); ctx.lineTo(-9, -15); ctx.moveTo(14, 11); ctx.lineTo(-9, 15); ctx.stroke();
+    ctx.fillStyle = "#991b1b";
+    ctx.fillRect(-9, -6, 12, 12);
+  } else if (ship.id === "eclipse") {
+    ctx.fillStyle = "#1e1b4b";
+    ctx.beginPath();
+    ctx.moveTo(27, 0); ctx.lineTo(-6, 13); ctx.lineTo(-13, 0); ctx.lineTo(-6, -13); ctx.closePath(); ctx.fill();
+    ctx.strokeStyle = "#c084fc";
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    ctx.fillStyle = "#c084fc";
+    ctx.beginPath(); ctx.arc(-2, 0, 5, 0, Math.PI * 2); ctx.fill();
   } else if (ship.id === "phantom") {
     ctx.fillStyle = "#e0f2fe";
     ctx.beginPath();
