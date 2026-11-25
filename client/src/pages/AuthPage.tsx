@@ -28,6 +28,7 @@ import { motion } from "framer-motion";
 import { PublicFooter } from "@/components/layout/PublicFooter";
 import { ThemeSelector } from "@/components/theme/ThemeSelector";
 import { PwaInstallPrompt } from "@/components/PwaInstallPrompt";
+import { SpaceBackdrop } from "@/components/effects/SpaceBackdrop";
 
 export default function AuthPage() {
   const [_, setLocation] = useLocation();
@@ -55,9 +56,10 @@ export default function AuthPage() {
       <div className="flex-1 flex items-center justify-center p-4 relative overflow-hidden">
       {/* Animated Background Elements */}
       <div className="absolute inset-0 bg-background z-0">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/20 rounded-full blur-[100px] animate-pulse" />
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-secondary/20 rounded-full blur-[100px] animate-pulse delay-1000" />
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/20 rounded-full blur-[100px] fx-drift-a" />
+        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-secondary/20 rounded-full blur-[100px] fx-drift-b" />
       </div>
+      <SpaceBackdrop />
 
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -66,16 +68,16 @@ export default function AuthPage() {
         className="w-full max-w-md z-10"
       >
         <div className="text-center mb-8">
-          <div className="inline-flex p-4 rounded-2xl bg-gradient-to-br from-primary to-accent mb-4 shadow-lg shadow-primary/20">
+          <div className="fx-float inline-flex p-4 rounded-2xl bg-gradient-to-br from-primary to-accent mb-4 shadow-lg shadow-primary/20">
             <Rocket className="h-10 w-10 text-white" />
           </div>
-          <h1 className="text-4xl font-display font-bold mb-2">ASTRODODGE</h1>
-          <p className="text-muted-foreground font-mono text-sm uppercase tracking-widest">
+          <h1 className="fx-shimmer text-4xl font-display font-bold mb-2">ASTRODODGE</h1>
+          <p className="fx-caret text-muted-foreground font-mono text-sm uppercase tracking-widest">
             Initiate Launch Sequence
           </p>
         </div>
 
-        <Card className="bg-card/50 backdrop-blur-xl border-white/10 shadow-2xl">
+        <Card className="fx-emerge bg-card/50 backdrop-blur-xl border-white/10 shadow-2xl" style={{ animationDelay: "0.25s" }}>
           <CardHeader>
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
               <TabsList className="grid w-full grid-cols-2 bg-muted/50">

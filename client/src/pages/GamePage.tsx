@@ -12,6 +12,7 @@ import { formatTimeLeft, useDaily } from "@/hooks/use-daily";
 import { getSectorEnvironmentById } from "@/lib/sector-environments";
 import { ships } from "@shared/ships";
 import { isPortal } from "@/lib/portal";
+import { SpaceBackdrop } from "@/components/effects/SpaceBackdrop";
 
 export default function GamePage() {
   const search = useSearch();
@@ -40,6 +41,7 @@ export default function GamePage() {
   return (
     <GameLayout>
       <div className={isPortal ? "h-full max-w-5xl mx-auto" : "fit-page max-w-5xl mx-auto space-y-8 pb-12"}>
+        {!showGame && !isPortal && <SpaceBackdrop shipColor={currentShip.color} />}
         <AnimatePresence mode="wait">
           {!showGame ? (
             <motion.div
@@ -52,11 +54,17 @@ export default function GamePage() {
               <MusicToggle className="absolute right-0 top-0 z-20" popoverAlign="right" />
               <div className="relative">
                 <div className="absolute inset-0 bg-primary/20 blur-3xl rounded-full" />
-                <Rocket className={isPortal ? "w-10 h-10 sm:w-16 sm:h-16 text-primary relative z-10 animate-bounce" : "w-24 h-24 text-primary relative z-10 animate-bounce"} />
+                {!isPortal && (
+                  <span
+                    aria-hidden="true"
+                    className="fx-float absolute left-1/2 top-[88%] z-0 h-10 w-3 -translate-x-1/2 rounded-full bg-gradient-to-b from-primary/70 via-primary/25 to-transparent blur-[3px]"
+                  />
+                )}
+                <Rocket className={isPortal ? "w-10 h-10 sm:w-16 sm:h-16 text-primary relative z-10 animate-bounce" : "w-24 h-24 text-primary relative z-10 fx-float"} />
               </div>
               
               <div className="space-y-4">
-                <h1 className={isPortal ? "text-3xl sm:text-5xl font-display font-bold text-foreground tracking-tighter" : "text-4xl min-[400px]:text-5xl sm:text-6xl font-display font-bold text-foreground tracking-tighter"}>
+                <h1 className={isPortal ? "text-3xl sm:text-5xl font-display font-bold text-foreground tracking-tighter" : "fx-shimmer text-4xl min-[400px]:text-5xl sm:text-6xl font-display font-bold text-foreground tracking-tighter"}>
                   ASTRODODGE
                 </h1>
                 <p className={isPortal ? "text-sm sm:text-base text-muted-foreground font-mono max-w-lg mx-auto [@media(max-height:400px)]:hidden" : "text-base sm:text-xl text-muted-foreground font-mono max-w-lg mx-auto"}>
@@ -64,11 +72,11 @@ export default function GamePage() {
                 </p>
               </div>
 
-              <div className="flex flex-col sm:flex-row gap-4 w-full max-w-md">
+              <div className={`flex flex-col sm:flex-row gap-4 w-full max-w-md ${isPortal ? "" : "fx-emerge"}`} style={isPortal ? undefined : { animationDelay: "0.3s" }}>
                 <Button 
                   onClick={() => { setDaily(false); setShowGame(true); }}
                   size="lg"
-                  className={`flex-1 ${isPortal ? "h-12 text-lg" : "h-16 text-xl"} font-display tracking-widest bg-gradient-to-r from-primary to-accent hover:scale-105 transition-all shadow-xl shadow-primary/20`}
+                  className={`flex-1 ${isPortal ? "h-12 text-lg" : "h-16 text-xl"} font-display tracking-widest bg-gradient-to-r from-primary to-accent hover:scale-105 transition-all shadow-xl shadow-primary/20 ${isPortal ? "" : "fx-breathe"}`}
                 >
                   <Play className="mr-2 h-6 w-6 fill-current" />
                   INITIATE MISSION
@@ -79,7 +87,8 @@ export default function GamePage() {
                 <button
                   type="button"
                   onClick={() => { setDaily(true); setShowGame(true); }}
-                  className="w-full max-w-md rounded-xl border border-violet-400/40 bg-violet-500/10 px-5 py-4 text-left backdrop-blur transition hover:border-violet-300/70 hover:bg-violet-500/20"
+                  style={{ animationDelay: "0.5s" }}
+                  className="fx-emerge w-full max-w-md rounded-xl border border-violet-400/40 bg-violet-500/10 px-5 py-4 text-left backdrop-blur transition hover:border-violet-300/70 hover:bg-violet-500/20"
                 >
                   <div className="flex items-center justify-between gap-3">
                     <span className="flex items-center gap-2 font-display text-lg font-bold tracking-wider text-violet-200">
@@ -97,7 +106,7 @@ export default function GamePage() {
               )}
 
               {!isPortal && (<>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 w-full mt-8">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 w-full mt-8 [&>div]:fx-emerge [&>div:nth-child(1)]:[animation-delay:0.7s] [&>div:nth-child(2)]:[animation-delay:0.85s] [&>div:nth-child(3)]:[animation-delay:1s]">
                 <div className="p-4 rounded-xl bg-white/5 border border-white/10 backdrop-blur">
                   <Target className="w-6 h-6 text-accent mx-auto mb-2" />
                   <div className="text-[10px] font-mono text-muted-foreground uppercase">Objective</div>
